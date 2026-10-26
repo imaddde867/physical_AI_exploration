@@ -1,20 +1,23 @@
 # MacDesk Buddy · Physical AI Exploration
 
-**First build:** a small, expressive, 3D-printable companion for a MacBook Pro. Original code and parametric enclosure; inspired by the nine saved robotics/IoT Reels, not a clone of their software.
+**First build:** a compact, original, Mac-first desk companion with a **1.28-inch circular GC9A01 full-color IPS face**, an ESP32-S3, optional motion sensing and a printable case. Inspired by the saved robotics Reels without copying creators' assets.
 
-> **Status:** Mac-side tests are automated; ESP32 firmware compile has its own new CI workflow. Parametric CAD has been rendered and mesh-checked, but **physical assembly, display compatibility, PCB fit and FDM slicer validation are not complete**. See [audit and evidence](docs/audit-2026-10-26.md).
+![Illustrative original round-color face concepts; not physical prototype photos](assets/face-preview.svg)
+
+> **Status:** Mac-side tests and both USB firmware builds are automated. The round CAD was rendered and mesh-checked, but **real LCD illumination, physical fit, Bambu slicing and assembly are not validated**. See [audit and evidence](docs/audit-2026-10-26.md).
 
 ## Why this build?
 
-A USB-powered **ESP32-S3** runs animated eyes and physical I/O; the **MacBook M4** hosts commands, automation and optional local model inference. The starter avoids cloud accounts, microphones, cameras and motor power. An optional **MPU-6050 motion sensor** on the same I²C bus can produce a locally triggered expression with no Mac AI required. Start with the electronics you can understand and validate, then expand.
+A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while the **MacBook M4** hosts commands and future optional local AI. The optional **MPU-6050** uses a **separate I²C bus** for motion-triggered reactions. The starter avoids cloud accounts, microphones, cameras and motors. Start with the electronics you can understand and validate, then expand.
 
 ```text
  MacBook Pro (Python host, optional local LLM)
            | USB serial / newline JSON
            v
- ESP32-S3 MCU --> I2C SSD1306 OLED (animated face)
+ ESP32-S3 MCU --> SPI GC9A01 round IPS (color animated face)
            |
-       optional expansion: sensor, servo, battery, Wi-Fi
+       \--> I2C MPU-6050 (optional motion sensor)
+       later expansion: servo, voice, Wi-Fi
 ```
 
 ## Start here
@@ -41,11 +44,11 @@ A USB-powered **ESP32-S3** runs animated eyes and physical I/O; the **MacBook M4
 
 ## Roadmap
 
-- **V0 (now):** simulator, original JSONL protocol, OLED faces + periodic blinking, optional MPU-6050 shake reaction, printable shell and fit coupon.
+- **V0 (now):** simulator, original JSONL protocol, **GC9A01 round color faces**, periodic blinking, optional MPU-6050 shake reaction, printable circular enclosure and fit coupon.
 - **V1 (hardware):** verify wiring + fit; measure time-to-expression and reconnect behavior.
-- **V2:** add IMU or ambient sensor for reactive, autonomous expressions.
-- **V3:** local Mac voice / local model tools behind an explicit action allowlist; record latency and memory.
-- **V4:** pan/tilt movement with separate 5 V power and safe angle limits.
+- **V2:** optional Mac-local LLM/voice and a constrained face-action interface; additional physical sensors only as needed.
+- **V3:** measure model-to-action reliability, latency and memory; introduce bounded movement with a separately rated motor power supply.
+- **V4:** camera or richer perception experiments and independent hardware sensing.
 - **V5:** optional standalone Wi-Fi mode; compare Mac-hosted vs edge-only behavior.
 
 **No language model runs in V0**. Mac-local model/tool integration is V2/V3 work, and ESP32 keeps deterministic sensor behavior. The M4 laptop should remain responsive; GPU machines are **optional for training**, not required at runtime. No cloud dependency is required for V0/V1. No third-party images, firmware or CAD assets have been copied.
@@ -59,4 +62,6 @@ See [docs/reel-index.md](docs/reel-index.md). Original repository material is MI
 - [Technical audit (26 October 2026)](docs/audit-2026-10-26.md)
 - [Verified vendor part list](docs/shopping-list.md)
 - [Original pin-level wiring diagram](assets/wiring.svg)
+- [Round color display choice and sourcing](docs/display-choice.md)
+- [Original concept face gallery](assets/face-preview.svg)
 - [Issue #1: actual hardware bring-up](https://github.com/imaddde867/physical_AI_exploration/issues/1)
