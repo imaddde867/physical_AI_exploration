@@ -1,6 +1,6 @@
 # First-build stage gates — round color MacDesk Buddy
 
-The goal is a polished-looking companion beside a MacBook, not a second GPU workstation. The selected face is **full-color GC9A01 IPS SPI**; the old SSD1306 monochrome screen is no longer in the bill of materials.
+The goal is a polished-looking companion beside a MacBook, not a second GPU workstation. The [approved single-face asset](../assets/face-idle-240.png) is now the firmware's actual source image, not a set of decorative concept characters. The selected face is **full-color GC9A01 IPS SPI**; the old SSD1306 monochrome screen is no longer in the bill of materials.
 
 ## Before purchasing
 

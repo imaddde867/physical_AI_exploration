@@ -25,6 +25,8 @@ The last command shows a simulated JSON ACK and a deliberately **synthetic** sha
 
 ## 3. Compile firmware on the Mac
 
+The PlatformIO pre-build hook automatically converts the approved indexed PNG to a generated RGB565 asset header, using only Python's standard library. Do not manually edit the gitignored header. The image itself is tracked in the repository and tested against an approved SHA256.
+
 Install the documented [PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/) with Homebrew (the verified formula is `platformio`; avoid modifying the system Python):
 
 ```sh
@@ -40,7 +42,8 @@ If you don't have Homebrew, use the official PlatformIO VS Code extension instea
 
 ## 4. Look at the design and screen sizes before buying
 
-- [Stylized concept, not to scale](../assets/face-preview.svg)
+- [Approved single face, actual native 240×240 sprite](../assets/face-idle-240.png)
+- [Simplified vector sketch, not firmware output](../assets/face-preview.svg)
 - [Dimensioned face/body ratio](../assets/actual-scale-front.svg)
 - [Hardware comparisons and Reel matches](hardware-options.md)
 - [Exact starter basket](shopping-list.md)

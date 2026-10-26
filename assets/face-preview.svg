@@ -1,45 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-label="Four MacDesk Buddy round IPS display concepts showing neutral, happy, thinking and surprised colorful expressions">
-<defs>
-<radialGradient id="glass"><stop offset="0" stop-color="#101722"/><stop offset=".87" stop-color="#030508"/><stop offset="1" stop-color="#151b25"/></radialGradient>
-<linearGradient id="case" x1="0" y1="0" x2="0.9" y2="1"><stop stop-color="#e2e6ec"/><stop offset="1" stop-color="#89919f"/></linearGradient>
-<filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".35"/></filter>
-</defs>
-<rect width="960" height="360" fill="#111827"/>
-<text x="32" y="37" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#f3f5fc">MacDesk Buddy · Color-face design preview</text>
-<g transform="translate(120 175)">
-<rect x="-89" y="-118" width="178" height="241" rx="42" fill="url(#case)" filter="url(#shadow)"/>
-<circle r="89" fill="#252b35"/><circle r="84" fill="url(#glass)" stroke="#56bcb2" stroke-width="1.5"/>
-<rect x="-53" y="-39" width="41" height="62" rx="18" fill="#9af2ec"/><rect x="12" y="-39" width="41" height="62" rx="18" fill="#9af2ec"/>
-<rect x="-38" y="-7" width="20" height="26" rx="9" fill="#172631"/><rect x="27" y="-7" width="20" height="26" rx="9" fill="#172631"/>
-<circle cx="-33" cy="-10" r="5" fill="#fff"/><circle cx="32" cy="-10" r="5" fill="#fff"/>
-<rect x="-19" y="51" width="38" height="5" rx="2.5" fill="#f6b2d0"/>
-<text x="-35" y="155" font-family="Arial" font-size="17" fill="#d7dde7">NEUTRAL</text>
-</g>
-<g transform="translate(360 175)">
-<rect x="-89" y="-118" width="178" height="241" rx="42" fill="url(#case)" filter="url(#shadow)"/>
-<circle r="89" fill="#252b35"/><circle r="84" fill="url(#glass)" stroke="#56bcb2" stroke-width="1.5"/>
-<rect x="-53" y="-39" width="41" height="62" rx="18" fill="#9af2ec"/><rect x="12" y="-39" width="41" height="62" rx="18" fill="#9af2ec"/>
-<rect x="-38" y="-7" width="20" height="26" rx="9" fill="#172631"/><rect x="27" y="-7" width="20" height="26" rx="9" fill="#172631"/>
-<circle cx="-33" cy="-10" r="5" fill="#fff"/><circle cx="32" cy="-10" r="5" fill="#fff"/>
-<circle cx="-67" cy="34" r="6" fill="#f6a2c5"/><circle cx="67" cy="34" r="6" fill="#f6a2c5"/>
-<path d="M-37 43 Q0 87 37 43" stroke="#f6a2c5" stroke-width="6" fill="none" stroke-linecap="round"/>
-<text x="-28" y="155" font-family="Arial" font-size="17" fill="#d7dde7">HAPPY</text>
-</g>
-<g transform="translate(600 175)">
-<rect x="-89" y="-118" width="178" height="241" rx="42" fill="url(#case)" filter="url(#shadow)"/>
-<circle r="89" fill="#252b35"/><circle r="84" fill="url(#glass)" stroke="#56bcb2" stroke-width="1.5"/>
-<rect x="-53" y="-39" width="41" height="62" rx="18" fill="#9af2ec"/><rect x="12" y="-39" width="41" height="62" rx="18" fill="#9af2ec"/>
-<rect x="-29" y="-7" width="20" height="26" rx="9" fill="#172631"/><rect x="36" y="-7" width="15" height="26" rx="8" fill="#172631"/>
-<circle cx="-24" cy="-10" r="5" fill="#fff"/><circle cx="40" cy="-10" r="5" fill="#fff"/>
-<circle cx="-7" cy="56" r="4" fill="#f6a2c5"/><circle cx="7" cy="52" r="4" fill="#f6a2c5"/><circle cx="21" cy="56" r="4" fill="#f6a2c5"/>
-<text x="-44" y="155" font-family="Arial" font-size="17" fill="#d7dde7">THINKING</text>
-</g>
-<g transform="translate(840 175)">
-<rect x="-89" y="-118" width="178" height="241" rx="42" fill="url(#case)" filter="url(#shadow)"/>
-<circle r="89" fill="#252b35"/><circle r="84" fill="url(#glass)" stroke="#56bcb2" stroke-width="1.5"/>
-<rect x="-53" y="-39" width="41" height="62" rx="18" fill="#ffdc78"/><rect x="12" y="-39" width="41" height="62" rx="18" fill="#ffdc78"/>
-<rect x="-38" y="-7" width="20" height="26" rx="9" fill="#172631"/><rect x="27" y="-7" width="20" height="26" rx="9" fill="#172631"/>
-<circle cx="-33" cy="-10" r="5" fill="#fff"/><circle cx="32" cy="-10" r="5" fill="#fff"/>
-<circle cx="0" cy="55" r="13" fill="#f6a2c5"/><circle cx="0" cy="55" r="7" fill="#030508"/>
-<text x="-44" y="155" font-family="Arial" font-size="17" fill="#d7dde7">SURPRISED</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="A single understated digital face on black: two half-lidded blue-white eyes and a small neutral mouth; vector sketch only">
+<defs><linearGradient id="iris" x1=".1" y1="0" x2=".5" y2="1"><stop stop-color="#ffe4cc"/><stop offset=".38" stop-color="#fcefe6"/><stop offset=".73" stop-color="#b7dfff"/><stop offset="1" stop-color="#5186cb"/></linearGradient>
+<linearGradient id="upper" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#eab07f"/><stop offset=".5" stop-color="#fce3ce"/><stop offset="1" stop-color="#e5a16c"/></linearGradient></defs>
+<rect width="240" height="240" fill="#03060b"/>
+<g stroke-linejoin="round" stroke-linecap="round">
+<path d="M40 109 Q73 107 102 116" stroke="url(#upper)" stroke-width="3" fill="none"/>
+<path d="M139 116 Q176 115 210 126" stroke="url(#upper)" stroke-width="3" fill="none"/>
+<path d="M44 118 Q75 120 100 125 Q101 150 74 151 Q53 150 44 118Z" fill="url(#iris)"/>
+<path d="M138 125 Q175 127 208 133 Q206 153 179 158 Q151 155 138 125Z" fill="url(#iris)"/>
+<path d="M64 124 Q76 119 92 127 Q94 146 82 150 Q67 150 64 124Z" fill="#071426"/>
+<path d="M163 130 Q179 126 194 133 Q196 150 182 157 Q164 156 163 130Z" fill="#071426"/>
+<circle cx="91" cy="129" r="3" fill="#ffe4c8"/><circle cx="190" cy="137" r="3" fill="#ffe4c8"/>
+<path d="M111 164 L131 165" stroke="url(#upper)" stroke-width="3.5" fill="none"/>
 </g></svg>

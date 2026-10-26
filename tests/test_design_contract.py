@@ -21,6 +21,10 @@ class DisplayDecisionTests(unittest.TestCase):
         self.assertIn("init_sent_unverified", fw)
         self.assertIn("adafruit/Adafruit GC9A01A @ 1.2.0", cfg)
         self.assertNotIn("Adafruit_SSD1306", fw + cfg)
+        self.assertIn('"face_asset.h"', fw)
+        self.assertIn('paintApprovedFace', fw)
+        self.assertIn('pre:scripts/embed_face.py', cfg)
+        self.assertNotIn('drawEyes(', fw)
 
     def test_bom_matches_display_choice(self):
         bom = self.read("docs/bom.md")
@@ -39,6 +43,8 @@ class DisplayDecisionTests(unittest.TestCase):
         self.assertIn("front_round_hole", scad)
         self.assertIn("GC9A01", readme)
         self.assertNotIn("I2C SSD1306 OLED", readme)
+        self.assertIn('assets/face-idle-240.png', readme)
+        self.assertNotIn('color face concepts', readme.lower())
 
 if __name__ == "__main__":
     unittest.main()
