@@ -1,36 +1,37 @@
-# Architecture, protocol and test levels
+# Architecture and verification
 
 ~~~text
-MacBook M4 (Python CLI; optional later model)
-    | USB serial (native USB/OTG, newline JSON, 115200 baud)
-    v
+MacBook Pro M4
+  | Python controller; USB serial, JSONL at 115200
 ESP32-S3 N16R8
-    +-- I²C at GPIO8 SDA, GPIO9 SCL -- SSD1306 OLED (0x3C)
-    +-- same I²C bus ------------- optional MPU-6050 (0x68)
+  |-- SPI MOSI GPIO11, SCK GPIO12, CS GPIO10, DC GPIO13, RES GPIO14
+  |      \-- 1.28-inch GC9A01 240x240 round IPS LCD, powered by 3V3
+  |-- I2C SDA GPIO8, SCL GPIO9
+         \-- optional MPU-6050 motion sensor at 0x68
 ~~~
 
-**Mac host:** validates command choice; no arbitrary model-generated shell execution; future model tools must use an action allowlist.
+This is a deterministic, fully offline embedded prototype. No large language model is loaded on the ESP32. Later Mac-local inference may choose from six **allowlisted** facial expressions; the model must never execute arbitrary shell commands or directly select unbounded actuator values.
 
-**Firmware:** physical display driver, deterministic blinking and optional threshold-based shake detector. **No LLM or ML model** runs on the microcontroller.
-
-## Wire protocol v1
+## JSONL protocol version 1
 
 ~~~json
 {"cmd":"face","value":"happy"}
 {"type":"ack","face":"happy"}
-{"type":"ready","display":"ok","imu":"ok","protocol":1}
+{"type":"ready","display":"init_sent_unverified","driver":"GC9A01","imu":"ok","protocol":1}
 {"type":"event","name":"shake"}
 {"type":"error","reason":"invalid_face"}
 ~~~
 
-Transport is UTF-8 line-delimited JSON. The six allowed facial values are neutral, happy, sad, sleepy, surprised and thinking. Overlong lines are discarded until newline; unsupported commands/values return errors. An absent IMU does not prevent OLED function. The sensor detector uses two consecutive 40 ms samples with large acceleration change and a 1.5 s cooldown; **thresholds are heuristic and require on-device calibration**.
+Valid expressions: neutral, happy, sad, sleepy, surprised, thinking. Invalid JSON and unsupported requests are rejected; overlong lines are dropped. Blink is periodic and local; optional motion response is deterministic with an experimental sensitivity threshold.
 
-## Evidence ladder
+**Important:** A GC9A01 on one-way SPI cannot acknowledge that pixels were illuminated. The startup message says **init_sent_unverified**, not false "display ok". The LCD must be inspected visually.
 
-1. **Unit tests** establish Python JSON generation/parsing and simulator behavior (synthetic events are clearly labeled).
-2. **Firmware CI build** establishes compilation/linking for selected platform/library versions and USB modes—not GPIO correctness or actual electronics.
-3. **OpenSCAD watertight check** establishes printable *geometry*, not practical print orientation or dimensional fit.
-4. **Physical device tests** establish serial, I²C, voltage, motion accuracy, materials/assembly and real latency. **Not done yet.**
-5. **AI integration tests** later establish latency, reliability, security and model suitability on 16GB M4 without workstation dependency.
+## Testing boundaries
 
-Measurements required later: ≥100 real command-to-ACK roundtrips, p50/p95/p99, sensor-event false positive rate and response latency, USB reconnect/recovery, Mac CPU/RAM/swap, board brownout checks. ACK is not itself a measured display-refresh timestamp.
+1. Python unit tests and simulator establish host protocol correctness only.
+2. ESP32 PlatformIO CI establishes compile/link for native USB and UART profiles only.
+3. OpenSCAD mesh checks establish closed geometry, not FDM slicer success or PCB fit.
+4. Physical GPIO, voltage, backlight, color ordering, screen appearance, IMU and serial behavior require real components.
+5. Future AI work must separately benchmark memory, responsiveness, action accuracy, p50/p95/p99 command latency and safety limits on a 16 GB M4.
+
+No performance claims until results are measured under repeatable physical conditions.

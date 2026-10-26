@@ -1,47 +1,56 @@
-// MacDesk Buddy: original adjustable open-back desktop enclosure.
-// All dimensions in mm. Nominal values are placeholders, not verified fit.
-// Change part to "fit_coupon" to test the OLED window before printing full case.
-$fn = 48;
-part = "shell"; // ["shell", "fit_coupon"]
-body_w = 74;
-body_h = 76;
-body_d = 44;
-base_w = 90;
-base_d = 57;
-base_h = 5;
+// MacDesk Buddy: open-back compact case with circular IPS LCD aperture.
+// Parametric prototype in mm; measure physical boards before final printing.
+// Round GC9A01 active area diameter 32.4 mm, supplier PCB ~44 x 36 x 5 mm.
+// To test the window cheaply first, set part = "fit_coupon".
+$fn = 96;
+part = "shell"; // ["shell","fit_coupon"]
+body_w = 72;
+body_h = 73;
+body_d = 43;
+body_r = 12;
+base_w = 82;
+base_d = 54;
+base_h = 5.5;
 wall = 2.8;
-corner_r = 7;
-// Visible aperture, not PCB dimensions; OLED nominal PCB ~26-27mm across.
-window_w = 21.5;
-window_h = 11.0;
-window_z_fraction = 0.61;
+opening_d = 31.4;       // hides ~0.5mm of screen edge per side
+face_height = 48.0;     // center of display above top of base
+bezel_outer_d = 37.0;  // rim surrounds circular aperture
+bezel_rise = 0.9;
 
-module rounded_prism(w, d, h, r) {
-  hull() for (x = [-w/2 + r, w/2 - r], y = [-d/2 + r, d/2 - r])
-    translate([x, y, 0]) cylinder(r = r, h = h);
+module rounded_prism(w,d,h,r) {
+  hull() {
+    for (x=[-w/2+r,w/2-r], y=[-d/2+r,d/2-r])
+      translate([x,y,0]) cylinder(r=r,h=h);
+  }
+}
+module front_round_hole(diameter, length) {
+  translate([0,body_d/2-wall-0.8,base_h+face_height])
+    rotate([-90,0,0]) cylinder(d=diameter,h=length);
 }
 module shell() {
   difference() {
     union() {
-      rounded_prism(base_w, base_d, base_h, 7);
-      translate([0, 0, base_h])
-        rounded_prism(body_w, body_d, body_h, corner_r);
+      rounded_prism(base_w,base_d,base_h,9);
+      translate([0,0,base_h])
+        rounded_prism(body_w,body_d,body_h,body_r);
+      translate([0,body_d/2-0.2,base_h+face_height])
+        rotate([-90,0,0]) difference() {
+          cylinder(d=bezel_outer_d,h=bezel_rise+0.2);
+          translate([0,0,-0.1])
+            cylinder(d=opening_d,h=bezel_rise+0.5);
+        }
     }
-    // Open back (-Y), preserve the top, floor, front and side walls.
-    translate([-body_w/2 + wall, -body_d/2 - 2, base_h + wall])
-      cube([body_w - 2*wall, body_d - wall + 2, body_h - 2*wall]);
-    // Front window: leaves lip around nominal 26-27mm OLED PCB.
-    translate([-window_w/2, body_d/2 - wall - 0.3,
-               base_h + body_h*window_z_fraction - window_h/2])
-      cube([window_w, wall + 1, window_h]);
+    // Rear open, front wall preserved; no unverified board mount geometry.
+    translate([-body_w/2+wall,-body_d/2-3,base_h+wall])
+      cube([body_w-2*wall,body_d-wall+3,body_h-2*wall]);
+    front_round_hole(opening_d,wall+bezel_rise+2);
   }
 }
 module fit_coupon() {
   difference() {
-    cube([40, 40, wall]);
-    translate([(40-window_w)/2, (40-window_h)/2, -0.5])
-      cube([window_w, window_h, wall + 1]);
+    rounded_prism(47,47,wall,5);
+    translate([0,0,-0.3]) cylinder(d=opening_d,h=wall+0.6);
   }
 }
-if (part == "fit_coupon") fit_coupon();
-else if (part == "shell") shell();
+if (part=="shell") shell();
+else if (part=="fit_coupon") fit_coupon();

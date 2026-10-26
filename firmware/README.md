@@ -1,64 +1,76 @@
-# MacDesk Buddy ESP32-S3 firmware
+# MacDesk Buddy: ESP32-S3 round color display firmware
 
-**Target:** ESP32-S3 DevKitC-1 *style* N16R8 board (16 MB QD flash, 8 MB OPI PSRAM), 0.96-inch **SSD1306** 128×64 I²C OLED, optional **MPU-6050** I²C motion sensor.
+**Target hardware:** ESP32-S3 N16R8 development board, **GC9A01 1.28 inch circular IPS LCD** (240×240 pixels; SPI; 2.8–3.3 V supply) and optional MPU-6050 I²C motion sensor. The old monochrome OLED firmware is retired.
 
-This code has automated compile checks, but **has not been flashed or electrically tested on the actual purchased modules**.
+The firmware uses the documented [Adafruit GC9A01A Arduino driver](https://github.com/adafruit/Adafruit_GC9A01A), pinned at version 1.2.0 in PlatformIO.
 
-## Pin wiring (power disconnected while wiring)
+## Pin connections — verify real module labels first
 
-| ESP32-S3 | OLED | Optional MPU-6050 |
+**Disconnect USB while wiring; never apply 5 V to a 3.3 V GPIO.**
+
+| ESP32-S3 | GC9A01 TFT (SPI) | Notes |
 |---|---|---|
-| 3V3 | VCC (only if display is 3.3 V safe) | VCC (only if breakout operates at 3.3 V) |
-| GND | GND | GND |
-| GPIO8 / SDA | SDA | SDA |
-| GPIO9 / SCL | SCL | SCL |
+| 3V3 | VCC | Otronic product states 2.8–3.3 V supply |
+| GND | GND | Shared ground |
+| **GPIO11** | **SDA / DIN / MOSI** | **SPI DATA, not I²C SDA** |
+| **GPIO12** | **SCL / CLK / SCK** | **SPI CLOCK, not I²C SCL** |
+| GPIO10 | CS | SPI chip select |
+| GPIO13 | DC | Data/command |
+| GPIO14 | RES / RST | Active-low reset |
+| — | BLK | **Leave open initially**, confirm actual module backlight spec before connecting |
 
-Both devices share SDA and SCL. OLED default address **0x3C**, MPU-6050 address **0x68**. Inspect actual PCB silkscreen and headers; no ESP32 GPIO pin is safe to connect to 5 V. **Do not power motors from 3V3.**
+The eight-pin header and its installed status are **not confirmed** by Otronic. Verify that connection is possible without soldering. Other GC9A01 breakout modules commonly illuminate with BLK floating or HIGH, but do not automatically apply that convention to an unidentified board.
 
-[Wiring diagram](../assets/wiring.svg)
+| ESP32-S3 | Optional MPU-6050 (I²C only) |
+|---|---|
+| 3V3 | VCC (requires 3.3 V-safe breakout and I²C pull-ups) |
+| GND | GND |
+| GPIO8 | SDA |
+| GPIO9 | SCL |
 
-## The two USB-C ports matter
+The I²C motion sensor remains completely separate from the LCD's SPI signals. See [color-coded wiring diagram](../assets/wiring.svg). The LCD uses a **write-only** bus; a microcontroller cannot report whether the panel is physically displaying pixels.
 
-The Otronic N16R8 board has two USB-C ports:
+## Install, compile and upload
 
-- **Native ESP32-S3 USB/OTG:** default firmware environment <code>esp32s3_n16r8_usb</code> enables USB CDC on boot. Choose this port for Mac serial communication without depending on CH343P UART driver support.
-- **CH343P USB-to-UART:** use alternative environment <code>esp32s3_n16r8_uart</code>, which disables USB CDC on boot. Using the opposite USB port from the chosen firmware may give **no Serial output**.
+The default profile uses the native ESP32-S3 USB/OTG connector, not the CH343P UART connector. Install PlatformIO IDE in VS Code, or [PlatformIO Core](https://docs.platformio.org/en/latest/core/installation/index.html).
 
-The seller board is not verified as a genuine Espressif PCB, so confirm its actual pin labels and which connector goes to which interface.
-
-## Flash and test
-
-Install the [PlatformIO IDE extension](https://platformio.org/install/ide?install=vscode) or PlatformIO Core 6.2.0 (for example with pipx). From the repository root:
+From the firmware directory:
 
 ~~~sh
-cd firmware
 pio run -e esp32s3_n16r8_usb
 pio run -e esp32s3_n16r8_usb -t upload
 pio device list
 pio device monitor -b 115200
 ~~~
 
-Choose the **native USB/OTG connector**; monitor the matching new serial port. Native USB first flash may require holding BOOT and tapping RESET before upload, followed by a reset after first flashing. If using CH343P UART, replace the environment name with <code>esp32s3_n16r8_uart</code> in both build/upload commands and select its serial device instead.
+If using the board's **separate CH343P UART** connector, build and upload the **esp32s3_n16r8_uart** environment instead and monitor that port. New firmware may require holding BOOT and pressing RESET to enter USB download mode on the first flash; this depends on the actual board.
 
-For a Mac host (run from repository root):
+For the Mac-side controller, from repository root:
 
 ~~~sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m macdesk.demo --simulate --face happy --watch
-# Replace /dev/cu.usbmodemXXXX with the actual native USB port:
+# Replace XXXX with the actual serial interface:
 .venv/bin/python -m macdesk.demo --port /dev/cu.usbmodemXXXX --face happy --watch
 ~~~
 
-**Expected:** an initial ready JSON event (display ok; imu ok/not_found), ACKs for valid expressions, and optional shake events from the MPU. A powered USB port may not show the initial ready message if the host connected late; valid face commands still ACK.
+Firmware should print a ready event such as:
+
+~~~json
+{"type":"ready","display":"init_sent_unverified","driver":"GC9A01","imu":"not_found","protocol":1}
+~~~
+
+**This event only proves that initialization commands were sent over SPI, not that the screen works.** Verify colors and face orientation visually. The Mac host accepts six face names and can watch optional shake events.
 
 ## Troubleshooting
 
-- No serial output: wrong USB port for chosen firmware env, charging-only cable, permissions, missing manual BOOT/RESET on first flash.
-- Ready says display not_found: check 3V3/GND, pin mapping, I²C address 0x3C, actual SSD1306 model.
-- Ready says imu not_found: sensor optional; check 0x68 address, compatible breakout and SDA/SCL.
-- Excess false shake: threshold is experimental (|‖accel‖−1g| > 0.55g twice at 40ms sample spacing, 1.5s cooldown). Calibrate on your assembled enclosure; not a production gesture detector.
-- Invalid JSON / unsupported face / overlong line: firmware sends error; overlong input is ignored until the next newline.
-- No wireless operation, audio or LLM in this firmware by design.
+- No serial output: check the chosen native USB/OTG versus UART port, data cable, permissions and BOOT/RESET.
+- Screen black: verify 3V3, GND, MOSI/SCK labels, DC, CS, RES, and **vendor-specific BLK** behavior. Review manufacturer's documentation before changing BLK wiring.
+- Blank but backlit: check CS/DC/MOSI/SCK wiring, 240×240 GC9A01 controller and actual pinout; a write-only panel offers no automatic error report.
+- Unusual colors or rotation: document it, then test GC9A01 rotation/inversion methods against your module (not yet calibrated).
+- Sensor not detected: optional; inspect MPU-6050 I²C GPIO8/9 and address 0x68.
+- Slow face updates: ensure hardware SPI wiring, reduce breadboard cable length; benchmark on the physical screen rather than predicting fps.
+- Display stays dark while terminal reports init_sent_unverified: this is expected because SPI initialization cannot confirm hardware state.
 
-PlatformIO Core 6.2.0 / Espressif32 7.1.3 and library versions are explicitly fixed in the build configuration and CI. This is stronger than a floating dependency setup, but a physical verification log is still required.
+No voice, LLM, camera, Wi-Fi, servos or battery is required for V0. Firmware compilation in CI is **not proof of electrical operation**.

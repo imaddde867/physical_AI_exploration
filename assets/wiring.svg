@@ -1,30 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="435" viewBox="0 0 1060 435" role="img" aria-label="MacDesk Buddy 3.3V I2C connections from ESP32-S3 GPIO8 and GPIO9 to SSD1306 OLED and optional MPU6050">
-<rect width="1060" height="435" rx="18" fill="#121c2b"/>
-<text x="35" y="52" font-size="26" fill="#ffffff" font-family="Arial,sans-serif" font-weight="700">MacDesk Buddy · wiring v0</text>
-<text x="36" y="79" font-size="15" fill="#b5c6d7" font-family="Arial,sans-serif">3.3 V logic • Disconnect USB when wiring • Verify actual header labels</text>
-<rect x="38" y="118" rx="13" width="265" height="246" fill="#27415a" stroke="#79bdff" stroke-width="2"/>
-<text x="63" y="151" fill="#fff" font-size="22" font-family="Arial,sans-serif">ESP32-S3 N16R8</text>
-<text x="63" y="179" fill="#b8d9ee" font-size="14" font-family="Arial,sans-serif">USB/OTG → MacBook</text>
-<rect x="54" y="200" rx="6" width="228" height="35" fill="#bc5949"/>
-<text x="74" y="223" fill="white" font-size="17" font-family="Arial,sans-serif">3V3</text>
-<rect x="54" y="241" rx="6" width="228" height="35" fill="#46566c"/>
-<text x="74" y="264" fill="white" font-size="17" font-family="Arial,sans-serif">GND</text>
-<rect x="54" y="282" rx="6" width="228" height="35" fill="#34795e"/>
-<text x="74" y="305" fill="white" font-size="17" font-family="Arial,sans-serif">GPIO8  SDA</text>
-<rect x="54" y="323" rx="6" width="228" height="30" fill="#82712c"/>
-<text x="74" y="344" fill="white" font-size="17" font-family="Arial,sans-serif">GPIO9  SCL</text>
-<rect x="738" y="116" rx="12" width="279" height="122" fill="#334957" stroke="#86e1cc" stroke-width="2"/>
-<text x="757" y="148" fill="#fff" font-family="Arial,sans-serif" font-size="21">SSD1306 OLED (0x3C)</text>
-<text x="757" y="177" fill="#c8e5e0" font-family="Arial,sans-serif" font-size="16">VCC   GND   SDA   SCL</text>
-<text x="758" y="208" fill="#a5bece" font-family="Arial,sans-serif" font-size="14">Required • 128×64 I²C</text>
-<rect x="738" y="277" rx="12" width="279" height="119" fill="#413b57" stroke="#d4baff" stroke-width="2"/>
-<text x="757" y="309" fill="#fff" font-family="Arial,sans-serif" font-size="20">MPU-6050 (0x68)</text>
-<text x="757" y="337" fill="#e8d8fc" font-family="Arial,sans-serif" font-size="16">VCC   GND   SDA   SCL</text>
-<text x="758" y="370" fill="#c9bbde" font-family="Arial,sans-serif" font-size="14">Optional • motion sensor</text>
-<path d="M282 217 H400 V157 H738 M400 217 V320 H738" fill="none" stroke="#f29882" stroke-width="3"/>
-<path d="M282 259 H425 V179 H738 M425 259 V342 H738" fill="none" stroke="#9eaabc" stroke-width="3"/>
-<path d="M282 300 H454 V198 H738 M454 300 V361 H738" fill="none" stroke="#64d2a2" stroke-width="3"/>
-<path d="M282 338 H487 V217 H738 M487 338 V380 H738" fill="none" stroke="#f4cf65" stroke-width="3"/>
-<text x="511" y="108" fill="#d4deea" font-family="Arial,sans-serif" font-size="15">Shared I²C bus (not separate pins per device)</text>
-<text x="38" y="415" fill="#d1d8e2" font-family="Arial,sans-serif" font-size="14">Use device PCB printed labels to locate pins. 5 V on an ESP32 GPIO can damage it. Never connect servos to 3V3.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="520" viewBox="0 0 1080 520" role="img" aria-label="ESP32-S3 round GC9A01 SPI TFT and separate MPU-6050 I2C wiring">
+<rect width="1080" height="520" rx="20" fill="#121b2b"/>
+<text x="34" y="48" font-family="Arial" font-size="25" font-weight="bold" fill="white">Round IPS: SPI display + independent I²C motion sensor</text>
+<text x="36" y="75" font-family="Arial" font-size="15" fill="#bcd0df">Display's SCL/SDA labels are SPI clock/data, not I²C. Disconnect USB before connecting.</text>
+<rect x="38" y="108" width="292" height="373" rx="16" fill="#2a435a" stroke="#82c1ed" stroke-width="2"/>
+<text x="58" y="145" fill="white" font-family="Arial" font-size="22" font-weight="bold">ESP32-S3 N16R8</text>
+<text x="58" y="172" fill="#c6ddec" font-family="Arial" font-size="14">Native USB/OTG → MacBook</text>
+<g font-family="Arial" font-size="16" fill="white">
+<text x="57" y="215">3V3 / GND → both boards</text>
+<text x="57" y="253" fill="#a3f5ed">GPIO11 → TFT SDA (MOSI)</text>
+<text x="57" y="281" fill="#a3f5ed">GPIO12 → TFT SCL (CLK)</text>
+<text x="57" y="309" fill="#a3f5ed">GPIO10 → TFT CS</text>
+<text x="57" y="337" fill="#a3f5ed">GPIO13 → TFT DC</text>
+<text x="57" y="365" fill="#a3f5ed">GPIO14 → TFT RES</text>
+<text x="57" y="412" fill="#f7cf8a">GPIO8 → MPU SDA</text>
+<text x="57" y="440" fill="#f7cf8a">GPIO9 → MPU SCL</text>
+</g>
+<path d="M334 286 H511 V190 H628" fill="none" stroke="#8fdfd6" stroke-width="3"/>
+<path d="M334 424 H518 V394 H628" fill="none" stroke="#f1ce83" stroke-width="3"/>
+<rect x="630" y="105" width="409" height="180" rx="15" fill="#403b5f" stroke="#bbadf4" stroke-width="2"/>
+<text x="655" y="143" fill="white" font-family="Arial" font-weight="bold" font-size="21">GC9A01 round IPS LCD</text>
+<text x="655" y="172" fill="#eeeaff" font-family="Arial" font-size="16">240 × 240 · SPI 4-wire protocol</text>
+<text x="655" y="200" fill="#eeeaff" font-family="Arial" font-size="16">VCC=3V3, GND, SDA, SCL, CS, DC, RES</text>
+<text x="655" y="229" fill="#eeeaff" font-family="Arial" font-size="15">BLK: leave unconnected pending module verification</text>
+<text x="655" y="254" fill="#bcd0f2" font-family="Arial" font-size="14">8 header positions; confirm soldered pins before order</text>
+<rect x="630" y="316" width="409" height="150" rx="15" fill="#5c4f34" stroke="#f8d08d" stroke-width="2"/>
+<text x="655" y="354" fill="white" font-family="Arial" font-weight="bold" font-size="21">MPU-6050 (optional)</text>
+<text x="655" y="386" fill="#fff1d4" font-family="Arial" font-size="16">VCC=3V3, GND, SDA=GPIO8, SCL=GPIO9</text>
+<text x="655" y="415" fill="#fff1d4" font-family="Arial" font-size="16">I²C 0x68 · 6-axis motion sensing</text>
+<text x="655" y="445" fill="#e7d5b4" font-family="Arial" font-size="14">Keep pull-ups at 3.3V, not 5V</text>
+<text x="38" y="501" fill="#c4cbd6" font-family="Arial" font-size="14">Not a physical connector pin map. PCB pin order may vary; use silkscreen and data sheet. Never apply 5V to ESP32 GPIO.</text>
 </svg>
