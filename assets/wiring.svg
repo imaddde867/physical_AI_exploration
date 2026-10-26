@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="435" viewBox="0 0 1060 435" role="img" aria-label="MacDesk Buddy 3.3V I2C connections from ESP32-S3 GPIO8 and GPIO9 to SSD1306 OLED and optional MPU6050">
+<rect width="1060" height="435" rx="18" fill="#121c2b"/>
+<text x="35" y="52" font-size="26" fill="#ffffff" font-family="Arial,sans-serif" font-weight="700">MacDesk Buddy · wiring v0</text>
+<text x="36" y="79" font-size="15" fill="#b5c6d7" font-family="Arial,sans-serif">3.3 V logic • Disconnect USB when wiring • Verify actual header labels</text>
+<rect x="38" y="118" rx="13" width="265" height="246" fill="#27415a" stroke="#79bdff" stroke-width="2"/>
+<text x="63" y="151" fill="#fff" font-size="22" font-family="Arial,sans-serif">ESP32-S3 N16R8</text>
+<text x="63" y="179" fill="#b8d9ee" font-size="14" font-family="Arial,sans-serif">USB/OTG → MacBook</text>
+<rect x="54" y="200" rx="6" width="228" height="35" fill="#bc5949"/>
+<text x="74" y="223" fill="white" font-size="17" font-family="Arial,sans-serif">3V3</text>
+<rect x="54" y="241" rx="6" width="228" height="35" fill="#46566c"/>
+<text x="74" y="264" fill="white" font-size="17" font-family="Arial,sans-serif">GND</text>
+<rect x="54" y="282" rx="6" width="228" height="35" fill="#34795e"/>
+<text x="74" y="305" fill="white" font-size="17" font-family="Arial,sans-serif">GPIO8  SDA</text>
+<rect x="54" y="323" rx="6" width="228" height="30" fill="#82712c"/>
+<text x="74" y="344" fill="white" font-size="17" font-family="Arial,sans-serif">GPIO9  SCL</text>
+<rect x="738" y="116" rx="12" width="279" height="122" fill="#334957" stroke="#86e1cc" stroke-width="2"/>
+<text x="757" y="148" fill="#fff" font-family="Arial,sans-serif" font-size="21">SSD1306 OLED (0x3C)</text>
+<text x="757" y="177" fill="#c8e5e0" font-family="Arial,sans-serif" font-size="16">VCC   GND   SDA   SCL</text>
+<text x="758" y="208" fill="#a5bece" font-family="Arial,sans-serif" font-size="14">Required • 128×64 I²C</text>
+<rect x="738" y="277" rx="12" width="279" height="119" fill="#413b57" stroke="#d4baff" stroke-width="2"/>
+<text x="757" y="309" fill="#fff" font-family="Arial,sans-serif" font-size="20">MPU-6050 (0x68)</text>
+<text x="757" y="337" fill="#e8d8fc" font-family="Arial,sans-serif" font-size="16">VCC   GND   SDA   SCL</text>
+<text x="758" y="370" fill="#c9bbde" font-family="Arial,sans-serif" font-size="14">Optional • motion sensor</text>
+<path d="M282 217 H400 V157 H738 M400 217 V320 H738" fill="none" stroke="#f29882" stroke-width="3"/>
+<path d="M282 259 H425 V179 H738 M425 259 V342 H738" fill="none" stroke="#9eaabc" stroke-width="3"/>
+<path d="M282 300 H454 V198 H738 M454 300 V361 H738" fill="none" stroke="#64d2a2" stroke-width="3"/>
+<path d="M282 338 H487 V217 H738 M487 338 V380 H738" fill="none" stroke="#f4cf65" stroke-width="3"/>
+<text x="511" y="108" fill="#d4deea" font-family="Arial,sans-serif" font-size="15">Shared I²C bus (not separate pins per device)</text>
+<text x="38" y="415" fill="#d1d8e2" font-family="Arial,sans-serif" font-size="14">Use device PCB printed labels to locate pins. 5 V on an ESP32 GPIO can damage it. Never connect servos to 3V3.</text>
+</svg>
