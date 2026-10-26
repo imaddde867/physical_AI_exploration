@@ -4,7 +4,9 @@
 
 [![Python and repository validation](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml) [![ESP32 firmware build](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml) [![OpenSCAD geometry checks](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml)
 
-![Illustrative original round-color face concepts; not physical prototype photos](assets/face-preview.svg)
+![Three original character directions, each with three moods: NIM, LUNE and KIP. Concept art, not firmware output or photos.](assets/face-preview.svg)
+
+> **Character design under review:** These are **three new character identities**, not the current firmware output. The firmware still draws the earlier generic geometric face until a character is selected and implemented. [See the character design brief](docs/character-direction.md). No hardware purchase or display change is necessary to evaluate them.
 
 > **Compare before purchasing:** [All worthwhile options: Reel-matched vs online alternatives](docs/hardware-options.md) · [Mac first-20-minutes clone/run guide](docs/clone-and-run.md) · [Actual screen-to-case dimensions](assets/actual-scale-front.svg). The illustration above is **not to physical scale**.
 
@@ -74,5 +76,6 @@ See [docs/reel-index.md](docs/reel-index.md). Original repository material is MI
 - [Verified vendor part list](docs/shopping-list.md)
 - [Original pin-level wiring diagram](assets/wiring.svg)
 - [Round color display choice and sourcing](docs/display-choice.md)
-- [Original concept face gallery](assets/face-preview.svg)
+- [Character concept gallery, pending user selection](assets/face-preview.svg)
+- [Character identity, expression and animation design brief](docs/character-direction.md)
 - [Issue #1: actual hardware bring-up](https://github.com/imaddde867/physical_AI_exploration/issues/1)

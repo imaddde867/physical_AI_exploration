@@ -32,6 +32,15 @@ class DisplayDecisionTests(unittest.TestCase):
         self.assertIn("8.99", shop)
         self.assertIn("pre-soldered", shop)
 
+    def test_concept_art_is_not_misrepresented_as_firmware(self):
+        art = self.read('assets/face-preview.svg')
+        doc = self.read('docs/character-direction.md')
+        readme = self.read('README.md')
+        for name in ('NIM', 'LUNE', 'KIP'):
+            self.assertIn(name, art)
+            self.assertIn(name, doc)
+        self.assertIn('not the current firmware output', readme)
+
     def test_case_is_round_and_user_readme_current(self):
         scad = self.read("cad/desk-buddy.scad")
         readme = self.read("README.md")

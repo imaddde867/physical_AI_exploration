@@ -2,7 +2,9 @@
 
 The design target is a distinctive, small, high-quality-looking companion for a MacBook, rather than a monochrome diagnostic module.
 
-![Original concept art, not a photo or physically proportioned depiction](../assets/face-preview.svg)
+![Character concept studies, not the current firmware output and not a physically proportioned product rendering](../assets/face-preview.svg)
+
+**Design decision pending:** NIM, LUNE and KIP are original visual explorations. See [character-direction.md](character-direction.md). The existing firmware still contains the older geometric face, and the gallery deliberately does **not** claim a pixel-accurate device screenshot.
 
 [**Actual front dimensions: Ø31.4 mm face window in 72 mm body**](../assets/actual-scale-front.svg) — about **43.6%** of the shell's width. The visual concept exaggerates the relative screen size. For premium-looking alternatives with different layouts and processors, see [the creator-versus-online hardware matrix](hardware-options.md).
 
@@ -21,7 +23,7 @@ The selected LCD has **32.4 mm circular active area**, manufacturer-stated modul
 
 [Adafruit's open-source Arduino GC9A01A driver](https://github.com/adafruit/Adafruit_GC9A01A) supports drawing geometric shapes, RGB colors and SPI display updates; the driver is a separately licensed dependency and not copied here. [GC9A01 breakout electrical reference](https://www.lcdwiki.com/index.php?title=1.28inch_IPS_Module) describes common BLK and SPI pins; **the Otronic module itself has not been inspected**, so these are not assumed to guarantee its backlight wiring.
 
-## Aesthetic implementation
+## Superseded aesthetic notes — legacy firmware still runs this until a character direction is approved
 
 - Black background, oversized cyan/lilac eyes and dark pupils with highlights.
 - Pastel expression details, no calculator-style white text at the bottom.

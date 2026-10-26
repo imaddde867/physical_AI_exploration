@@ -2,6 +2,10 @@
 
 The goal is a polished-looking companion beside a MacBook, not a second GPU workstation. The selected face is **full-color GC9A01 IPS SPI**; the old SSD1306 monochrome screen is no longer in the bill of materials.
 
+## Decide on character identity before purchasing
+
+The former generic RGB faces were rejected aesthetically. Review [three new character concepts](../assets/face-preview.svg) and the [design/implementation brief](character-direction.md). **The gallery is concept-only; it is not a preview of flashed firmware.** The budget GC9A01 screen still supports simple 240×240 RGB graphics, but screen size and custom animation quality should be evaluated independently of electrical bring-up.
+
 ## Before purchasing
 
 - [ ] Confirm [Otronic GC9A01 OT8724](shopping-list.md) has **pre-soldered headers**, or buy a module with a connector cable. Exact BLK pin behavior must be established before use.
