@@ -10,6 +10,8 @@ ESP32-S3 N16R8
          \-- optional MPU-6050 motion sensor at 0x68
 ~~~
 
+**Single-character graphics:** The [approved 240×240 PNG](../assets/face-idle-240.png) is verified by SHA256 in tests and compiled using the Python standard library into a 32-color palette/RLE asset in flash. Firmware writes one RGB565 scanline at a time (480-byte row buffer). Six backward-compatible face command values change small details on the **same identity**, never select other avatar designs.
+
 This is a deterministic, fully offline embedded prototype. No large language model is loaded on the ESP32. Later Mac-local inference may choose from six **allowlisted** facial expressions; the model must never execute arbitrary shell commands or directly select unbounded actuator values.
 
 ## JSONL protocol version 1

@@ -3,6 +3,13 @@
 **Target hardware:** ESP32-S3 N16R8 development board, **GC9A01 1.28 inch circular IPS LCD** (240×240 pixels; SPI; 2.8–3.3 V supply) and optional MPU-6050 I²C motion sensor. The old monochrome OLED firmware is retired.
 
 The firmware uses the documented [Adafruit GC9A01A Arduino driver](https://github.com/adafruit/Adafruit_GC9A01A), pinned at version 1.2.0 in PlatformIO.
+**Approved on-screen artwork:** [one actual 240×240 PNG](../assets/face-idle-240.png). It is screen content only (no rendered bezel or robot body).
+
+The PlatformIO hook in `firmware/scripts/embed_face.py` converts this PNG to an RGB565 header before compilation using only Python's standard library. The generated header `firmware/include/face_asset.h` is gitignored. The source file is 32-color indexed, then encoded as **10,514 flash-resident one-byte RLE tokens** with a palette. The display driver streams one 480-byte row buffer instead of allocating a 115 KB framebuffer.
+
+To regenerate manually from the repository root: `python3 tools/face_asset.py`. To validate: `python3 -m unittest discover -s tests -v`. No Pillow or runtime image decoder is required.
+
+**Visual scope:** One mature half-lidded character for all six serial mood names; tiny mouth/lid overlays and infrequent blink are the only changes. These are not six separate faces. Reproduction on the real IPS screen is **not** physically tested.
 
 ## Pin connections — verify real module labels first
 

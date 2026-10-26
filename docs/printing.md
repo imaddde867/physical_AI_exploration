@@ -18,4 +18,4 @@ For visual realism, inspect the [dimensional front-view illustration](../assets/
 6. Use PLA, ~0.2 mm layers, 3 walls and ~15% infill as **initial slicing suggestions**, not validated settings.
 7. Print, photograph the assembly, and test actual LCD and connector clearances. Avoid touching or trapping LCD glass. For a durable version, design proper mounts/standoffs after measuring the real PCB.
 
-The face preview is a visual concept only. Final aesthetics depend on actual filament finish, screen black-level, backlight, fit and print quality.
+The [actual approved 240×240 sprite](../assets/face-idle-240.png) is firmware's idle screen source; it is enlarged by browsers and is not a photograph of the real LCD. The [vector sketch](../assets/face-preview.svg) is a simplified illustration, not pixel-exact. Final aesthetics depend on actual filament finish, screen black-level, backlight, fit and print quality.
