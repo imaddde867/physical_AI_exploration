@@ -24,26 +24,28 @@ constexpr uint32_t IMU_SAMPLE_MS = 40;
 constexpr uint32_t SHAKE_COOLDOWN_MS = 1500;
 constexpr float SHAKE_DELTA_G = 0.55f;  // experimental, calibrate on hardware
 
-constexpr uint16_t BG = 0x0000;
-constexpr uint16_t AQUA = 0x7FFF;
-constexpr uint16_t LILAC = 0xA2FF;
-constexpr uint16_t PINK = 0xF2DC;
-constexpr uint16_t CREAM = 0xFF7A;
-constexpr uint16_t GOLD = 0xFDE0;
-constexpr uint16_t DARK = 0x18C5;
-constexpr uint16_t RIM = 0x21AB;
+// One approved identity: image authored specifically for this 240x240 screen.
+// The generated header is built from assets/face-idle-240.png, NOT from a UI mockup.
+// RLE palette asset lives in flash and is streamed a scanline at a time.
+#include "face_asset.h"
 
+constexpr uint16_t BLACK = 0x0000;
+constexpr uint16_t WARM = 0xFE1A;
+constexpr uint16_t WARM_DIM = 0xBCAF;
 Adafruit_GC9A01A lcd(TFT_CS, TFT_DC, TFT_RST);
 String activeFace = "neutral";
 String commandBuffer;
 bool droppingOverlongLine = false;
 bool imuReady = false;
-bool eyesClosed = false;
 bool previouslyReacting = false;
+bool blinkActive = false;
+uint32_t blinkFinish = 0;
+uint32_t nextBlinkAt = 0;
 uint32_t surpriseUntil = 0;
 uint32_t lastShake = 0;
 uint32_t lastImuSample = 0;
 uint8_t consecutiveShocks = 0;
+static uint16_t lineBuffer[kFaceWidth];  // only 480 bytes, no full framebuffer
 
 bool validFace(const String &name) {
   return name == "neutral" || name == "happy" || name == "sad" ||
@@ -57,70 +59,66 @@ void sendReply(const char *type, const char *field, const char *value) {
   Serial.println();
 }
 
-// Draws curves algorithmically: no external copyrighted bitmap assets.
-void drawMouth(bool smile, uint16_t color) {
-  int lastX = 0, lastY = 0;
-  for (int x = 88; x <= 152; x += 2) {
-    const int delta = x - 120;
-    const int depth = (delta * delta) / 60;
-    const int y = smile ? 176 - depth : 162 + depth;
-    if (x > 88) {
-      lcd.drawLine(lastX, lastY, x, y, color);
-      lcd.drawLine(lastX, lastY + 1, x, y + 1, color);
+// Display the *actual approved raster* as RGB565 in 240 scanline writes.
+// 32-color palette; compact one-byte tokens encode up to 8 repeated pixels.
+// No PNG, alpha compositing or heap allocation runs on the microcontroller.
+void paintApprovedFace() {
+  lcd.startWrite();
+  lcd.setAddrWindow(0, 0, kFaceWidth, kFaceHeight);
+  uint16_t x = 0;
+  for (size_t i = 0; i < kFaceRunCount; ++i) {
+    const uint8_t token = pgm_read_byte(&kFacePackedRuns[i]);
+    uint8_t count = (token >> 5) + 1;
+    const uint16_t color = pgm_read_word(&kFacePalette[token & 31]);
+    while (count--) {
+      lineBuffer[x++] = color;
+      if (x == kFaceWidth) {
+        lcd.writePixels(lineBuffer, kFaceWidth);
+        x = 0;
+      }
     }
-    lastX = x;
-    lastY = y;
+  }
+  lcd.endWrite();
+}
+
+// The six original protocol states remain supported, but *all* use one
+// single identity. These are restrained mouth/lid changes, not new avatars.
+void applyMood(const String &mood) {
+  if (mood == "neutral") return;
+  if (mood == "sleepy") {
+    lcd.fillRect(106, 148, 33, 20, BLACK);
+    lcd.drawFastHLine(111, 157, 19, WARM_DIM);
+    return;
+  }
+  lcd.fillRect(106, 148, 33, 20, BLACK);
+  if (mood == "happy") {
+    lcd.drawLine(111, 153, 122, 159, WARM);
+    lcd.drawLine(122, 159, 134, 152, WARM);
+  } else if (mood == "sad") {
+    lcd.drawLine(111, 161, 121, 156, WARM_DIM);
+    lcd.drawLine(121, 156, 134, 162, WARM_DIM);
+  } else if (mood == "thinking") {
+    lcd.drawFastHLine(117, 157, 16, WARM_DIM);
+  } else if (mood == "surprised") {
+    lcd.drawCircle(122, 158, 5, WARM);
   }
 }
-void drawEyes(uint16_t color, bool blink, bool lookingRight) {
-  const int positions[2] = {82, 158};
-  for (int cx : positions) {
-    if (blink) {
-      lcd.fillRoundRect(cx - 19, 105, 38, 6, 3, color);
-      continue;
-    }
-    lcd.fillRoundRect(cx - 18, 86, 36, 55, 16, color);
-    const int offset = lookingRight ? 7 : 0;
-    lcd.fillRoundRect(cx - 8 + offset, 107, 17, 25, 8, DARK);
-    lcd.fillCircle(cx - 5 + offset, 108, 5, CREAM);
-  }
+
+// A short blink. Preserve the eyebrow silhouettes and original character.
+// The eyes are restored from the approved sprite when blink ends.
+void paintBlink() {
+  lcd.fillRoundRect(35, 119, 70, 40, 9, BLACK);
+  lcd.fillRoundRect(135, 119, 75, 40, 9, BLACK);
+  lcd.drawLine(42, 132, 97, 135, WARM_DIM);
+  lcd.drawLine(145, 134, 201, 136, WARM_DIM);
 }
-// A redraw happens on a face/blink/sensor transition, not every loop.
+
 void drawFace(uint32_t now) {
+  paintApprovedFace();
   const bool reacting = surpriseUntil != 0 &&
                         (int32_t)(surpriseUntil - now) > 0;
-  const String shown = reacting ? "surprised" : activeFace;
-  const bool blink = (now % 4300UL) < 130UL && shown != "sleepy";
-  eyesClosed = blink;
-  lcd.fillScreen(BG);
-  lcd.drawCircle(120, 120, 112, RIM);
-  lcd.drawCircle(120, 120, 111, RIM);
-  if (shown == "sleepy") {
-    drawEyes(LILAC, true, false);
-    lcd.fillRoundRect(110, 167, 20, 4, 2, PINK);
-  } else if (shown == "happy") {
-    drawEyes(AQUA, blink, false);
-    if (!blink) {
-      lcd.fillCircle(49, 150, 5, PINK);
-      lcd.fillCircle(191, 150, 5, PINK);
-    }
-    drawMouth(true, PINK);
-  } else if (shown == "sad") {
-    drawEyes(LILAC, blink, false);
-    drawMouth(false, LILAC);
-  } else if (shown == "surprised") {
-    drawEyes(GOLD, blink, false);
-    lcd.fillCircle(120, 174, 12, PINK);
-    lcd.fillCircle(120, 175, 7, BG);
-  } else if (shown == "thinking") {
-    drawEyes(AQUA, blink, true);
-    lcd.fillCircle(113, 177, 4, PINK);
-    lcd.fillCircle(124, 174, 4, PINK);
-    lcd.fillCircle(135, 177, 4, PINK);
-  } else {
-    drawEyes(AQUA, blink, false);
-    lcd.fillRoundRect(101, 171, 38, 5, 2, PINK);
-  }
+  applyMood(reacting ? String("surprised") : activeFace);
+  if (activeFace == "sleepy" || blinkActive) paintBlink();
 }
 bool configureImu() {
   Wire.beginTransmission(IMU_ADDRESS);
@@ -159,6 +157,7 @@ void checkMotion(uint32_t now) {
     lastShake = now;
     consecutiveShocks = 0;
     surpriseUntil = now + 700;
+    previouslyReacting = true;
     drawFace(now);
     sendReply("event", "name", "shake");
   }
@@ -194,6 +193,7 @@ void setup() {
   Wire.begin(IMU_SDA, IMU_SCL);
   imuReady = configureImu();
   drawFace(millis());
+  nextBlinkAt = millis() + 3300 + (esp_random() % 3400);
   JsonDocument ready;
   ready["type"] = "ready";
   ready["display"] = "init_sent_unverified";
@@ -222,10 +222,19 @@ void loop() {
   checkMotion(now);
   const bool reacting = surpriseUntil != 0 &&
                         (int32_t)(surpriseUntil - now) > 0;
-  const bool expectedBlink = (now % 4300UL) < 130UL &&
-                             (reacting || activeFace != "sleepy");
-  if (reacting != previouslyReacting || expectedBlink != eyesClosed) {
+  if (reacting != previouslyReacting) {
     previouslyReacting = reacting;
+    drawFace(now);
+  }
+  // Organic enough not to feel like a metronome; only one character animates.
+  if (!blinkActive && activeFace != "sleepy" &&
+      (int32_t)(now - nextBlinkAt) >= 0) {
+    blinkActive = true;
+    blinkFinish = now + 135;
+    paintBlink();
+  } else if (blinkActive && (int32_t)(now - blinkFinish) >= 0) {
+    blinkActive = false;
+    nextBlinkAt = now + 3300 + (esp_random() % 3400);
     drawFace(now);
   }
   delay(2);
