@@ -8,3 +8,5 @@ __pycache__/
 *.stl
 *.3mf
 *.gcode
+# Built from one checked-in approved 240x240 face PNG by PlatformIO:
+firmware/include/face_asset.h
