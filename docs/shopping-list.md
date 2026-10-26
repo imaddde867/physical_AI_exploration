@@ -26,7 +26,7 @@
 
 ## Required checks before payment
 
-1. The Otronic OT8724 spec confirms GC9A01, 240×240 IPS, 2.8–3.3 V, 8 pins and a 44×36×5 mm board. **It does NOT confirm its header is soldered or how BLK is electrically controlled.** Ask the vendor; the first-build plan assumes no soldering.
+1. The Otronic OT8724 spec confirms GC9A01, 240×240 IPS, 2.8–3.3 V, 8 pins and a 44×36×5 mm board. **It does NOT confirm a pre-soldered header or how BLK is electrically controlled.** Ask the vendor; the first-build plan assumes no soldering.
 2. The LCD uses **SPI**, even though its SCL and SDA pads resemble I²C labels. They map to ESP32-S3 GPIO12 SCK and GPIO11 MOSI, with GPIO10 CS, GPIO13 DC and GPIO14 RES. MPU-6050 alone uses GPIO8 and GPIO9 for I²C.
 3. Check the ESP32 board header labels, 3V3 and native USB/OTG socket. Do not apply 5 V to ESP32 GPIO.
 4. The optional BLK pin is intentionally left unconnected in the default design until the exact module's backlight operation is verified. If the display stays dark, check vendor documentation before changing this wire.
