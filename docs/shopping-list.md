@@ -9,14 +9,14 @@
 | 1 | ESP32-S3 N16R8 16 MB flash / 8 MB PSRAM | 9.95 | [Controller](https://www.otronic.nl/en/esp32-s3-n16r8-devboard-16mb-flash-en-8mb-psram.html) |
 | **1** | **OT8724 1.28 inch round GC9A01 240×240 IPS color LCD** | **8.99** | **[Round IPS screen](https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino)** |
 | 1 | MPU-6050 I²C motion sensor | 3.75 | [Sensor](https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html) |
-| 1 | 830-hole solderless breadboard | 2.39 | [Breadboard](https://www.otronic.nl/en/breadboard-830-hole-for-prototyping.html) |
+| 1 | 830-hole solderless breadboard | 2.99 | [Breadboard](https://www.otronic.nl/en/breadboard-830-hole-for-prototyping.html) |
 | 1 | Female-female Dupont wires, 40 × 20 cm | 1.85 | [Female-female cables](https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-female-female-20cm.html) |
 | 1 | Male-female Dupont wires, 40 × 20 cm | 1.85 | [Male-female cables](https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-male-female-20cm-dr.html) |
 | 1 | USB-C-to-USB-C DATA cable 1 m | 2.65 | [USB data cable](https://www.otronic.nl/en/usb-c-to-usb-c-1m-cable-for-data-and-fast-charging.html) |
 | — | [Estimated tracked Finland delivery](https://www.otronic.nl/nl/verzending) | 8.00 | Same seller |
-| | **Total estimated delivered** | **39.43** | |
+| | **Total estimated delivered** | **40.03** | |
 
-**Without buying another data cable: €36.78.** This is only €3.00 more than the €36.43 previous monochrome-OLED basket.
+**Without buying another data cable: €37.38.** The display costs €3.00 more than the retired OLED, and the breadboard now lists €0.60 higher than in the earlier basket.
 
 ## Evaluate different attractive hardware paths before buying
 

@@ -27,8 +27,8 @@ class DisplayDecisionTests(unittest.TestCase):
         shop = self.read("docs/shopping-list.md")
         self.assertIn("GC9A01", bom)
         self.assertIn("GC9A01", shop)
-        self.assertIn("39.43", bom)
-        self.assertIn("39.43", shop)
+        self.assertIn("40.03", bom)
+        self.assertIn("40.03", shop)
         self.assertIn("8.99", shop)
         self.assertIn("pre-soldered", shop)
 

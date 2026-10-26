@@ -15,7 +15,7 @@
       "hardware": "ESP32-S3 N16R8 + Otronic GC9A01 OT8724 + optional MPU-6050",
       "screen_driver": "GC9A01 SPI",
       "price": {
-        "amount": "39.43",
+        "amount": "40.03",
         "currency": "EUR",
         "covers": "complete planned Otronic basket, tracked Finland shipping included"
       },

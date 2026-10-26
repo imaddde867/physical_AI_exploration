@@ -6,7 +6,7 @@
 
 | Path | Based on | Screen / capabilities | Price evidence | Best reason to choose | Main limitation |
 |---|---|---|---|---|---|
-| **A — Supported first build** | Reel 09 concept, **original implementation** | ESP32-S3 N16R8 + 1.28″ **GC9A01 IPS**, 240×240; optional MPU-6050 | **€39.43** estimated full one-store basket delivered to Finland | Cheapest well-scoped **hands-on electronics** and learning SPI/I²C, wiring, CAD | Bare module pins/BLK need confirmation; small 31.4 mm visible aperture |
+| **A — Supported first build** | Reel 09 concept, **original implementation** | ESP32-S3 N16R8 + 1.28″ **GC9A01 IPS**, 240×240; optional MPU-6050 | **€40.03** estimated full one-store basket delivered to Finland | Cheapest well-scoped **hands-on electronics** and learning SPI/I²C, wiring, CAD | Bare module pins/BLK need confirmation; small 31.4 mm visible aperture |
 | **A2 — Better documented connector** | Online alternative | Waveshare 1.28″ GC9A01 240×240 with supplied 8-pin cable; still needs separate MCU | **$14.99** display alone before shipping | Same driver family, documented cable/pinout | Not necessarily drop-in **mechanically**; MCU end of cable still needs wiring |
 | **B — Taby Round** | **Reel 05**, creator-supported | Waveshare **ESP32-S3-Touch-AMOLED-1.32**; 466×466 AMOLED, touch, mic/audio interface | **$21.99** board alone, excluding shipping/VAT | Best compact premium-looking **creator-supported** face/animations | Separate firmware/toolchain, official round case **not yet available** |
 | **C — Taby 1.64 V1** | **Reel 05**, creator-supported | 1.64″ rectangular 280×456 AMOLED, touch, onboard IMU | **$23.99** board alone | Official Taby animations **and downloadable STL/3MF case** | **V1 only** supported; V2 incompatible; not a round face |
@@ -19,7 +19,7 @@
 ## My recommended order of operations
 
 1. **Without buying anything:** clone and run the Python simulator, inspect face art **and the physically scaled front view** ([visual guide](../assets/actual-scale-front.svg)), then decide whether a Ø31.4 mm visible display is big enough.
-2. **Want to learn electronics at the lowest cost?** Choose **A** and [buy the €39.43 basket](shopping-list.md) **after confirming headers/backlight**.
+2. **Want to learn electronics at the lowest cost?** Choose **A** and [buy the €40.03 basket](shopping-list.md) **after confirming headers/backlight**.
 3. **Want the most attractive, ready animated character with little wiring?** Consider **B** (round AMOLED Taby), accepting a different codebase and no official round enclosure yet.
 4. **Want a creator-matched printable project now?** Choose **C**, but obtain an explicitly identified **1.64 V1**. The 1.64 V2 does not run the current Taby image.
 5. **Want a longer-lived general-purpose standalone devboard with bigger round display and built-in IMU?** Choose **D**, but budget time to port firmware.
@@ -53,4 +53,6 @@ Maker documentation, not unsupported marketing claims:
 - [Taby firmware support matrix](https://github.com/TRIIIS-LABS/firmware-taby/blob/main/INSTALL.md): `round-1.32` and `amoled-1.64` **V1 only**; [case availability](https://github.com/TRIIIS-LABS/firmware-taby).
 - [Official StackChan K151 ($99)](https://shop.m5stack.com/products/stackchan-kawaii-co-created-open-source-ai-desktop-robot), [Rocky parts/version requirements](https://github.com/cgro00/desk-robot), [OOMWOO simulation status](https://github.com/makerspet/oomwoo).
 
-**Price comparison limitation:** The €39.43 baseline **includes** estimated Finland shipping and a full basket. USD amounts apply to products or bare boards **only** and exclude postage, VAT/import costs, peripherals and optional enclosures. Cross-currency comparisons should not be treated as delivered-price rankings. Stock can change; no item was ordered. 
+**Freshness check:** On 2026-10-26, the 830-hole Otronic breadboard listed **€2.99** (previously €2.39); this is why the complete basket is now €40.03 rather than €39.43. The quote is not a completed checkout.
+
+**Price comparison limitation:** The €40.03 baseline **includes** estimated Finland shipping and a full basket. USD amounts apply to products or bare boards **only** and exclude postage, VAT/import costs, peripherals and optional enclosures. Cross-currency comparisons should not be treated as delivered-price rankings. Stock can change; no item was ordered. 
