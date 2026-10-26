@@ -42,7 +42,7 @@
 | 08 | [OOMWOO](https://github.com/makerspet/oomwoo) | ROS 2, LiDAR, navigation | **Simulation ready, physical vacuum not yet buildable**; do not buy unvalidated parts |
 | 09 | Independent 3-part sensing/face concept | **Our first implemented learning exercise** | Original source/repo not established; our code/CAD are original |
 
-For a detailed per-Reel research report, see the earlier session archive; this repository intentionally stores **links and independently authored documentation**, not the downloaded third-party Reels.
+The [full nine-Reel technical notes](reel-technical-notes.md) are also in this repository, preserving the observed demonstrations, original sources, project-specific build challenges and next engineering steps. The original third-party MP4s remain outside the public repository.
 
 ## Sources and fair comparison
 

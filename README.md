@@ -2,6 +2,8 @@
 
 **First build:** a compact, original, Mac-first desk companion with a **1.28-inch circular GC9A01 full-color IPS face**, an ESP32-S3, optional motion sensing and a printable case. Inspired by the saved robotics Reels without copying creators' assets.
 
+[![Python and repository validation](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml) [![ESP32 firmware build](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml) [![OpenSCAD geometry checks](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml)
+
 ![Illustrative original round-color face concepts; not physical prototype photos](assets/face-preview.svg)
 
 > **Compare before purchasing:** [All worthwhile options: Reel-matched vs online alternatives](docs/hardware-options.md) · [Mac first-20-minutes clone/run guide](docs/clone-and-run.md) · [Actual screen-to-case dimensions](assets/actual-scale-front.svg). The illustration above is **not to physical scale**.
@@ -40,7 +42,8 @@ A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while th
 | [hardware/options.json](hardware/options.json) | Machine-readable hardware options and source links |
 | [hardware/bom.json](hardware/bom.json) | Auditable shopping basket prices and assumptions |
 | [docs/clone-and-run.md](docs/clone-and-run.md) | Reproducible MacBook software-only start |
-| [docs/reel-index.md](docs/reel-index.md) | All nine inspirations, upstream links, licensing cautions |
+| [docs/reel-index.md](docs/reel-index.md) | Nine-video quick reference and original sources |
+| [docs/reel-technical-notes.md](docs/reel-technical-notes.md) | Complete practical engineering notes and build paths from all nine saved videos |
 | [docs/printing.md](docs/printing.md) | Printable enclosure and fit test |
 | [docs/architecture.md](docs/architecture.md) | JSON protocol, responsibility boundaries |
 | [firmware/](firmware/) | Original PlatformIO Arduino ESP32-S3 implementation |
