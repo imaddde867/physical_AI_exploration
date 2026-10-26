@@ -15,7 +15,11 @@ Supplier: [Otronic, Netherlands](https://www.otronic.nl/en/). Its [shipping tabl
 | Male-female Dupont wires 40x20cm | OT211-B91 | 1.85 | https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-male-female-20cm-dr.html |
 | USB-C to USB-C **data** cable, 1 m | OT5551, omit if already owned | 2.65 | https://www.otronic.nl/en/usb-c-to-usb-c-1m-cable-for-data-and-fast-charging.html |
 
-**Parts: €24.68. Estimated shipping: €8.00. Total: €32.68.** Without the cable: €30.03.
+**OLED-only parts: €24.68; Finland shipping: €8.00; total: €32.68.** The **recommended first-build basket adds one MPU-6050 for €3.75: €36.43 delivered**. Without the cable: €33.78 with the MPU-6050. These are advertised prices, not a real checkout.
+
+### Optional but recommended for day one: motion sensor
+
+[MPU-6050 I²C accelerometer / gyroscope, Otronic OT2020-D106](https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html) **€3.75**. It shares SDA/SCL and 3.3V/GND with the OLED, normally address 0x68. The firmware supports shake-triggered face reactions with no Mac connection. **Confirm populated header and electrical compatibility** of the exact module before ordering; the shop's 3–5 V claim alone does not verify its internal I²C pull-up configuration. Neither sensor performance nor shake threshold has been calibrated.
 
 ### OLED fallback — guaranteed controller, higher price
 
@@ -41,3 +45,11 @@ Supplier: [Otronic, Netherlands](https://www.otronic.nl/en/). Its [shipping tabl
 6. Do not purchase microphone, camera, actuator, LiPo battery, amplifier or separate power supply for the first build. Add them only after validating v0 and their electrical requirements.
 
 **Technical references:** [project README](../README.md), [assembly](first-build.md), [BOM specification](bom.md), [firmware pinout](../firmware/README.md).
+
+## Verification update, 2026-10-26
+
+- [Otronic Finland tracked-shipping table](https://www.otronic.nl/nl/verzending) explicitly lists **€8**. The number can change at checkout.
+- The N16R8 board's listed flash and PSRAM are **not** the defaults of PlatformIO's generic 8MB/no-PSRAM DevKitC profile. The new [PlatformIO configuration](../firmware/platformio.ini) overrides those values.
+- For default native-USB firmware, plug into the board's **USB/OTG** connector, not its separate **CH343P USB-UART** connector. Follow [firmware setup](../firmware/README.md).
+- **STOP before buying the Otronic OLED:** seller page confirms I²C 128x64 but **does not explicitly confirm SSD1306**. Prefer the confirmed Partco Joy-IT SSD1306 if seller confirmation isn't available; budget additional shipping.
+- The Bambu Academy URL provided is **not independently resolvable as a specific printer model**. Check the label/display at the actual printer.

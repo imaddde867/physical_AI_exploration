@@ -1,19 +1,33 @@
-# Hardware basket: purchase only the essentials
+# MacDesk Buddy — minimum repeat-use hardware basket
 
-**Goal:** €35–60 planning allowance, not a verified checkout total. Prices, local stock, taxes and shipping vary. The printer is already available. No LLM-capable embedded device is needed because the M4 Mac hosts higher-level logic.
+The goal is to buy **as little as possible without introducing disposable/unsupported parts**. Your MacBook M4 provides the host; the ESP32-S3 runs display/sensor I/O. 3D printer access is already available.
 
-| Priority | Part | Specification / reason | Planning allowance |
-|---|---|---|---|
-| Essential | ESP32-S3 DevKitC-1-compatible USB-C development board | ESP32-S3 with accessible GPIO8/9 and 3V3; avoid tiny boards without headers unless you plan to solder | €10–20 |
-| Essential | 0.96-inch I2C OLED | 128x64 **SSD1306**, 3.3 V-compatible, 4 pins (GND/VCC/SCL/SDA), ideally pre-soldered | €4–9 |
-| Essential | Jumper wires + breadboard | Female-to-female wires for pre-soldered modules, breadboard if required | €5–10 |
-| Essential | USB data cable | Compatible with actual board port | €3–8 |
-| Optional | Filament, small screws, adhesive feet | Use available printer materials first | €0–10 |
-| Later | BME280 or MPU-6050 | Adds real sensing and I2C device management | €4–15 |
-| Later | MG90S servo, 5 V regulated supply | Adds physical motion **after** power engineering | €10–25 |
+## One recommended Finnish-delivered order (advertised prices, 2026-10-26)
 
-**Check before ordering:** exact board's programming interface/pin labels, OLED driver (SSD1306 not SH1106), dimensions, headers, USB data cable, Finnish shipping/VAT. Search product pages rather than relying on assumed availability.
+| Item | Model/specification | Listed € | Need |
+|---|---|---:|---|
+| Controller | Otronic **ESP32-S3 N16R8** (16MB flash, 8MB PSRAM, 2 × USB-C), header installation check | 9.95 | Required |
+| Display | Otronic 0.96" 128×64 I²C OLED, **controller SSD1306 not confirmed** | 5.99 | Required; confirm before purchase |
+| Motion sensor | MPU-6050 I²C 6-axis breakout | 3.75 | **Recommended** for Reel #9-style reactive behavior |
+| Breadboard | 830-hole solderless prototyping board | 2.39 | Required for learning/prototyping |
+| 40 female–female wires | 20 cm | 1.85 | Required for two header-equipped modules |
+| 40 male–female wires | 20 cm | 1.85 | Useful for breadboard |
+| USB-C data cable | 1 m; omit if already owned | 2.65 | Required unless already owned |
+| Delivery | Otronic tracked to Finland | 8.00 | Checkout estimate |
 
-Supplier discovery: [Partco](https://www.partco.fi/), [Robomaa](https://www.robomaa.fi/), [Opencircuit](https://opencircuit.fi/), [DigiKey Finland](https://www.digikey.fi/), [Mouser Finland](https://www.mouser.fi/). These are research starting points, **not confirmed cart links or stock**.
+**Total including MPU-6050: €36.43.** OLED-only €32.68; both exclude optional tools, extra taxes/currency adjustments or changed checkout conditions. Verify headers on all three electronics boards.
 
-**Printer identity not verified:** the supplied Bambu Academy URL is not itself sufficient evidence of the exact printer model. Verify the model on the printer's own display before choosing printable volume/profile.
+## Useful longer-term tools
+
+- Low-voltage multimeter for continuity, 3V3/5V rail checks and avoiding short circuits; buy a more durable branded model if budget permits.
+- Digital or vernier caliper to measure hardware before designing mounts.
+- Basic soldering equipment **only if needed** for unpopulated headers or later permanent wiring.
+
+## Alternatives / avoid early purchases
+
+- Explicitly specified **Joy-IT SBC-OLED01V2 SSD1306** from Partco, €11.29 + its separate shipping, is safer than guessing the controller. Check interface jumpers/configuration.
+- Defer microphones, amplifiers, cameras, servos, separate 5 V supplies and batteries until the base build works and electrical requirements are documented.
+- This full-size N16R8 board is ideal for reusable experiments; a future **XIAO-sized board** may make the finished desk sculpture much smaller, but changing boards means rechecking pinouts and CAD.
+- No new LLM workstation, RTX GPU or cloud service is necessary for this phase.
+
+[Exact vendor links and seller-side limitations](shopping-list.md).

@@ -1,27 +1,40 @@
-# First build: beginner checklist
+# First physical build: stage gates
 
-## Stage A — free, no hardware
+The intended experience is **MacBook + small nearby companion**, not a home-workstation service. Firmware provides local OLED control and optional motion response; LLM/voice integration comes later.
 
-- [ ] Read `README.md` and inspect the architecture drawing.
-- [ ] `python3 -m unittest discover -s tests -v` passes.
-- [ ] `python3 -m macdesk.demo --simulate --face happy` prints an acknowledgement.
-- [ ] Open `cad/desk-buddy.scad` in OpenSCAD; adjust dimensions for your board, screen and cable.
-- [ ] Print only the fit-check cradle initially.
+## A. Free validation, no board required
 
-## Stage B — minimal physical build
+- [ ] Read [audit](audit-2026-10-26.md), [architecture](architecture.md), and [wiring diagram](../assets/wiring.svg).
+- [ ] Run <code>python3 -m unittest discover -s tests -v</code> and <code>python3 -m macdesk.demo --simulate --face happy --watch</code>.
+- [ ] Confirm firmware CI compiles both USB variants.
+- [ ] Render [OpenSCAD enclosure](../cad/desk-buddy.scad), first using <code>part="fit_coupon"</code>.
+- [ ] Check printer model **at the machine**; the Academy URL has not established it.
 
-- [ ] Buy one ESP32-S3 DevKitC-1-style USB-C board, one **SSD1306 I2C** OLED at 3.3 V, female-female jumper wires, and a small solderless breadboard if the board and display are header-equipped.
-- [ ] Check that the parts **actually have usable headers**, or arrange help with soldering.
-- [ ] Before wiring, disconnect USB. Verify display VCC and the ESP32 3V3 pin; never place servo loads on the 3V3 pin.
-- [ ] Install firmware dependencies; compile and flash with the correct board settings.
-- [ ] Check that the board says `{"type":"ready","display":"ok"}` and draws eyes.
-- [ ] Use a **data** USB-C cable; test every face via `macdesk.demo`.
-- [ ] Measure board and display; adjust the CAD and print a fit test, then full stand.
+## B. Confirm parts before purchasing
 
-## Stage C — report results
+- [ ] ESP32-S3 **N16R8** with USB/OTG, CH343P USB-UART and usable GPIO8/GPIO9, 3V3 and GND.
+- [ ] OLED **SSD1306** (not just 128×64), 3.3 V supply/I²C, populated 4-pin header.
+- [ ] Recommended additional sensor: **MPU-6050** 3.3 V-compatible breakout, populated headers.
+- [ ] Jumper wires, breadboard, USB **data** cable, available filament; basic multimeter useful.
+- [ ] Confirm prices + Finland shipping at checkout. See [shopping list](shopping-list.md).
 
-Record: exact board SKU, display PCB revision/controller, operating system, PlatformIO package versions, USB port, CAD dimensions, print time/material, wiring photo, actual response latency, power issues and failures. Don't claim performance or power use without measuring.
+## C. Breadboard bring-up (disconnect USB while wiring)
 
-## Electrical and privacy guardrails
+Wire OLED (and optionally MPU-6050) **3V3 / GND / GPIO8 SDA / GPIO9 SCL**; see diagram. Do not connect servo/battery/mains to this prototype.
 
-Use USB only for V0; no LiPo battery or mains modifications. Never power motors from MCU 3V3; use separately rated 5 V with shared ground and proper motor protection when upgrading. Do not enable public access or auto-executing arbitrary model-generated shell commands. For Mac automation, use a human-approved allowlist and local authentication.
+- [ ] Compile and flash [firmware](../firmware/README.md) using **native USB/OTG** port for default profile.
+- [ ] Confirm expected ready message and all six faces on the real SSD1306 screen.
+- [ ] Test invalid face command, cable unplug/replug, boot with display disconnected.
+- [ ] Add MPU-6050, confirm <code>"imu":"ok"</code> and <code>event:shake</code> when intentionally shaken; check false triggering.
+- [ ] Record board/PCBs and their actual dimensions, wiring photos, pin labels and firmware package versions.
+
+## D. Print
+
+- [ ] Print a small window-fit coupon and measure its true hole dimensions.
+- [ ] Adjust CAD dimensions against real PCB, headers, connector and display active area.
+- [ ] Inspect Bambu Studio slicing preview carefully for bridging, overhangs and supports.
+- [ ] Print the shell; retain board/display safely without stressing glass or shorting components.
+
+## E. Evidence and next milestone
+
+Capture short before/after video and first measured timings, plus any errors. Only then close [Issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1) and proceed to [Issue #2](https://github.com/imaddde867/physical_AI_exploration/issues/2). AI-controlled motion and voice should not be added without separate safety and privacy review.

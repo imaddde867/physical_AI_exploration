@@ -1,12 +1,19 @@
-# Printing the enclosure
+# CAD, printer and physical fit
 
-`cad/desk-buddy.scad` is an **original parametric desk stand**, not a creator-provided STL. It contains a vented enclosure with an open service back and separate face bezel. The display and board are initially mounted with removable adhesive/foam or small printed spacers: final standoffs/holes require measured board dimensions.
+The original [parametric OpenSCAD source](../cad/desk-buddy.scad) produces a small **open-back desktop shell** (not a locked enclosure) and a separate **window-fit test coupon**.
 
-1. Check the exact **Bambu printer model** at the machine. The shared Academy link is not proof of the printer model.
-2. Measure your actual OLED PCB, module visible area, ESP32 development board, USB port/cable clearance and available headers. Do not rely on internet nominal dimensions.
-3. Install OpenSCAD; open the SCAD and adjust `body_w`, `body_h`, `body_d`, `screen_w`, and `screen_h`.
-4. Render with F6 and export STL. Check fit and layer orientation in Bambu Studio.
-5. Default prototype: PLA, 0.2 mm layers, 3 perimeters, ~15% infill; print the hollow shell open-back down where practical, verify bridges/support preview.
-6. Print a low-cost fit-check bezel or small draft first. Keep ventilation and USB cable strain relief. Never enclose a LiPo battery in this initial design.
+**Local geometric validation (2026-10-26):** OpenSCAD 2021.01 rendered both as one connected, watertight STL each. The shell outer dimensions were **90 × 57 × 81 mm**; coupon **40 × 40 × 2.8 mm**. These facts do **not** establish mechanical fit or support-free FDM printability.
 
-The CAD does **not** yet guarantee a snap-fit or safe retention of a specific OLED or ESP32-S3 SKU. Measure and revise before final assembly.
+The default OLED window is **21.5 × 11 mm** (visible aperture), whereas the cheap OLED PCB is nominally **26.1 × 26.1 mm**, with exact panel location unknown. Do not confuse active viewing area with circuit-board dimensions. The case intentionally has no unverified screw holes or snap-clips. Start with removable, electrically insulating fixture material **on the PCB perimeter**, avoiding display glass, heat sources, connector contacts and the MacBook.
+
+## Workflow
+
+1. Identify the **actual Bambu printer model** from its display/label. The provided Bambu Academy URL does not establish which printer it is.
+2. Measure the purchased OLED PCB, viewing area and header offset, ESP32 board, USB connector and cable bend radius with a caliper.
+3. In OpenSCAD, set <code>part = "fit_coupon"</code>; render with F6 and export an STL. Print this tiny test first.
+4. Adjust <code>window_w</code>/<code>window_h</code>, enclosure dimensions and tolerances, then set <code>part = "shell"</code> and export STL.
+5. Slice using the actual printer profile in Bambu Studio. Start with PLA / 0.2 mm layers / 3 walls / ~15% infill; these are **proposed starting parameters**, not a validated print profile.
+6. Inspect preview for the **top cavity roof bridging and the front screen window**. The shell may need an alternate orientation and/or supports: **watertight mesh is not evidence of support-free printing**.
+7. Print, measure and physically fit. Revise CAD and document results. Keep ventilation and cable strain relief.
+
+No battery, heat-set inserts or powered servos are included in the initial enclosure. A later release should add actual PCB standoffs, retention features, access cover and measured printer tolerances.

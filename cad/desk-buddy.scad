@@ -1,36 +1,47 @@
-// Original adjustable desk companion enclosure (millimeters).
-// Measurements below are illustrative; measure actual components before printing.
-// Open back allows service, USB and initial foam-tape mounting.
-$fn = 36;
-body_w = 78;
+// MacDesk Buddy: original adjustable open-back desktop enclosure.
+// All dimensions in mm. Nominal values are placeholders, not verified fit.
+// Change part to "fit_coupon" to test the OLED window before printing full case.
+$fn = 48;
+part = "shell"; // ["shell", "fit_coupon"]
+body_w = 74;
 body_h = 76;
 body_d = 44;
-wall = 2.8;
-screen_w = 28;  // visible window width: revise for purchased OLED
-screen_h = 15;  // visible window height: revise for purchased OLED
 base_w = 90;
-base_d = 55;
+base_d = 57;
 base_h = 5;
+wall = 2.8;
+corner_r = 7;
+// Visible aperture, not PCB dimensions; OLED nominal PCB ~26-27mm across.
+window_w = 21.5;
+window_h = 11.0;
+window_z_fraction = 0.61;
 
-module rounded_box(w,d,h,r=5) {
-  hull() for(x=[-w/2+r,w/2-r],y=[-d/2+r,d/2-r])
-    translate([x,y,0]) cylinder(r=r,h=h);
+module rounded_prism(w, d, h, r) {
+  hull() for (x = [-w/2 + r, w/2 - r], y = [-d/2 + r, d/2 - r])
+    translate([x, y, 0]) cylinder(r = r, h = h);
 }
 module shell() {
   difference() {
     union() {
-      translate([0,0,base_h]) rounded_box(body_w,body_d,body_h,7);
-      rounded_box(base_w,base_d,base_h,8);
+      rounded_prism(base_w, base_d, base_h, 7);
+      translate([0, 0, base_h])
+        rounded_prism(body_w, body_d, body_h, corner_r);
     }
-    // cavity opens at rear (negative Y), leaving front wall
-    translate([0,-wall,base_h+wall])
-      rounded_box(body_w-2*wall,body_d+wall,body_h,5);
-    // display window on front face (+Y), at eye level
-    translate([-screen_w/2,body_d/2-wall-1,base_h+body_h*0.54])
-      cube([screen_w,wall+3,screen_h]);
-    // USB/service exit in the bottom rear (size to be measured)
-    translate([-7,-base_d/2-1,base_h+8])
-      cube([14,wall+10,10]);
+    // Open back (-Y), preserve the top, floor, front and side walls.
+    translate([-body_w/2 + wall, -body_d/2 - 2, base_h + wall])
+      cube([body_w - 2*wall, body_d - wall + 2, body_h - 2*wall]);
+    // Front window: leaves lip around nominal 26-27mm OLED PCB.
+    translate([-window_w/2, body_d/2 - wall - 0.3,
+               base_h + body_h*window_z_fraction - window_h/2])
+      cube([window_w, wall + 1, window_h]);
   }
 }
-shell();
+module fit_coupon() {
+  difference() {
+    cube([40, 40, wall]);
+    translate([(40-window_w)/2, (40-window_h)/2, -0.5])
+      cube([window_w, window_h, wall + 1]);
+  }
+}
+if (part == "fit_coupon") fit_coupon();
+else if (part == "shell") shell();
