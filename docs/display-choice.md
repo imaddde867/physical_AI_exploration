@@ -6,7 +6,7 @@ The design target is a distinctive, small, high-quality-looking companion for a 
 
 **Approved character direction:** one mature, restrained, heavy-lidded character on a near-black canvas. No ribbons, cheeks, anime eyes, pastel emoji decorations or multiple character concepts. The previous decorative illustrations have been superseded. This image is exactly what the sprite pipeline reads—not a photo of a tested LCD.
 
-[**Actual front dimensions: Ø31.4 mm face window in 72 mm body**](../assets/actual-scale-front.svg) — about **43.6%** of the shell's width. The visual concept exaggerates the relative screen size. For premium-looking alternatives with different layouts and processors, see [the creator-versus-online hardware matrix](hardware-options.md).
+[**Actual front dimensions: Ø31.4 mm face window in 72 mm body**](../assets/actual-scale-front.svg) — about **43.6%** of the shell's width. The on-screen PNG is a native-resolution source image; its appearance on a large monitor does **not** represent its actual 31.4 mm physical opening. For premium-looking alternatives with different layouts and processors, see [the creator-versus-online hardware matrix](hardware-options.md).
 
 ## Decision and comparison (2026-10-26)
 
@@ -19,7 +19,7 @@ The design target is a distinctive, small, high-quality-looking companion for a 
 | Interface | I²C | **SPI, 3.3 V** | SPI, 3.3 V |
 | Code library | Adafruit SSD1306 | **Adafruit GC9A01A 1.2.0** | Separate ST7789 implementation |
 
-The selected LCD has **32.4 mm circular active area**, manufacturer-stated module PCB dimensions 44 × 36 × 5 mm, and costs €8.99 at [Otronic](https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino). This improves display design for only **€3.00** above the earlier mono OLED.
+The selected LCD has **32.4 mm circular active area**, manufacturer-stated module PCB dimensions 44 × 36 × 5 mm, and costs €8.99 at [Otronic](https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino). This costs **€3.00 more for the display module** than the earlier monochrome OLED; the complete basket is tracked separately in the [current BOM](bom.md).
 
 [Adafruit's open-source Arduino GC9A01A driver](https://github.com/adafruit/Adafruit_GC9A01A) supports drawing geometric shapes, RGB colors and SPI display updates; the driver is a separately licensed dependency and not copied here. [GC9A01 breakout electrical reference](https://www.lcdwiki.com/index.php?title=1.28inch_IPS_Module) describes common BLK and SPI pins; **the Otronic module itself has not been inspected**, so these are not assumed to guarantee its backlight wiring.
 

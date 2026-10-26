@@ -57,9 +57,9 @@ For the Mac-side controller, from repository root:
 ~~~sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m macdesk.demo --simulate --face happy --watch
+.venv/bin/python -m macdesk.demo --simulate --face neutral --watch
 # Replace XXXX with the actual serial interface:
-.venv/bin/python -m macdesk.demo --port /dev/cu.usbmodemXXXX --face happy --watch
+.venv/bin/python -m macdesk.demo --port /dev/cu.usbmodemXXXX --face neutral --watch
 ~~~
 
 Firmware should print a ready event such as:

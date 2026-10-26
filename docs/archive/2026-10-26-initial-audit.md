@@ -1,6 +1,8 @@
-# Independent build-readiness review — 2026-10-26
+# Archived initial build-readiness review — 2026-10-26
 
-> **Historical note:** R3 and other SSD1306/OLED purchasing and wiring references below describe the **retired monochrome v0**. The current round GC9A01 IPS upgrade supersedes them. See [display-choice.md](display-choice.md), [shopping-list.md](shopping-list.md) and [firmware setup](../firmware/README.md). The previous review is retained for provenance.
+> **HISTORICAL DOCUMENT — NOT AN ACTIVE SHOPPING OR WIRING GUIDE.** This records early OLED-era decisions and the first circular-display upgrade. Its €39.43 basket, SSD1306 pin references and early geometry describe **retired versions**. Use the [current readiness report](../release-readiness.md), [€40.03 shopping list](../shopping-list.md), and [current wiring guide](../../firmware/README.md) instead.
+
+> **Historical note:** R3 and other SSD1306/OLED purchasing and wiring references below describe the **retired monochrome v0**. The current round GC9A01 IPS upgrade supersedes them. See [display-choice.md](../display-choice.md), [shopping-list.md](../shopping-list.md) and [firmware setup](../../firmware/README.md). The previous review is retained for provenance.
 
 ## Decision
 

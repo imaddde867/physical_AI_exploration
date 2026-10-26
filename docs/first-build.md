@@ -6,16 +6,16 @@ The goal is a polished-looking companion beside a MacBook, not a second GPU work
 
 - [ ] Confirm [Otronic GC9A01 OT8724](shopping-list.md) has **pre-soldered headers**, or buy a module with a connector cable. Exact BLK pin behavior must be established before use.
 - [ ] Confirm ESP32-S3 N16R8 USB/OTG port and GPIO10,11,12,13,14 / GPIO8,9 labels.
-- [ ] Use the existing MPU-6050 as an optional sensor, at 3.3 V logic.
+- [ ] Use an **optional MPU-6050** sensor only if you buy/have one; check its breakout board uses 3.3 V-safe I²C pull-ups.
 - [ ] Verify the actual Bambu printer model on the machine, not from the Academy link.
 - [ ] No soldering, motors, batteries or high-voltage wiring planned for the first experiment.
 
 ## Free work before any order
 
 - [ ] Run Python tests: python3 -m unittest discover -s tests -v
-- [ ] Run simulator: python3 -m macdesk.demo --simulate --face happy --watch
+- [ ] Run simulator: python3 -m macdesk.demo --simulate --face neutral --watch
 - [ ] Confirm ESP32 firmware compile workflow is green for **both** USB profiles.
-- [ ] Inspect the [original face preview](../assets/face-preview.svg) and [parametric case](../cad/desk-buddy.scad).
+- [ ] Inspect the [approved 240×240 screen PNG](../assets/face-idle-240.png), the [actual physical size diagram](../assets/actual-scale-front.svg), and the [parametric case](../cad/desk-buddy.scad).
 
 ## Breadboard assembly
 

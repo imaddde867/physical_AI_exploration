@@ -25,9 +25,9 @@
 5. **Want a longer-lived general-purpose standalone devboard with bigger round display and built-in IMU?** Choose **D**, but budget time to port firmware.
 6. **Want actual movement/camera immediately?** Choose **E**; **F** is a richer DIY challenge to do later.
 
-## Why the face preview can mislead
+## Actual screen size versus the finished body
 
-[Concept SVG](../assets/face-preview.svg) is an artistic illustration, **not drawn to the actual component/case scale**. The real budget LCD has **Ø32.4 mm active area** and current CAD opens **Ø31.4 mm** in a **72 mm-wide shell** — the exposed window is **~44% of the face body's width**. It will look more like a small round badge on a larger body, unless we shrink the housing or select a larger display. The [actual-scale view](../assets/actual-scale-front.svg) shows the dimension relationship. **Do not purchase based solely on the concept art.**
+[The approved 240×240 PNG](../assets/face-idle-240.png) is the **exact embedded source artwork**, but a browser's enlarged view is not the physical size of a finished device. The real budget LCD has **Ø32.4 mm active area** and current CAD opens **Ø31.4 mm** in a **72 mm-wide shell** — the exposed window is **~44% of the face body's width**. It will look more like a small round badge on a larger body, unless we shrink the housing or select a larger display. The [actual-scale view](../assets/actual-scale-front.svg) shows the dimension relationship. **Decide using the actual millimeter dimensions, not the size of a PNG in a browser.**
 
 ## What each of the nine videos contributes
 

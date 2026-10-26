@@ -18,6 +18,7 @@ from xml.etree import ElementTree
 ROOT = Path(__file__).resolve().parents[1]
 URL_SCHEMES = ("https:", "http:", "mailto:", "tel:", "data:")
 MD_LINKS = re.compile(r"\[[^\]]*\]\(([^)\n]+)\)")
+HTML_IMAGES = re.compile(r"""<img\b[^>]*\bsrc=["']([^"']+)["']""", re.IGNORECASE)
 
 
 def read_json(path: Path) -> dict:
@@ -81,8 +82,10 @@ def check_markdown_links(root: Path) -> list[str]:
         if ".git" in path.parts or ".venv" in path.parts:
             continue
         text = path.read_text(encoding="utf-8")
-        for match in MD_LINKS.finditer(text):
-            destination = match.group(1).strip().split(" ", 1)[0].strip("<>")
+        destinations = [m.group(1) for m in MD_LINKS.finditer(text)]
+        destinations.extend(m.group(1) for m in HTML_IMAGES.finditer(text))
+        for raw_destination in destinations:
+            destination = raw_destination.strip().split(" ", 1)[0].strip("<>")
             if not destination or destination.startswith(URL_SCHEMES + ("#",)):
                 continue
             destination = unquote(destination.split("#", 1)[0].split("?", 1)[0])
@@ -93,7 +96,7 @@ def check_markdown_links(root: Path) -> list[str]:
             else:
                 target = path.parent / destination
             if not target.resolve().is_relative_to(root.resolve()) or not target.exists():
-                broken.append(f"{path.relative_to(root)} -> {match.group(1)}")
+                broken.append(f"{path.relative_to(root)} -> {raw_destination}")
     return broken
 
 
@@ -137,7 +140,7 @@ def main() -> int:
     except (AssertionError, KeyError, ValueError, OSError, json.JSONDecodeError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
-    print(f"OK: BOM €{bom['expected_total']}, {len(options['options'])} hardware choices, Markdown links, SVG and firmware contract.")
+    print(f"OK: BOM €{bom['expected_total']}, {len(options['options'])} hardware choices, Markdown/HTML image links, SVG and firmware contract.")
     return 0
 
 

@@ -1,25 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" width="900" height="440" role="img" aria-label="Actual physical dimensions of the proposed MacDesk Buddy: 72 mm front body and 31.4 mm round display opening, about 44 percent of body width">
-<defs><linearGradient id="housing" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#b4bcca"/><stop offset="1" stop-color="#636e80"/></linearGradient></defs>
-<rect width="900" height="440" rx="16" fill="#121b2b"/>
-<text x="32" y="45" font-family="Arial" font-size="24" font-weight="bold" fill="#fff">Real face-to-housing size ratio · budget GC9A01</text>
-<text x="32" y="72" font-family="Arial" font-size="14" fill="#bcd1dd">Front elevation, dimensionally proportioned. No PCB fixture/tolerance or printed-fit guarantee.</text>
-<!-- 3 pixels / mm front view -->
-<g transform="translate(230,249)">
-<rect x="-108" y="-109.5" width="216" height="219" rx="36" fill="url(#housing)" stroke="#dae0e9" stroke-width="2"/>
-<circle cx="0" cy="-18" r="47.1" fill="#080c12" stroke="#32beb8" stroke-width="3"/>
-<circle cx="-17" cy="-24" r="11" rx="6" fill="#72e5e2"/>
-<circle cx="17" cy="-24" r="11" fill="#72e5e2"/>
-<path d="M-12 -1 Q0 12 12 -1" fill="none" stroke="#f7bad1" stroke-width="3" stroke-linecap="round"/>
-<path d="M-108 134 H108" stroke="#89a8c2" stroke-width="2" />
-<path d="M-108 127 V141 M108 127 V141" stroke="#89a8c2" stroke-width="2"/>
-<text x="0" y="161" text-anchor="middle" font-family="Arial" font-size="18" fill="#e8f0f8">72 mm body width</text>
-</g>
-<path d="M230 184 L342 140 H545" stroke="#65d4cc" stroke-width="2" fill="none"/>
-<text x="557" y="144" font-family="Arial" font-size="20" font-weight="bold" fill="#8af4ed">Ø31.4 mm aperture</text>
-<text x="557" y="168" font-family="Arial" font-size="16" fill="#d6e6ec">Visible window = 43.6% of body width</text>
-<text x="557" y="208" font-family="Arial" font-size="18" fill="#fff">The earlier face-preview SVG is artistic.</text>
-<text x="557" y="235" font-family="Arial" font-size="16" fill="#b7c7d9">It exaggerates the LCD-to-body proportion.</text>
-<text x="557" y="264" font-family="Arial" font-size="16" fill="#b7c7d9">For a larger face, choose an integrated</text>
-<text x="557" y="290" font-family="Arial" font-size="16" fill="#b7c7d9">AMOLED board or design a smaller shell.</text>
-<text x="32" y="405" font-family="Arial" font-size="14" fill="#a7bbca">Current CAD's 82 mm foot is wider than the 72 mm upright body; active LCD is Ø32.4 mm, aperture hides 0.5 mm each edge.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="480" viewBox="0 0 1024 480" role="img" aria-label="Measured design proportions: round LCD window 31.4 mm diameter occupies 43.6 percent of a 72 mm-wide body; 82 mm base. This is an aperture schematic, not character artwork.">
+<rect width="1024" height="480" rx="20" fill="#111923"/>
+<text x="42" y="48" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="bold" fill="#F1F4F8">The real dimensions · GC9A01 prototype</text>
+<text x="42" y="76" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#AAC0D0">Schematic front elevation • scaled at 3 px/mm • no unverified PCB mounting assumptions</text>
+<rect x="95" y="128" width="216" height="219" rx="36" fill="#AEB8C6" stroke="#DFE5EE" stroke-width="2"/>
+<rect x="80" y="342" width="246" height="17" rx="8" fill="#818D9C"/>
+<circle cx="203" cy="242" r="51" fill="#454F5B"/>
+<circle cx="203" cy="242" r="47.1" fill="#03070B" stroke="#8B9BAA" stroke-width="1.5"/>
+<path d="M95 380 V399 M311 380 V399 M95 393 H311" stroke="#9DB3C8" stroke-width="2"/>
+<path d="M95 388 l9 5 -9 5 M311 388 l-9 5 9 5" stroke="#9DB3C8" stroke-width="2" fill="none"/>
+<text x="203" y="421" text-anchor="middle" font-family="Arial" font-size="18" fill="#EDF3FA">72 mm housing width</text>
+<path d="M203 195 L352 145 H478" fill="none" stroke="#84C5D7" stroke-width="2"/>
+<text x="493" y="147" font-family="Arial" font-weight="bold" font-size="21" fill="#B4E4EE">Ø31.4 mm viewing aperture</text>
+<text x="493" y="177" font-family="Arial" font-size="17" fill="#DAE6EE">43.6% of the housing width</text>
+<text x="493" y="215" font-family="Arial" font-size="18" fill="#F3F6F8">Active LCD glass: Ø32.4 mm</text>
+<text x="493" y="244" font-family="Arial" font-size="18" fill="#D6E0EA">Display PCB: 44 × 36 × 5 mm nominal</text>
+<text x="493" y="273" font-family="Arial" font-size="18" fill="#D6E0EA">Foot width: 82 mm nominal</text>
+<text x="493" y="321" font-family="Arial" font-size="16" fill="#A9C0CF">The approved face lives in a separate 240×240 PNG.</text>
+<text x="493" y="346" font-family="Arial" font-size="16" fill="#A9C0CF">This diagram intentionally does not redraw it.</text>
+<text x="43" y="462" font-family="Arial" font-size="14" fill="#96ACBE">Before printing: confirm Bambu model, real module dimensions, bezel fit, headers, USB cable clearance and supports.</text>
 </svg>

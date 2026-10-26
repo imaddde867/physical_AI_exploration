@@ -2,7 +2,7 @@
 
 The source [desk-buddy.scad](../cad/desk-buddy.scad) now models a **circular face opening**, a subtle front bezel, a rounded enclosure and an open-back service cavity. There is also a separate **fit_coupon** part to print before the full housing.
 
-For visual realism, inspect the [dimensional front-view illustration](../assets/actual-scale-front.svg) before deciding whether the screen is big enough: **31.4 mm aperture / 72 mm body width = 43.6%**. The earlier expressive face render is stylized and overstates LCD size. Smaller body dimensions would require verifying internal board and cable clearances.
+For visual realism, inspect the [dimensional front-view illustration](../assets/actual-scale-front.svg) before deciding whether the screen is big enough: **31.4 mm aperture / 72 mm body width = 43.6%**. The approved PNG represents **screen pixels**, not the relative size of the finished enclosure. Smaller body dimensions would require verifying internal board and cable clearances.
 
 **Manufacturer/seller nominal dimensions:** active round LCD diameter 32.4 mm; external display board about 44×36×5 mm. The default visible aperture diameter is **31.4 mm** to hide the extreme screen edge and the display PCB. The LCD must sit behind the front wall, with its active area centered on the opening.
 
@@ -18,4 +18,4 @@ For visual realism, inspect the [dimensional front-view illustration](../assets/
 6. Use PLA, ~0.2 mm layers, 3 walls and ~15% infill as **initial slicing suggestions**, not validated settings.
 7. Print, photograph the assembly, and test actual LCD and connector clearances. Avoid touching or trapping LCD glass. For a durable version, design proper mounts/standoffs after measuring the real PCB.
 
-The [actual approved 240×240 sprite](../assets/face-idle-240.png) is firmware's idle screen source; it is enlarged by browsers and is not a photograph of the real LCD. The [vector sketch](../assets/face-preview.svg) is a simplified illustration, not pixel-exact. Final aesthetics depend on actual filament finish, screen black-level, backlight, fit and print quality.
+The [actual approved 240×240 sprite](../assets/face-idle-240.png) is firmware's idle screen source; it is enlarged by browsers and is not a photograph of the real LCD. The [dimensioned aperture diagram](../assets/actual-scale-front.svg) describes geometry, **not** a second character design. Final aesthetics depend on actual filament finish, screen black-level, backlight, fit and print quality.

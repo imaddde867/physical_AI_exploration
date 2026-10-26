@@ -1,80 +1,84 @@
-# First 20 minutes after cloning — MacBook M4
+# First session on the MacBook Pro M4
 
-**You can complete every software step in this section with no ESP32, display, 3D printer, cloud credentials or GPU workstation.** This is a quick **smoke test**, not a claim that the hardware is already operational.
+**Target:** MacBook Pro 14-inch (2024), **base M4 10-core CPU / 10-core GPU / 16 GB unified RAM**. See [development-host specifications](development-host.md). This guide starts with **no new hardware, no models and no cloud accounts**.
 
-## 1. Clone and inspect
+## 1. Clone
 
-```sh
+~~~sh
 git clone https://github.com/imaddde867/physical_AI_exploration.git
 cd physical_AI_exploration
 git status --short
+uname -m                           # Expected: arm64 on your Mac
 python3 --version
-```
+~~~
 
-Use an existing Python **3.11 or newer**. (The code is ordinary Python; Python 3.12 was used in CI.)
+Use **Python 3.11+**. For a reproducible fresh installation, if you use Homebrew, the following commands install **Python 3.12** and PlatformIO Core (the verified macOS formulae):
 
-## 2. Tests and software-only demonstration
-
-```sh
-python3 -m unittest discover -s tests -v
-python3 tools/check_repository.py
-python3 -m macdesk.demo --simulate --face happy --watch
-```
-
-The last command shows a simulated JSON ACK and a deliberately **synthetic** shake event. **No microcontroller, sensors or local LLM were involved.**
-
-## 3. Compile firmware on the Mac
-
-The PlatformIO pre-build hook automatically converts the approved indexed PNG to a generated RGB565 asset header, using only Python's standard library. Do not manually edit the gitignored header. The image itself is tracked in the repository and tested against an approved SHA256.
-
-Install the documented [PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/) with Homebrew (the verified formula is `platformio`; avoid modifying the system Python):
-
-```sh
-brew install platformio
+~~~sh
+brew install python@3.12 platformio
+python3.12 --version
 pio --version
+~~~
+
+If Homebrew is not available, use a compatible Python 3.11+ installation and the [PlatformIO VS Code IDE extension](https://platformio.org/install/ide?install=vscode). Do not run a downloaded installer as root. The repository does not require Docker or Xcode-specific Python packages.
+
+## 2. Create an isolated environment and test
+
+~~~sh
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python tools/check_repository.py
+.venv/bin/python -m macdesk.demo --simulate --face neutral --watch
+~~~
+
+**Expected:** unit-test pass, a repository-check pass, and a simulated serial ACK / **explicitly synthetic** motion event. No physical ESP32 is accessed. If Python 3.12 is not installed but another supported Python is, substitute its actual executable when creating the venv.
+
+## 3. Compile both ESP32-S3 firmwares
+
+~~~sh
 pio run -d firmware -e esp32s3_n16r8_usb
 pio run -d firmware -e esp32s3_n16r8_uart
-```
+git status --short
+~~~
 
-Both configurations must compile. The USB environment assumes **native ESP32-S3 USB/OTG**; the UART environment is for the board's separate USB-to-serial CH343P connector. **Neither build command flashes a board.**
+The first build downloads the **pinned PlatformIO dependencies** and may take longer. Both build environments use the same approved artwork. A pre-build hook converts [the one 240×240 screen PNG](../assets/face-idle-240.png) into a gitignored RGB565 asset header with **standard-library Python**; do not manually modify the generated file.
 
-If you don't have Homebrew, use the official PlatformIO VS Code extension instead.
+**The build does not flash anything.** The USB profile is for **native ESP32-S3 USB/OTG**; the UART profile uses the board's **separate CH343P USB-to-UART** port. The actual board may need first-flash BOOT/RESET steps. Full [firmware instructions and wiring](../firmware/README.md).
 
-## 4. Look at the design and screen sizes before buying
+## 4. Review your choices before purchasing
 
-- [Approved single face, actual native 240×240 sprite](../assets/face-idle-240.png)
-- [Simplified vector sketch, not firmware output](../assets/face-preview.svg)
-- [Dimensioned face/body ratio](../assets/actual-scale-front.svg)
-- [Hardware comparisons and Reel matches](hardware-options.md)
-- [Exact starter basket](shopping-list.md)
+- [One approved screen-only face, exactly 240×240 source pixels](../assets/face-idle-240.png).
+- [Physical screen aperture versus body width](../assets/actual-scale-front.svg): Ø31.4 mm visible opening in a 72 mm-wide body.
+- [Part compatibility and price comparison](hardware-options.md) and [single-store basket](shopping-list.md).
+- [Development milestones](first-build.md).
 
-The available Bambu printer model still needs direct identification. Do not slice with a guessed profile.
+**The existing Bambu Academy URL does not identify the printer model.** Verify the physical printer label before slicing. On Apple Silicon, the current [Homebrew OpenSCAD snapshot cask](https://formulae.brew.sh/cask/openscad%40snapshot) can be installed optionally:
 
-**OpenSCAD on current Apple Silicon macOS:** Homebrew's 2021.01 `openscad` cask is listed as disabled/Intel-only; use the manufacturer's installer or the maintained [`openscad@snapshot` cask](https://formulae.brew.sh/cask/openscad%40snapshot) if its requirements match your Mac. Check the installation details first.
+~~~sh
+brew install --cask openscad@snapshot
+~~~
 
-## 5. When electronics arrive (not before)
+Check its OS requirements first. The legacy `openscad` cask is disabled and Intel-only; do not add Rosetta just for an outdated CAD build.
 
-1. Photograph the exact board labels, display backside, connectors and screen dimensions.
-2. Confirm **pre-soldered header** and **BLK** behavior on the Otronic GC9A01. Verify the chosen board variant is the same one the firmware targets.
-3. Follow [the SPI wiring table and USB instructions](../firmware/README.md). Disconnect USB before each rewiring step.
-4. With data-capable USB cable attached to the **correct** connector, identify the board with `pio device list`. Check the selected port carefully, then (only after verifying it) flash:
+## 5. When electronics arrive
 
-```sh
+1. Check module revisions and **pre-soldered headers**, **LCD BLK pin** behavior, 3.3 V-safe sensor pull-ups and the ESP32 board's native USB/OTG labeling.
+2. Disconnect USB when wiring. Wire the GC9A01 on **SPI**, and the optional MPU-6050 on **separate I²C** pins.
+3. Find the correct serial device with `pio device list`, then flash the matching board profile. For native USB/OTG only:
+
+~~~sh
 pio run -d firmware -e esp32s3_n16r8_usb -t upload
-```
+~~~
 
-5. Start with one expression, inspect screen illumination and backlight **visually**, then check all six face commands. Example (replace placeholder with the actual device):
+4. Inspect the LCD **with your eyes**: `display=init_sent_unverified` is a transmit-only event, not proof of illumination. Then test the one face and all six *moods*:
 
-```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python -m macdesk.demo --port /dev/cu.usbmodemXXXX --face happy --watch
-```
+~~~sh
+.venv/bin/python -m macdesk.demo --port /dev/cu.usbmodemXXXX --face neutral --watch
+~~~
 
-**Important**: `"display":"init_sent_unverified"` reports only that the SPI initialization was sent. It does **not** prove the panel illuminated correctly.
+Replace the port placeholder with the actual macOS device. Record color order, clarity, timing, motion false positives and USB recovery in [Issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1).
 
-## 6. What to record
+## Scope
 
-[Build Issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1) is your physical validation log. Include board revision, actual GPIO labels, solder status, serial port, firmware versions, photograph of each face, actual backlight wiring, Bambu model, fit-coupon measurements, case slicing and any failures.
-
-The next step is [Phase #2](https://github.com/imaddde867/physical_AI_exploration/issues/2): Mac-local inference, permissions, response-time benchmarks and later servo motion. It is **not** necessary for the first build.
+V0/V1 uses **no local LLM or extra GPU memory**. Later Mac inference is optional and should stay within the machine's **shared 16 GB unified-memory budget**, using measurements rather than guessed model-fit assumptions. See [Mac profile](development-host.md) and [readiness gates](release-readiness.md).

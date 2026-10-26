@@ -45,6 +45,11 @@ class DisplayDecisionTests(unittest.TestCase):
         self.assertNotIn("I2C SSD1306 OLED", readme)
         self.assertIn('assets/face-idle-240.png', readme)
         self.assertNotIn('color face concepts', readme.lower())
+        self.assertIn('<p align="center">', readme)
+        self.assertIn('<img src="assets/face-idle-240.png"', readme)
+        self.assertIn('Mac16,1', readme)
+        self.assertIn('16 GB unified', readme)
+        self.assertFalse((ROOT / 'assets/face-preview.svg').exists())
 
 if __name__ == "__main__":
     unittest.main()

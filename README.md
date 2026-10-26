@@ -1,84 +1,70 @@
-# MacDesk Buddy · Physical AI Exploration
+# Physical AI Exploration
 
-**First build:** a compact, original, Mac-first desk companion with a **1.28-inch circular GC9A01 full-color IPS face**, an ESP32-S3, optional motion sensing and a printable case. Inspired by the saved robotics Reels without copying creators' assets.
+<p align="center">
+  <img src="assets/face-idle-240.png" alt="Approved single digital face: understated, heavy-lidded eyes on a dark 240 × 240 display" width="240" height="240">
+</p>
 
-[![Python and repository validation](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml) [![ESP32 firmware build](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml) [![OpenSCAD geometry checks](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml)
+<p align="center">
+  <strong>MacDesk Buddy · Build 01</strong><br>
+  One character. One compact screen. A practical route from software into electronics, sensing and physical AI.
+</p>
 
-![The single approved mature face, exactly 240 × 240 source pixels](assets/face-idle-240.png)
+<p align="center">
+  <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml"><img alt="Python and repository checks" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg"></a>
+  <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml"><img alt="ESP32 firmware build" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg"></a>
+  <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml"><img alt="OpenSCAD geometry checks" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg"></a>
+</p>
 
-**One character only.** The earlier pastel/emoji-like gallery is replaced by a single heavy-lidded, neutral face. Firmware reads this exact screen-only [240×240 PNG](assets/face-idle-240.png) through an automatic RGB565 sprite compiler. There is no character sheet, childlike artwork or robot enclosure in the display asset.
+**Status — software prototype.** The single-face PNG is the source used by ESP32 firmware, not a rendered robot or an expression gallery. Python tests, both PlatformIO configurations and CAD mesh validation pass in CI. **Real LCD brightness/colors, PCB wiring, printed fit and motion thresholds are not yet physically verified.** [Current build-readiness report](docs/release-readiness.md).
 
-**Display fidelity:** the sprite source is 32-color indexed at native screen resolution. Its reproduction on the actual LCD—colors, backlight, rotation and physical appearance—has not yet been tested.
+## Start on your MacBook
 
-> **Compare before purchasing:** [All worthwhile options: Reel-matched vs online alternatives](docs/hardware-options.md) · [Mac first-20-minutes clone/run guide](docs/clone-and-run.md) · [Actual screen-to-case dimensions](assets/actual-scale-front.svg). The image above is the **exact 240×240 source**, enlarged on your screen. The real device's viewing diameter remains ~31.4 mm.
+Target: **14-inch MacBook Pro (2024), base M4 (Mac16,1), 10-core CPU, 10-core GPU, 16 GB unified RAM**. The GPU has **no separate 16 GB VRAM**. A local LLM, workstation or cloud account is **not required** for this first build. See [development-host notes](docs/development-host.md).
 
-> **Status:** Python unit tests, repository metadata verification and both ESP32 USB firmware builds run in CI; OpenSCAD geometry has its own CI workflow. The round CAD was rendered and mesh-checked, but **real LCD illumination, physical fit, Bambu slicing and assembly are not validated**. See [audit and evidence](docs/audit-2026-10-26.md).
+~~~sh
+git clone https://github.com/imaddde867/physical_AI_exploration.git
+cd physical_AI_exploration
+python3 --version                     # Requires Python >= 3.11; see Mac setup guide
+python3 -m unittest discover -s tests -v
+python3 tools/check_repository.py
+python3 -m macdesk.demo --simulate --face neutral --watch
+~~~
 
-## Why this build?
+This runs **software-only tests and a synthetic simulation**; it does not talk to electronics or run AI. If your default Python is too old, follow the [verified macOS setup guide](docs/clone-and-run.md) to use Python 3.12 in a virtual environment.
 
-A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while the **MacBook M4** hosts commands and future optional local AI. The optional **MPU-6050** uses a **separate I²C bus** for motion-triggered reactions. The starter avoids cloud accounts, microphones, cameras and motors. Start with the electronics you can understand and validate, then expand.
+## First physical target
 
-```text
- MacBook Pro (Python host, optional local LLM)
-           | USB serial / newline JSON
-           v
- ESP32-S3 MCU --> SPI GC9A01 round IPS (color animated face)
-           |
-       \--> I2C MPU-6050 (optional motion sensor)
-       later expansion: servo, voice, Wi-Fi
-```
-
-## Start here
-
-1. Start with [clone and first-run instructions](docs/clone-and-run.md), then review [physical build steps](docs/first-build.md) and the [verified-priced parts basket](docs/bom.md).
-2. Without hardware: `python3 -m unittest discover -s tests -v` and `python3 -m macdesk.demo --simulate --face neutral`.
-3. With hardware: follow [firmware/README.md](firmware/README.md) and flash the ESP32-S3.
-4. Connect a **data-capable USB cable to the board's native ESP32-S3 USB/OTG port (not its CH343P UART port for the default firmware)**, find the port, then run `python3 -m pip install -r requirements.txt` and `python3 -m macdesk.demo --port /dev/cu.usbmodemXXXX --face neutral`.
-5. Print the small **screen fit coupon** first, then render `cad/desk-buddy.scad` with **OpenSCAD** after measuring actual components. See [docs/printing.md](docs/printing.md).
-
-## Project map
-
-| Area | What you'll find |
+| Part | Purpose |
 |---|---|
-| [docs/first-build.md](docs/first-build.md) | Steps, safety, acceptance tests |
-| [docs/bom.md](docs/bom.md) | One small first-build basket |
-| [docs/hardware-options.md](docs/hardware-options.md) | Creator/Reel-matched vs available online kits (important: **not plug-and-play compatible**) |
-| [hardware/options.json](hardware/options.json) | Machine-readable hardware options and source links |
-| [hardware/bom.json](hardware/bom.json) | Auditable shopping basket prices and assumptions |
-| [docs/clone-and-run.md](docs/clone-and-run.md) | Reproducible MacBook software-only start |
-| [docs/reel-index.md](docs/reel-index.md) | Nine-video quick reference and original sources |
-| [docs/reel-technical-notes.md](docs/reel-technical-notes.md) | Complete practical engineering notes and build paths from all nine saved videos |
-| [docs/printing.md](docs/printing.md) | Printable enclosure and fit test |
-| [docs/architecture.md](docs/architecture.md) | JSON protocol, responsibility boundaries |
-| [firmware/](firmware/) | Original PlatformIO Arduino ESP32-S3 implementation |
-| [macdesk/](macdesk/) | macOS-friendly Python controller + simulator |
-| [cad/](cad/) | Source-controlled, adjustable OpenSCAD enclosure |
-| [assets/architecture.svg](assets/architecture.svg) | Original vector architecture visual |
-| [assets/actual-scale-front.svg](assets/actual-scale-front.svg) | Honest physical face-to-case proportions |
-| [assets/face-idle-240.png](assets/face-idle-240.png) | Actual single-face screen sprite |
-| [tools/face_asset.py](tools/face_asset.py) | Deterministic dependency-free PNG to RGB565 compiler |
-| [tools/check_repository.py](tools/check_repository.py) | Offline BOM/links/catalogue consistency checks |
+| ESP32-S3 **N16R8** | USB-connected microcontroller, reusable for later projects |
+| **1.28-inch GC9A01 IPS** | Round, full-color 240 × 240 screen showing the **one approved face** |
+| Optional **MPU-6050** | I²C motion input / shake reaction |
+| Parametric OpenSCAD stand | Printable open-back housing and small fit coupon |
+| MacBook Pro M4 | Python host now; optional MLX/local model integration later |
 
-## Roadmap
+The **estimated complete Otronic basket is €40.03 delivered to Finland**, not a checkout quote. **Confirm pre-soldered headers, the LCD backlight pin, actual module dimensions and the exact Bambu printer model before buying or printing.** [Shopping list](docs/shopping-list.md) · [Reel-matched vs online alternatives](docs/hardware-options.md). Alternative Taby/AMOLED/StackChan boards do **not** run this firmware unchanged.
 
-- **V0 (now):** simulator, original JSONL protocol, **one understated GC9A01 character with restrained moods**, occasional blinking, optional MPU-6050 shake reaction, printable circular enclosure and fit coupon.
-- **V1 (hardware):** verify wiring + fit; measure time-to-expression and reconnect behavior.
-- **V2:** optional Mac-local LLM/voice and a constrained face-action interface; additional physical sensors only as needed.
-- **V3:** measure model-to-action reliability, latency and memory; introduce bounded movement with a separately rated motor power supply.
-- **V4:** camera or richer perception experiments and independent hardware sensing.
-- **V5:** optional standalone Wi-Fi mode; compare Mac-hosted vs edge-only behavior.
+## How it works
 
-**Current software only supports the GC9A01-based first build.** Taby, Waveshare AMOLED boards, Rocky and StackChan are documented **alternatives**, not build targets for the existing firmware. **No language model runs in V0**. Mac-local model/tool integration is V2/V3 work, and ESP32 keeps deterministic sensor behavior. The M4 laptop should remain responsive; GPU machines are **optional for training**, not required at runtime. No cloud dependency is required for V0/V1. No third-party images, firmware or CAD assets have been copied.
+~~~text
+MacBook (Python JSONL host, USB serial)
+                  |
+               ESP32-S3
+                /     \
+    SPI: GC9A01 LCD   I²C: optional MPU-6050
+     single character      motion events
+~~~
 
-## Attributions and licensing
+The **same character** handles neutral, happy, sad, sleepy, surprised and thinking commands via restrained overlays, plus a brief blink. The approved 240 × 240 PNG is reproducibly compiled into a small RGB565 asset in flash; no full-size model runs on the device. See [protocol and architecture](docs/architecture.md).
 
-See [docs/reel-index.md](docs/reel-index.md). Original repository material is MIT licensed under [LICENSE](LICENSE). Linked projects retain their authors' licenses and restrictions. This is an independently designed learning project.
+## Pick your next step
 
-## Latest review
+- **No electronics yet:** [clone, simulate and build firmware on macOS](docs/clone-and-run.md).
+- **Ready for the first assembly:** [wiring and physical validation checklist](docs/first-build.md), [firmware ports](firmware/README.md), [3D printing](docs/printing.md).
+- **Choosing parts:** [priced BOM](docs/bom.md), [hardware options](docs/hardware-options.md), [true physical size diagram](assets/actual-scale-front.svg).
+- **Research background:** [nine-Reel technical notes](docs/reel-technical-notes.md), [short Reel index](docs/reel-index.md).
+- **After hardware works:** [Issue #1 — reproducible physical bring-up](https://github.com/imaddde867/physical_AI_exploration/issues/1) followed by [Issue #2 — optional Mac-local AI](https://github.com/imaddde867/physical_AI_exploration/issues/2).
 
-- [Technical audit (26 October 2026)](docs/audit-2026-10-26.md)
-- [Verified vendor part list](docs/shopping-list.md)
-- [Original pin-level wiring diagram](assets/wiring.svg)
-- [Round color display choice and sourcing](docs/display-choice.md)
-- [Original concept face gallery](assets/face-preview.svg)
-- [Issue #1: actual hardware bring-up](https://github.com/imaddde867/physical_AI_exploration/issues/1)
+## Project boundaries and license
+
+This is an independently authored **learning and research prototype**, not a finished consumer robot, an exact clone of a Reel or a proven physical AI agent. The Mac-first V0 uses only Python/USB and deterministic microcontroller logic; servos, voice, camera, networking and local models are **later, optional milestones**. The repository is [MIT licensed](LICENSE); linked third-party projects retain their own licenses and artwork restrictions.
