@@ -1,55 +1,36 @@
-# MacDesk Buddy — concrete Finland shopping basket
+# MacDesk Buddy — color-display shopping basket
 
-**Checked:** 2026-10-26. Prices are advertised, not checked out; stock, regional VAT and delivery charges may change. Project is not hardware-validated.
+**Updated 2026-10-26:** The old monochrome calculator-looking OLED is NOT in the basket. Prices are seller listings, not final checkout totals; VAT, stock and delivery may change.
 
-## Recommended consolidated one-shop order
+## Buy from a single EU store: Otronic
 
-Supplier: [Otronic, Netherlands](https://www.otronic.nl/en/). Its [shipping table](https://www.otronic.nl/nl/verzending) lists tracked delivery to Finland for **€8**.
+| Quantity | Part | List € | Product link |
+|---:|---|---:|---|
+| 1 | ESP32-S3 N16R8 16 MB flash / 8 MB PSRAM | 9.95 | [Controller](https://www.otronic.nl/en/esp32-s3-n16r8-devboard-16mb-flash-en-8mb-psram.html) |
+| **1** | **OT8724 1.28 inch round GC9A01 240×240 IPS color LCD** | **8.99** | **[Round IPS screen](https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino)** |
+| 1 | MPU-6050 I²C motion sensor | 3.75 | [Sensor](https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html) |
+| 1 | 830-hole solderless breadboard | 2.39 | [Breadboard](https://www.otronic.nl/en/breadboard-830-hole-for-prototyping.html) |
+| 1 | Female-female Dupont wires, 40 × 20 cm | 1.85 | [Female-female cables](https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-female-female-20cm.html) |
+| 1 | Male-female Dupont wires, 40 × 20 cm | 1.85 | [Male-female cables](https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-male-female-20cm-dr.html) |
+| 1 | USB-C-to-USB-C DATA cable 1 m | 2.65 | [USB data cable](https://www.otronic.nl/en/usb-c-to-usb-c-1m-cable-for-data-and-fast-charging.html) |
+| — | [Estimated tracked Finland delivery](https://www.otronic.nl/nl/verzending) | 8.00 | Same seller |
+| | **Total estimated delivered** | **39.43** | |
 
-| Item (quantity 1 each) | SKU / specification | € | Direct link |
-|---|---|---:|---|
-| ESP32-S3 N16R8 development board | OT1022; 16 MB flash, 8 MB PSRAM, dual USB-C, seller-provided CH343P USB-UART, pre-soldered header **reported in a buyer review** | 9.95 | https://www.otronic.nl/en/esp32-s3-n16r8-devboard-16mb-flash-en-8mb-psram.html |
-| White OLED 0.96-inch 128x64 I2C | OT822-C66; address 0x3C default, 3–5 V advertised, **SSD1306 controller and soldered headers unconfirmed** | 5.99 | https://www.otronic.nl/en/mini-oled-display-white-096-inch-128x64-i2c.html |
-| 830-hole solderless breadboard | OT141-B94; bench testing only; will not fit inside final printed enclosure | 2.39 | https://www.otronic.nl/en/breadboard-830-hole-for-prototyping.html |
-| Female-female Dupont wires 40x20cm | OT215-B93 | 1.85 | https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-female-female-20cm.html |
-| Male-female Dupont wires 40x20cm | OT211-B91 | 1.85 | https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-male-female-20cm-dr.html |
-| USB-C to USB-C **data** cable, 1 m | OT5551, omit if already owned | 2.65 | https://www.otronic.nl/en/usb-c-to-usb-c-1m-cable-for-data-and-fast-charging.html |
+**Without buying another data cable: €36.78.** This is only €3.00 more than the €36.43 previous monochrome-OLED basket.
 
-**OLED-only parts: €24.68; Finland shipping: €8.00; total: €32.68.** The **recommended first-build basket adds one MPU-6050 for €3.75: €36.43 delivered**. Without the cable: €33.78 with the MPU-6050. These are advertised prices, not a real checkout.
+## Display alternatives (not drop-in compatible with current firmware)
 
-### Optional but recommended for day one: motion sensor
+- **[Otronic 1.3 inch square ST7789 IPS 240×240](https://www.otronic.nl/en/1-3-inch-spi-tft-lcd-display-rgb-st7789-3-3v) — €6.25.** Good colors but square shape and different firmware/CAD; cheaper if a rectangular face is preferred.
+- **[Waveshare 1.28 inch round GC9A01](https://www.waveshare.com/product/1.28inch-lcd-module.htm) — $14.99 list.** Offers official documentation and an included 8-pin cable; check shipping if Otronic's header cannot be used without soldering.
+- **[Electrokit Waveshare module](https://www.electrokit.com/en/lcd-module-round-1.28240x240px-spi) — 199 SEK list.** Stock and Finland shipping require a live checkout check.
 
-[MPU-6050 I²C accelerometer / gyroscope, Otronic OT2020-D106](https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html) **€3.75**. It shares SDA/SCL and 3.3V/GND with the OLED, normally address 0x68. The firmware supports shake-triggered face reactions with no Mac connection. **Confirm populated header and electrical compatibility** of the exact module before ordering; the shop's 3–5 V claim alone does not verify its internal I²C pull-up configuration. Neither sensor performance nor shake threshold has been calibrated.
+## Required checks before payment
 
-### OLED fallback — guaranteed controller, higher price
+1. The Otronic OT8724 spec confirms GC9A01, 240×240 IPS, 2.8–3.3 V, 8 pins and a 44×36×5 mm board. **It does NOT confirm its header is soldered or how BLK is electrically controlled.** Ask the vendor; the first-build plan assumes no soldering.
+2. The LCD uses **SPI**, even though its SCL and SDA pads resemble I²C labels. They map to ESP32-S3 GPIO12 SCK and GPIO11 MOSI, with GPIO10 CS, GPIO13 DC and GPIO14 RES. MPU-6050 alone uses GPIO8 and GPIO9 for I²C.
+3. Check the ESP32 board header labels, 3V3 and native USB/OTG socket. Do not apply 5 V to ESP32 GPIO.
+4. The optional BLK pin is intentionally left unconnected in the default design until the exact module's backlight operation is verified. If the display stays dark, check vendor documentation before changing this wire.
+5. The MPU-6050 breakout should keep its I²C pullups at 3.3 V. Measure actual parts before designing final board mounts.
+6. The printer must be identified from its label/display; the Academy URL is not confirmation of a particular Bambu printer.
 
-[Joy-IT SBC-OLED01V2 from Partco](https://partco.fi/tuote/joy-it-oled-n%C3%A4ytt%C3%B6-0-96-128x64-i2c-spi-v2-2588), **€11.29**, explicitly specifies **SSD1306**, 128x64, 3.3/5 V and I2C-compatible 4-pin header. Requires a separate shipment and adds delivery cost. Check its switch/configuration for I2C mode, rather than assuming all I2C/SPI boards default to I2C.
-
-### Alternative Finnish controller
-
-[ESP32-S3 N16R8 at Piikauppa](https://piikauppa.fi/kauppa/mikrokontrollerit/esp32/esp32-s3-devkitc-1-n16r8/), listed €15.90; verify header population and shipping before buying. Avoid making a second shipment purely to save a few euros on individual pieces.
-
-## Useful *optional* tools
-
-- [Digital multimeter, Otronic OT3201](https://www.otronic.nl/en/digital-multimeter) — €9.95, includes leads and battery; **only recommend for low-voltage electronics**, not mains safety work. Listings show inconsistent stock status, verify at checkout. For long-term use, consider a better branded UNI-T meter when your experiments become more demanding.
-- [150 mm caliper, Otronic](https://www.otronic.nl/en/tools) — from €8.79. Useful for measuring PCB/display and reworking the CAD. A more durable metal option is listed at €18.35 but availability is inconsistent.
-- [MPU-6050 I2C accelerometer/gyro](https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html) — €3.75; worthwhile for V2 motion interaction, **not required now**.
-
-## Final checks before purchasing
-
-1. Confirm the Otronic OLED is **SSD1306**, not SH1106/SSD1315, and that its 4-pin header is **pre-soldered**; otherwise use the explicit Joy-IT alternative.
-2. Confirm the ESP32 board's exact manufacturer SKU, 3V3, GND, GPIO8 and GPIO9 pin positions and pre-soldered headers. Product is **compatible-style**, not confirmed to be manufactured by Espressif.
-3. Check USB-UART CH343P macOS driver compatibility. The board also has a native USB port; depending on the driver, prefer native USB CDC as configured in `firmware/platformio.ini`. Test serial communication before building the enclosure.
-4. Do **not** connect motor/servo loads to the board's 3V3 pin.
-5. Confirm Bambu printer model and **measure your actual electronics** before slicing `cad/desk-buddy.scad`.
-6. Do not purchase microphone, camera, actuator, LiPo battery, amplifier or separate power supply for the first build. Add them only after validating v0 and their electrical requirements.
-
-**Technical references:** [project README](../README.md), [assembly](first-build.md), [BOM specification](bom.md), [firmware pinout](../firmware/README.md).
-
-## Verification update, 2026-10-26
-
-- [Otronic Finland tracked-shipping table](https://www.otronic.nl/nl/verzending) explicitly lists **€8**. The number can change at checkout.
-- The N16R8 board's listed flash and PSRAM are **not** the defaults of PlatformIO's generic 8MB/no-PSRAM DevKitC profile. The new [PlatformIO configuration](../firmware/platformio.ini) overrides those values.
-- For default native-USB firmware, plug into the board's **USB/OTG** connector, not its separate **CH343P USB-UART** connector. Follow [firmware setup](../firmware/README.md).
-- **STOP before buying the Otronic OLED:** seller page confirms I²C 128x64 but **does not explicitly confirm SSD1306**. Prefer the confirmed Partco Joy-IT SSD1306 if seller confirmation isn't available; budget additional shipping.
-- The Bambu Academy URL provided is **not independently resolvable as a specific printer model**. Check the label/display at the actual printer.
+**No products were purchased on your behalf.** 

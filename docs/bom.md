@@ -1,33 +1,23 @@
-# MacDesk Buddy — minimum repeat-use hardware basket
+# MacDesk Buddy — minimal, reusable hardware basket
 
-The goal is to buy **as little as possible without introducing disposable/unsupported parts**. Your MacBook M4 provides the host; the ESP32-S3 runs display/sensor I/O. 3D printer access is already available.
+The small monochrome SSD1306 OLED was rejected for appearance. The active build uses a **round, full-color GC9A01 IPS LCD**. The ESP32-S3 N16R8, MPU-6050 and Mac-first design remain the same.
 
-## One recommended Finnish-delivered order (advertised prices, 2026-10-26)
+## One-store order (Otronic, to Finland; advertised prices 2026-10-26)
 
-| Item | Model/specification | Listed € | Need |
-|---|---|---:|---|
-| Controller | Otronic **ESP32-S3 N16R8** (16MB flash, 8MB PSRAM, 2 × USB-C), header installation check | 9.95 | Required |
-| Display | Otronic 0.96" 128×64 I²C OLED, **controller SSD1306 not confirmed** | 5.99 | Required; confirm before purchase |
-| Motion sensor | MPU-6050 I²C 6-axis breakout | 3.75 | **Recommended** for Reel #9-style reactive behavior |
-| Breadboard | 830-hole solderless prototyping board | 2.39 | Required for learning/prototyping |
-| 40 female–female wires | 20 cm | 1.85 | Required for two header-equipped modules |
-| 40 male–female wires | 20 cm | 1.85 | Useful for breadboard |
-| USB-C data cable | 1 m; omit if already owned | 2.65 | Required unless already owned |
-| Delivery | Otronic tracked to Finland | 8.00 | Checkout estimate |
+| Part | Specification | € |
+|---|---|---:|
+| ESP32-S3 N16R8 | 16 MB flash, 8 MB PSRAM, dual USB-C | 9.95 |
+| **Round IPS LCD** | **OT8724, GC9A01, 1.28 inch, 240×240, SPI, 3.3 V** | **8.99** |
+| MPU-6050 sensor | 6-axis gyro/accelerometer; recommended for reactive behavior | 3.75 |
+| Breadboard | Reusable 830-contact prototype board | 2.39 |
+| Female-female jumper wires | 40 × 20 cm | 1.85 |
+| Male-female jumper wires | 40 × 20 cm | 1.85 |
+| USB-C data cable | 1 m (omit if owned) | 2.65 |
+| Estimated Finland delivery | Tracked Otronic shipment | 8.00 |
+| **Total** | | **39.43** |
 
-**Total including MPU-6050: €36.43.** OLED-only €32.68; both exclude optional tools, extra taxes/currency adjustments or changed checkout conditions. Verify headers on all three electronics boards.
+Without a new USB cable: **€36.78**. No purchase was made.
 
-## Useful longer-term tools
+**Stop before ordering:** the screen has 8 positions at 2.54 mm pitch, but the seller does **not explicitly confirm the pins are pre-soldered**. Confirm header population or ask for a preassembled alternative. Confirm **BLK backlight behavior**, power at 2.8–3.3 V and the exact screen dimensions. All GPIO signals must be 3.3 V. See [shopping links](shopping-list.md) and [display research](display-choice.md).
 
-- Low-voltage multimeter for continuity, 3V3/5V rail checks and avoiding short circuits; buy a more durable branded model if budget permits.
-- Digital or vernier caliper to measure hardware before designing mounts.
-- Basic soldering equipment **only if needed** for unpopulated headers or later permanent wiring.
-
-## Alternatives / avoid early purchases
-
-- Explicitly specified **Joy-IT SBC-OLED01V2 SSD1306** from Partco, €11.29 + its separate shipping, is safer than guessing the controller. Check interface jumpers/configuration.
-- Defer microphones, amplifiers, cameras, servos, separate 5 V supplies and batteries until the base build works and electrical requirements are documented.
-- This full-size N16R8 board is ideal for reusable experiments; a future **XIAO-sized board** may make the finished desk sculpture much smaller, but changing boards means rechecking pinouts and CAD.
-- No new LLM workstation, RTX GPU or cloud service is necessary for this phase.
-
-[Exact vendor links and seller-side limitations](shopping-list.md).
+**Long-term accessories:** a dependable low-voltage multimeter (e.g. UNI-T), a 150 mm caliper and eventually basic soldering tools. **Do not buy motors, batteries, cameras or a separate GPU machine for V0.** The supplied Bambu Academy URL did not identify the exact printer model; verify it at the machine.
