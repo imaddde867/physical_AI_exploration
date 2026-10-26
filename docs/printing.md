@@ -1,19 +1,19 @@
-# CAD, printer and physical fit
+# Round color face — printing and mechanical fit
 
-The original [parametric OpenSCAD source](../cad/desk-buddy.scad) produces a small **open-back desktop shell** (not a locked enclosure) and a separate **window-fit test coupon**.
+The source [desk-buddy.scad](../cad/desk-buddy.scad) now models a **circular face opening**, a subtle front bezel, a rounded enclosure and an open-back service cavity. There is also a separate **fit_coupon** part to print before the full housing.
 
-**Local geometric validation (2026-10-26):** OpenSCAD 2021.01 rendered both as one connected, watertight STL each. The shell outer dimensions were **90 × 57 × 81 mm**; coupon **40 × 40 × 2.8 mm**. These facts do **not** establish mechanical fit or support-free FDM printability.
+**Manufacturer/seller nominal dimensions:** active round LCD diameter 32.4 mm; external display board about 44×36×5 mm. The default visible aperture diameter is **31.4 mm** to hide the extreme screen edge and the display PCB. The LCD must sit behind the front wall, with its active area centered on the opening.
 
-The default OLED window is **21.5 × 11 mm** (visible aperture), whereas the cheap OLED PCB is nominally **26.1 × 26.1 mm**, with exact panel location unknown. Do not confuse active viewing area with circuit-board dimensions. The case intentionally has no unverified screw holes or snap-clips. Start with removable, electrically insulating fixture material **on the PCB perimeter**, avoiding display glass, heat sources, connector contacts and the MacBook.
+**Local geometrical checks (2026-10-26):** OpenSCAD compiled both configurations. Watertight meshes with one connected component: shell outer bounds **82×54×78.5 mm**; coupon **47×47×2.8 mm**. This is **not a verified part fit**, and not a tested Bambu Studio slicing profile.
 
-## Workflow
+## Steps
 
-1. Identify the **actual Bambu printer model** from its display/label. The provided Bambu Academy URL does not establish which printer it is.
-2. Measure the purchased OLED PCB, viewing area and header offset, ESP32 board, USB connector and cable bend radius with a caliper.
-3. In OpenSCAD, set <code>part = "fit_coupon"</code>; render with F6 and export an STL. Print this tiny test first.
-4. Adjust <code>window_w</code>/<code>window_h</code>, enclosure dimensions and tolerances, then set <code>part = "shell"</code> and export STL.
-5. Slice using the actual printer profile in Bambu Studio. Start with PLA / 0.2 mm layers / 3 walls / ~15% infill; these are **proposed starting parameters**, not a validated print profile.
-6. Inspect preview for the **top cavity roof bridging and the front screen window**. The shell may need an alternate orientation and/or supports: **watertight mesh is not evidence of support-free printing**.
-7. Print, measure and physically fit. Revise CAD and document results. Keep ventilation and cable strain relief.
+1. Identify the exact Bambu Lab printer from the physical machine label or display. The Academy URL does not establish the model.
+2. Obtain the actual LCD module and measure PCB, viewing-glass location, header protrusion and wire bend radius with a caliper.
+3. Open the SCAD in OpenSCAD; set **part = "fit_coupon"**, render F6 and export STL. Print this small circular-window sample first.
+4. Revise **opening_d**, **face_height**, body dimensions and tolerances if needed. Set **part = "shell"**, render F6 and export STL.
+5. Import the exported model into Bambu Studio with the correct printer profile, inspect the enclosed top bridge and circular front face overhang for supports; choose the lowest-risk orientation.
+6. Use PLA, ~0.2 mm layers, 3 walls and ~15% infill as **initial slicing suggestions**, not validated settings.
+7. Print, photograph the assembly, and test actual LCD and connector clearances. Avoid touching or trapping LCD glass. For a durable version, design proper mounts/standoffs after measuring the real PCB.
 
-No battery, heat-set inserts or powered servos are included in the initial enclosure. A later release should add actual PCB standoffs, retention features, access cover and measured printer tolerances.
+The face preview is a visual concept only. Final aesthetics depend on actual filament finish, screen black-level, backlight, fit and print quality.

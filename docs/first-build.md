@@ -1,40 +1,38 @@
-# First physical build: stage gates
+# First-build stage gates — round color MacDesk Buddy
 
-The intended experience is **MacBook + small nearby companion**, not a home-workstation service. Firmware provides local OLED control and optional motion response; LLM/voice integration comes later.
+The goal is a polished-looking companion beside a MacBook, not a second GPU workstation. The selected face is **full-color GC9A01 IPS SPI**; the old SSD1306 monochrome screen is no longer in the bill of materials.
 
-## A. Free validation, no board required
+## Before purchasing
 
-- [ ] Read [audit](audit-2026-10-26.md), [architecture](architecture.md), and [wiring diagram](../assets/wiring.svg).
-- [ ] Run <code>python3 -m unittest discover -s tests -v</code> and <code>python3 -m macdesk.demo --simulate --face happy --watch</code>.
-- [ ] Confirm firmware CI compiles both USB variants.
-- [ ] Render [OpenSCAD enclosure](../cad/desk-buddy.scad), first using <code>part="fit_coupon"</code>.
-- [ ] Check printer model **at the machine**; the Academy URL has not established it.
+- [ ] Confirm [Otronic GC9A01 OT8724](shopping-list.md) has **pre-soldered headers**, or buy a module with a connector cable. Exact BLK pin behavior must be established before use.
+- [ ] Confirm ESP32-S3 N16R8 USB/OTG port and GPIO10,11,12,13,14 / GPIO8,9 labels.
+- [ ] Use the existing MPU-6050 as an optional sensor, at 3.3 V logic.
+- [ ] Verify the actual Bambu printer model on the machine, not from the Academy link.
+- [ ] No soldering, motors, batteries or high-voltage wiring planned for the first experiment.
 
-## B. Confirm parts before purchasing
+## Free work before any order
 
-- [ ] ESP32-S3 **N16R8** with USB/OTG, CH343P USB-UART and usable GPIO8/GPIO9, 3V3 and GND.
-- [ ] OLED **SSD1306** (not just 128×64), 3.3 V supply/I²C, populated 4-pin header.
-- [ ] Recommended additional sensor: **MPU-6050** 3.3 V-compatible breakout, populated headers.
-- [ ] Jumper wires, breadboard, USB **data** cable, available filament; basic multimeter useful.
-- [ ] Confirm prices + Finland shipping at checkout. See [shopping list](shopping-list.md).
+- [ ] Run Python tests: python3 -m unittest discover -s tests -v
+- [ ] Run simulator: python3 -m macdesk.demo --simulate --face happy --watch
+- [ ] Confirm ESP32 firmware compile workflow is green for **both** USB profiles.
+- [ ] Inspect the [original face preview](../assets/face-preview.svg) and [parametric case](../cad/desk-buddy.scad).
 
-## C. Breadboard bring-up (disconnect USB while wiring)
+## Breadboard assembly
 
-Wire OLED (and optionally MPU-6050) **3V3 / GND / GPIO8 SDA / GPIO9 SCL**; see diagram. Do not connect servo/battery/mains to this prototype.
+1. Disconnect USB.
+2. Wire the LCD at **3V3, GND, SPI MOSI GPIO11, SPI clock GPIO12, CS GPIO10, DC GPIO13, reset GPIO14**. The LCD pads labeled SCL and SDA are **SPI**, not I²C.
+3. Leave BLK as specified in the firmware README pending seller confirmation; do not blindly connect to 5V or GPIO.
+4. Optionally attach MPU-6050 at **3V3, GND, GPIO8 SDA, GPIO9 SCL**.
+5. Flash the [correct firmware profile](../firmware/README.md) using native ESP32-S3 USB/OTG, then visually inspect the panel.
+6. Send each of six expression commands from the Mac controller, test reconnection and invalid JSON, then deliberately trigger the sensor reaction.
+7. Record actual board/display model, header labels, color order, power issues, serial port, successful photos/videos and any discrepancies.
 
-- [ ] Compile and flash [firmware](../firmware/README.md) using **native USB/OTG** port for default profile.
-- [ ] Confirm expected ready message and all six faces on the real SSD1306 screen.
-- [ ] Test invalid face command, cable unplug/replug, boot with display disconnected.
-- [ ] Add MPU-6050, confirm <code>"imu":"ok"</code> and <code>event:shake</code> when intentionally shaken; check false triggering.
-- [ ] Record board/PCBs and their actual dimensions, wiring photos, pin labels and firmware package versions.
+## Print and finish
 
-## D. Print
+1. Print just the circular 31.4 mm aperture coupon and check actual fit/visibility of the round 32.4 mm display glass.
+2. Measure module PCB (seller nominal 44×36×5 mm), wire-header and USB cable clearance.
+3. Update and render the OpenSCAD shell, inspect the **actual printer profile and slice supports** in Bambu Studio.
+4. Print the shell; hold the module with removable, electrically insulating fixtures at safe PCB areas. Avoid pressure on LCD glass, exposed contacts and power components.
+5. Do not close [Issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1) until real electrical and mechanical fit results exist.
 
-- [ ] Print a small window-fit coupon and measure its true hole dimensions.
-- [ ] Adjust CAD dimensions against real PCB, headers, connector and display active area.
-- [ ] Inspect Bambu Studio slicing preview carefully for bridging, overhangs and supports.
-- [ ] Print the shell; retain board/display safely without stressing glass or shorting components.
-
-## E. Evidence and next milestone
-
-Capture short before/after video and first measured timings, plus any errors. Only then close [Issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1) and proceed to [Issue #2](https://github.com/imaddde867/physical_AI_exploration/issues/2). AI-controlled motion and voice should not be added without separate safety and privacy review.
+Next phase: optional local language model and permissioned tools on the Mac, then independently powered motion hardware.
