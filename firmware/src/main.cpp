@@ -43,7 +43,7 @@ void sendReply(const char *type, const char *field, const char *value) {
 void drawFace() {
   if (!oledReady) return;
   oled.clearDisplay();
-  const bool reacting = (int32_t)(surpriseUntil - millis()) > 0;
+  const bool reacting = surpriseUntil != 0 && (int32_t)(surpriseUntil - millis()) > 0;
   const String shown = reacting ? "surprised" : activeFace;
   const bool blinkNow = (millis() % 4300UL) < 120UL && shown != "sleepy";
   eyesClosed = blinkNow;
@@ -175,8 +175,8 @@ void loop() {
   }
   const uint32_t now = millis();
   checkMotion(now);
-  const bool reacting = (int32_t)(surpriseUntil - now) > 0;
-  const bool shouldBlink = (now % 4300UL) < 120UL && activeFace != "sleepy";
+  const bool reacting = surpriseUntil != 0 && (int32_t)(surpriseUntil - now) > 0;
+  const bool shouldBlink = (now % 4300UL) < 120UL && (reacting || activeFace != "sleepy");
   static bool wasReacting = false;
   if (reacting != wasReacting || shouldBlink != eyesClosed) {
     wasReacting = reacting;
