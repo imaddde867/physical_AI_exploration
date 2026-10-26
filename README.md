@@ -4,9 +4,13 @@
 
 [![Python and repository validation](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml) [![ESP32 firmware build](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml) [![OpenSCAD geometry checks](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml)
 
-![Illustrative original round-color face concepts; not physical prototype photos](assets/face-preview.svg)
+![The single approved mature face, exactly 240 × 240 source pixels](assets/face-idle-240.png)
 
-> **Compare before purchasing:** [All worthwhile options: Reel-matched vs online alternatives](docs/hardware-options.md) · [Mac first-20-minutes clone/run guide](docs/clone-and-run.md) · [Actual screen-to-case dimensions](assets/actual-scale-front.svg). The illustration above is **not to physical scale**.
+**One character only.** The earlier pastel/emoji-like gallery is replaced by a single heavy-lidded, neutral face. Firmware reads this exact screen-only [240×240 PNG](assets/face-idle-240.png) through an automatic RGB565 sprite compiler. There is no character sheet, childlike artwork or robot enclosure in the display asset.
+
+**Display fidelity:** the sprite source is 32-color indexed at native screen resolution. Its reproduction on the actual LCD—colors, backlight, rotation and physical appearance—has not yet been tested.
+
+> **Compare before purchasing:** [All worthwhile options: Reel-matched vs online alternatives](docs/hardware-options.md) · [Mac first-20-minutes clone/run guide](docs/clone-and-run.md) · [Actual screen-to-case dimensions](assets/actual-scale-front.svg). The image above is the **exact 240×240 source**, enlarged on your screen. The real device's viewing diameter remains ~31.4 mm.
 
 > **Status:** Python unit tests, repository metadata verification and both ESP32 USB firmware builds run in CI; OpenSCAD geometry has its own CI workflow. The round CAD was rendered and mesh-checked, but **real LCD illumination, physical fit, Bambu slicing and assembly are not validated**. See [audit and evidence](docs/audit-2026-10-26.md).
 
@@ -27,9 +31,9 @@ A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while th
 ## Start here
 
 1. Start with [clone and first-run instructions](docs/clone-and-run.md), then review [physical build steps](docs/first-build.md) and the [verified-priced parts basket](docs/bom.md).
-2. Without hardware: `python3 -m unittest discover -s tests -v` and `python3 -m macdesk.demo --simulate --face happy`.
+2. Without hardware: `python3 -m unittest discover -s tests -v` and `python3 -m macdesk.demo --simulate --face neutral`.
 3. With hardware: follow [firmware/README.md](firmware/README.md) and flash the ESP32-S3.
-4. Connect a **data-capable USB cable to the board's native ESP32-S3 USB/OTG port (not its CH343P UART port for the default firmware)**, find the port, then run `python3 -m pip install -r requirements.txt` and `python3 -m macdesk.demo --port /dev/cu.usbmodemXXXX --face happy`.
+4. Connect a **data-capable USB cable to the board's native ESP32-S3 USB/OTG port (not its CH343P UART port for the default firmware)**, find the port, then run `python3 -m pip install -r requirements.txt` and `python3 -m macdesk.demo --port /dev/cu.usbmodemXXXX --face neutral`.
 5. Print the small **screen fit coupon** first, then render `cad/desk-buddy.scad` with **OpenSCAD** after measuring actual components. See [docs/printing.md](docs/printing.md).
 
 ## Project map
@@ -51,11 +55,13 @@ A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while th
 | [cad/](cad/) | Source-controlled, adjustable OpenSCAD enclosure |
 | [assets/architecture.svg](assets/architecture.svg) | Original vector architecture visual |
 | [assets/actual-scale-front.svg](assets/actual-scale-front.svg) | Honest physical face-to-case proportions |
+| [assets/face-idle-240.png](assets/face-idle-240.png) | Actual single-face screen sprite |
+| [tools/face_asset.py](tools/face_asset.py) | Deterministic dependency-free PNG to RGB565 compiler |
 | [tools/check_repository.py](tools/check_repository.py) | Offline BOM/links/catalogue consistency checks |
 
 ## Roadmap
 
-- **V0 (now):** simulator, original JSONL protocol, **GC9A01 round color faces**, periodic blinking, optional MPU-6050 shake reaction, printable circular enclosure and fit coupon.
+- **V0 (now):** simulator, original JSONL protocol, **one understated GC9A01 character with restrained moods**, occasional blinking, optional MPU-6050 shake reaction, printable circular enclosure and fit coupon.
 - **V1 (hardware):** verify wiring + fit; measure time-to-expression and reconnect behavior.
 - **V2:** optional Mac-local LLM/voice and a constrained face-action interface; additional physical sensors only as needed.
 - **V3:** measure model-to-action reliability, latency and memory; introduce bounded movement with a separately rated motor power supply.

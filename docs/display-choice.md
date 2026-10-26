@@ -2,7 +2,9 @@
 
 The design target is a distinctive, small, high-quality-looking companion for a MacBook, rather than a monochrome diagnostic module.
 
-![Original concept art, not a photo or physically proportioned depiction](../assets/face-preview.svg)
+![The single approved 240×240 face, source used in firmware](../assets/face-idle-240.png)
+
+**Approved character direction:** one mature, restrained, heavy-lidded character on a near-black canvas. No ribbons, cheeks, anime eyes, pastel emoji decorations or multiple character concepts. The previous decorative illustrations have been superseded. This image is exactly what the sprite pipeline reads—not a photo of a tested LCD.
 
 [**Actual front dimensions: Ø31.4 mm face window in 72 mm body**](../assets/actual-scale-front.svg) — about **43.6%** of the shell's width. The visual concept exaggerates the relative screen size. For premium-looking alternatives with different layouts and processors, see [the creator-versus-online hardware matrix](hardware-options.md).
 
@@ -21,13 +23,14 @@ The selected LCD has **32.4 mm circular active area**, manufacturer-stated modul
 
 [Adafruit's open-source Arduino GC9A01A driver](https://github.com/adafruit/Adafruit_GC9A01A) supports drawing geometric shapes, RGB colors and SPI display updates; the driver is a separately licensed dependency and not copied here. [GC9A01 breakout electrical reference](https://www.lcdwiki.com/index.php?title=1.28inch_IPS_Module) describes common BLK and SPI pins; **the Otronic module itself has not been inspected**, so these are not assumed to guarantee its backlight wiring.
 
-## Aesthetic implementation
+## Screen asset and implementation
 
-- Black background, oversized cyan/lilac eyes and dark pupils with highlights.
-- Pastel expression details, no calculator-style white text at the bottom.
-- Six faces and a periodic blink; MPU-6050 shake triggers a surprised face.
-- Rounded 3D-printed shell with circular bezel concealing the display PCB.
-- SVG above is **illustrative original design**, not measured pixel output or a photo.
+- The approved [screen-only PNG](../assets/face-idle-240.png) is **240×240**, indexed to **32 colors** for predictable small-screen appearance.
+- The standard-library-only [asset compiler](../tools/face_asset.py) generates a flash-resident RGB565 palette and roughly **10.5 KB** of run-length tokens before every PlatformIO build. The generated header is not checked into git.
+- The embedded driver streams pixels row by row to the GC9A01, using just a **480-byte scanline buffer** and no full-frame heap allocation.
+- One face identity is shared by all **six retained JSON protocol commands**. Commands only adjust small mouth/lid cues; occasional blinks do not introduce new characters.
+- No LLM, image-generation inference, runtime PNG parsing or workstation is required for the display.
+- The visual on the real IPS LCD remains unverified until physical hardware is wired and photographed.
 
 ## Technical changes
 
