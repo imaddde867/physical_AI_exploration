@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-26",
+  "id": "macdesk-buddy-gc9a01-v0",
+  "currency": "EUR",
+  "estimate_type": "Advertised shop prices including tracked Finland delivery, not a confirmed cart",
+  "supplier": "Otronic",
+  "selected_display": "OT8724 GC9A01 SPI",
+  "items": [
+    {
+      "id": "esp32_s3_n16r8",
+      "name": "ESP32-S3 N16R8 dual USB-C development board",
+      "quantity": 1,
+      "unit_price": "9.95",
+      "url": "https://www.otronic.nl/en/esp32-s3-n16r8-devboard-16mb-flash-and-8mb-psram",
+      "verify": "Correct GPIO labels and populated headers"
+    },
+    {
+      "id": "display_gc9a01",
+      "name": "OT8724 1.28 inch GC9A01 240x240 SPI IPS",
+      "quantity": 1,
+      "unit_price": "8.99",
+      "url": "https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino",
+      "verify": "Confirm pre-soldered 8-pin header, backlight BLK wiring and module dimensions"
+    },
+    {
+      "id": "imu_mpu6050",
+      "name": "MPU-6050 motion sensor",
+      "quantity": 1,
+      "unit_price": "3.75",
+      "url": "https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html",
+      "verify": "Check module 3.3V I2C pull-ups and installed headers"
+    },
+    {
+      "id": "breadboard",
+      "name": "830 point solderless breadboard",
+      "quantity": 1,
+      "unit_price": "2.99",
+      "url": "https://www.otronic.nl/en/breadboard-830-hole-for-prototyping.html",
+      "verify": "Prototype only; not needed inside case"
+    },
+    {
+      "id": "wire_ff",
+      "name": "40 female-female Dupont jumpers",
+      "quantity": 1,
+      "unit_price": "1.85",
+      "url": "https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-female-female-20cm.html",
+      "verify": "Match actual connectors"
+    },
+    {
+      "id": "wire_mf",
+      "name": "40 male-female Dupont jumpers",
+      "quantity": 1,
+      "unit_price": "1.85",
+      "url": "https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-male-female-20cm-dr.html",
+      "verify": "Match actual connectors"
+    },
+    {
+      "id": "cable",
+      "name": "1m USB-C data cable",
+      "quantity": 1,
+      "unit_price": "2.65",
+      "url": "https://www.otronic.nl/en/usb-c-to-usb-c-1m-cable-for-data-and-fast-charging.html",
+      "optional_if_already_owned": true,
+      "verify": "Data-capable (not charge-only)"
+    },
+    {
+      "id": "shipping",
+      "name": "Estimated tracked delivery to Finland",
+      "quantity": 1,
+      "unit_price": "8.00",
+      "url": "https://www.otronic.nl/nl/verzending",
+      "verify": "Verify delivery and tax at checkout"
+    }
+  ],
+  "expected_total": "40.03",
+  "expected_total_without_cable": "37.38",
+  "notes": [
+    "No order placed.",
+    "Prices/stock are time sensitive.",
+    "No motors, batteries or external GPU included.",
+    "Other displays/boards are alternative hardware tracks; don't add them to this cart."
+  ]
+}

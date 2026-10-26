@@ -2,7 +2,9 @@
 
 The design target is a distinctive, small, high-quality-looking companion for a MacBook, rather than a monochrome diagnostic module.
 
-![Original concept art, not a photo](../assets/face-preview.svg)
+![Original concept art, not a photo or physically proportioned depiction](../assets/face-preview.svg)
+
+[**Actual front dimensions: Ø31.4 mm face window in 72 mm body**](../assets/actual-scale-front.svg) — about **43.6%** of the shell's width. The visual concept exaggerates the relative screen size. For premium-looking alternatives with different layouts and processors, see [the creator-versus-online hardware matrix](hardware-options.md).
 
 ## Decision and comparison (2026-10-26)
 

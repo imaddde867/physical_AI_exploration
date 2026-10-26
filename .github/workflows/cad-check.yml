@@ -1,0 +1,39 @@
+name: OpenSCAD geometry checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install headless OpenSCAD and mesh inspector
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends openscad
+          python -m pip install 'trimesh>=4,<5' 'numpy>=1.26,<3' 'networkx>=3,<5'
+      - name: Render shell and cheap fit coupon
+        run: |
+          openscad -o /tmp/macdesk-shell.stl cad/desk-buddy.scad
+          openscad -D 'part="fit_coupon"' -o /tmp/macdesk-coupon.stl cad/desk-buddy.scad
+      - name: Validate watertight, connected, sized meshes
+        run: |
+          python - <<'PY'
+          import trimesh
+          for name in ('shell', 'coupon'):
+              model = trimesh.load(f'/tmp/macdesk-{name}.stl', force='mesh', process=True)
+              assert model.is_watertight, f'{name} has open edges'
+              assert len(model.split(only_watertight=True)) == 1, f'{name} not one component'
+              assert (model.extents > 0).all(), f'{name} has zero dimension'
+              print(name, 'dimensions mm:', model.extents.tolist(), 'faces:', len(model.faces))
+          PY

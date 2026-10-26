@@ -2,9 +2,13 @@
 
 **First build:** a compact, original, Mac-first desk companion with a **1.28-inch circular GC9A01 full-color IPS face**, an ESP32-S3, optional motion sensing and a printable case. Inspired by the saved robotics Reels without copying creators' assets.
 
+[![Python and repository validation](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml) [![ESP32 firmware build](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml) [![OpenSCAD geometry checks](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml)
+
 ![Illustrative original round-color face concepts; not physical prototype photos](assets/face-preview.svg)
 
-> **Status:** Mac-side tests and both USB firmware builds are automated. The round CAD was rendered and mesh-checked, but **real LCD illumination, physical fit, Bambu slicing and assembly are not validated**. See [audit and evidence](docs/audit-2026-10-26.md).
+> **Compare before purchasing:** [All worthwhile options: Reel-matched vs online alternatives](docs/hardware-options.md) · [Mac first-20-minutes clone/run guide](docs/clone-and-run.md) · [Actual screen-to-case dimensions](assets/actual-scale-front.svg). The illustration above is **not to physical scale**.
+
+> **Status:** Python unit tests, repository metadata verification and both ESP32 USB firmware builds run in CI; OpenSCAD geometry has its own CI workflow. The round CAD was rendered and mesh-checked, but **real LCD illumination, physical fit, Bambu slicing and assembly are not validated**. See [audit and evidence](docs/audit-2026-10-26.md).
 
 ## Why this build?
 
@@ -22,7 +26,7 @@ A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while th
 
 ## Start here
 
-1. Read [docs/first-build.md](docs/first-build.md) and [docs/bom.md](docs/bom.md).
+1. Start with [clone and first-run instructions](docs/clone-and-run.md), then review [physical build steps](docs/first-build.md) and the [verified-priced parts basket](docs/bom.md).
 2. Without hardware: `python3 -m unittest discover -s tests -v` and `python3 -m macdesk.demo --simulate --face happy`.
 3. With hardware: follow [firmware/README.md](firmware/README.md) and flash the ESP32-S3.
 4. Connect a **data-capable USB cable to the board's native ESP32-S3 USB/OTG port (not its CH343P UART port for the default firmware)**, find the port, then run `python3 -m pip install -r requirements.txt` and `python3 -m macdesk.demo --port /dev/cu.usbmodemXXXX --face happy`.
@@ -33,14 +37,21 @@ A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while th
 | Area | What you'll find |
 |---|---|
 | [docs/first-build.md](docs/first-build.md) | Steps, safety, acceptance tests |
-| [docs/bom.md](docs/bom.md) | One small starter basket and expansion options |
-| [docs/reel-index.md](docs/reel-index.md) | All nine inspirations, upstream links, licensing cautions |
+| [docs/bom.md](docs/bom.md) | One small first-build basket |
+| [docs/hardware-options.md](docs/hardware-options.md) | Creator/Reel-matched vs available online kits (important: **not plug-and-play compatible**) |
+| [hardware/options.json](hardware/options.json) | Machine-readable hardware options and source links |
+| [hardware/bom.json](hardware/bom.json) | Auditable shopping basket prices and assumptions |
+| [docs/clone-and-run.md](docs/clone-and-run.md) | Reproducible MacBook software-only start |
+| [docs/reel-index.md](docs/reel-index.md) | Nine-video quick reference and original sources |
+| [docs/reel-technical-notes.md](docs/reel-technical-notes.md) | Complete practical engineering notes and build paths from all nine saved videos |
 | [docs/printing.md](docs/printing.md) | Printable enclosure and fit test |
 | [docs/architecture.md](docs/architecture.md) | JSON protocol, responsibility boundaries |
 | [firmware/](firmware/) | Original PlatformIO Arduino ESP32-S3 implementation |
 | [macdesk/](macdesk/) | macOS-friendly Python controller + simulator |
 | [cad/](cad/) | Source-controlled, adjustable OpenSCAD enclosure |
 | [assets/architecture.svg](assets/architecture.svg) | Original vector architecture visual |
+| [assets/actual-scale-front.svg](assets/actual-scale-front.svg) | Honest physical face-to-case proportions |
+| [tools/check_repository.py](tools/check_repository.py) | Offline BOM/links/catalogue consistency checks |
 
 ## Roadmap
 
@@ -51,7 +62,7 @@ A USB-powered **ESP32-S3** renders full-color expressions over **SPI**, while th
 - **V4:** camera or richer perception experiments and independent hardware sensing.
 - **V5:** optional standalone Wi-Fi mode; compare Mac-hosted vs edge-only behavior.
 
-**No language model runs in V0**. Mac-local model/tool integration is V2/V3 work, and ESP32 keeps deterministic sensor behavior. The M4 laptop should remain responsive; GPU machines are **optional for training**, not required at runtime. No cloud dependency is required for V0/V1. No third-party images, firmware or CAD assets have been copied.
+**Current software only supports the GC9A01-based first build.** Taby, Waveshare AMOLED boards, Rocky and StackChan are documented **alternatives**, not build targets for the existing firmware. **No language model runs in V0**. Mac-local model/tool integration is V2/V3 work, and ESP32 keeps deterministic sensor behavior. The M4 laptop should remain responsive; GPU machines are **optional for training**, not required at runtime. No cloud dependency is required for V0/V1. No third-party images, firmware or CAD assets have been copied.
 
 ## Attributions and licensing
 

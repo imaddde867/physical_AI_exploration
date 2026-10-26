@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-26",
+  "selected_track": "gc9a01-separate-parts",
+  "methodology": "Maker/manufacturer documented specs; public list prices are not landed prices; video project options are not mechanically or firmware interchangeable.",
+  "options": [
+    {
+      "id": "gc9a01-separate-parts",
+      "category": "first-build",
+      "related_reels": [
+        9
+      ],
+      "name": "MacDesk Buddy — separate ESP32-S3 and GC9A01 round IPS",
+      "visual": "1.28 inch round IPS, 240x240",
+      "hardware": "ESP32-S3 N16R8 + Otronic GC9A01 OT8724 + optional MPU-6050",
+      "screen_driver": "GC9A01 SPI",
+      "price": {
+        "amount": "40.03",
+        "currency": "EUR",
+        "covers": "complete planned Otronic basket, tracked Finland shipping included"
+      },
+      "source_url": "https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino",
+      "source_type": "seller",
+      "software": "implemented in this repository",
+      "mechanical": "source CAD; not physically fit-tested",
+      "solder_free": "unconfirmed display pin header",
+      "recommendation": "Supported cheapest learning baseline; choose if you want to wire components and learn SPI/I2C."
+    },
+    {
+      "id": "waveshare-round-cabled",
+      "category": "screen-alternative",
+      "related_reels": [
+        9
+      ],
+      "name": "Waveshare 1.28 inch GC9A01 IPS with supplied 8-pin cable",
+      "visual": "1.28 inch round IPS, 240x240",
+      "hardware": "Waveshare LCD Module SKU 19192 plus separate ESP32-S3",
+      "screen_driver": "GC9A01 SPI",
+      "price": {
+        "amount": "14.99",
+        "currency": "USD",
+        "covers": "display module only; no VAT/delivery or MCU"
+      },
+      "source_url": "https://www.waveshare.com/product/1.28inch-lcd-module.htm",
+      "source_type": "manufacturer",
+      "software": "driver-family match, but pin names, BLK and CAD dimensions require checks",
+      "mechanical": "different module PCB: 40.4 x 37.5 mm",
+      "solder_free": "supplied PH2.0 8-pin cable; cable termination at controller still required",
+      "recommendation": "Worth the premium if connector certainty matters more than the absolute lowest display price."
+    },
+    {
+      "id": "taby-round-amoled",
+      "category": "video-matched-integrated",
+      "related_reels": [
+        5
+      ],
+      "name": "Physical Taby round — Waveshare ESP32-S3-Touch-AMOLED-1.32",
+      "visual": "1.32 inch round AMOLED, 466x466 touch",
+      "hardware": "Integrated ESP32-S3 + display + microphone + audio interface; separate speaker may be needed",
+      "screen_driver": "CO5300 QSPI; CST820 touch",
+      "price": {
+        "amount": "21.99",
+        "currency": "USD",
+        "covers": "development board only, no international shipping/taxes"
+      },
+      "source_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.32.htm",
+      "source_type": "manufacturer",
+      "firmware_url": "https://github.com/TRIIIS-LABS/firmware-taby",
+      "software": "Official Taby firmware supports exact 1.32 board (target round-1.32); not compatible with this repo's GC9A01 build",
+      "mechanical": "Official Taby round printable case still listed as coming soon",
+      "solder_free": "integrated screen; external peripherals use expansion connectors",
+      "recommendation": "Most attractive creator-matched compact option for experimenting with an already working expressive UI."
+    },
+    {
+      "id": "taby-rect-amoled",
+      "category": "video-matched-integrated",
+      "related_reels": [
+        5
+      ],
+      "name": "Physical Taby 1.64 rectangular AMOLED — exact V1",
+      "visual": "1.64 inch rectangular AMOLED, 280x456 touch",
+      "hardware": "Waveshare ESP32-S3-Touch-AMOLED-1.64 V1 integrated display/ESP32/IMU",
+      "screen_driver": "CO5300 QSPI; FT3168 touch",
+      "price": {
+        "amount": "23.99",
+        "currency": "USD",
+        "covers": "board alone, before shipping/taxes"
+      },
+      "source_url": "https://www.waveshare.com/ESP32-S3-Touch-AMOLED-1.64.htm",
+      "source_type": "manufacturer",
+      "firmware_url": "https://github.com/TRIIIS-LABS/firmware-taby",
+      "software": "Official Taby supports only exact V1; V2 not supported (2026-10-26)",
+      "mechanical": "Official STL/3MF files available for 1.64 case",
+      "solder_free": "integrated board",
+      "recommendation": "Best ready-made creator-aligned alternative with printable case, if rectangular look is acceptable."
+    },
+    {
+      "id": "waveshare-round-143-amoled",
+      "category": "premium-integrated",
+      "related_reels": [],
+      "name": "Waveshare ESP32-S3-Touch-AMOLED-1.43",
+      "visual": "1.43 inch round AMOLED, 466x466 touch",
+      "hardware": "Integrated ESP32-S3, 8MB PSRAM, 16MB flash, IMU and RTC; case variant exists",
+      "screen_driver": "SH8601/CO5300 QSPI (revision dependent)",
+      "price": {
+        "amount": "26.99",
+        "currency": "USD",
+        "covers": "manufacturer entry price; exact option and shipping extra"
+      },
+      "source_url": "https://www.waveshare.com/product/esp32-s3-touch-amoled-1.43.htm",
+      "source_type": "manufacturer",
+      "software": "Waveshare SDK examples; NOT an official Taby supported board, requires separate project/firmware",
+      "mechanical": "version with CNC case available as alternate option",
+      "solder_free": "integrated screen/IMU",
+      "recommendation": "Higher-spec custom display platform if you're ready to develop custom firmware instead of cloning our GC9A01 code."
+    },
+    {
+      "id": "stackchan-k151",
+      "category": "video-matched-robot",
+      "related_reels": [
+        7
+      ],
+      "name": "M5Stack StackChan K151",
+      "visual": "2 inch color touchscreen and animated robot head",
+      "hardware": "Assembled CoreS3 robot; camera, 2 microphones, speaker, sensors, servos, battery",
+      "screen_driver": "Integrated CoreS3 HMI",
+      "price": {
+        "amount": "99.00",
+        "currency": "USD",
+        "covers": "K151 robot, before shipping/taxes"
+      },
+      "source_url": "https://shop.m5stack.com/products/stackchan-kawaii-co-created-open-source-ai-desktop-robot",
+      "source_type": "manufacturer",
+      "firmware_url": "https://github.com/m5stack/StackChan",
+      "software": "Manufacturer-supported StackChan ecosystem; not the repo's GC9A01 firmware",
+      "mechanical": "Assembled retail robot",
+      "solder_free": "yes, prebuilt robot",
+      "recommendation": "Best immediate fully embodied reference; higher cost and less hands-on electronics learning."
+    },
+    {
+      "id": "rocky-xiao",
+      "category": "video-matched-build",
+      "related_reels": [
+        3
+      ],
+      "name": "Rocky V1/V2 DIY camera-and-servo desk robot",
+      "visual": "Monochrome OLED in original design",
+      "hardware": "Seeed XIAO ESP32-S3 Sense, camera+mic, 2 servos, amplifier, speaker, display",
+      "screen_driver": "OLED variants differ by version",
+      "price": {
+        "amount": "100",
+        "currency": "USD",
+        "covers": "rough V2 parts estimate from creator; paid print/board bundle, tools and taxes extra"
+      },
+      "source_url": "https://github.com/cgro00/desk-robot",
+      "source_type": "creator",
+      "software": "MIT code, version-specific build; V1 video matches release v1.0",
+      "mechanical": "Creator offers separate paid V2 3D/CAD bundle",
+      "solder_free": "no; creator calls for soldering",
+      "recommendation": "Best later step for motors, camera, speech and mechatronics after the first display/sensor build."
+    }
+  ],
+  "access_notes": [
+    "Reel 02/06 Mac AI Buddy requires separate BOM and lacks a publicly specified reuse license as reviewed; study/link rather than copy.",
+    "Reel 04 Neo Deskimon offers paid printable character/software resources; reproduction not open-source assumed.",
+    "Reel 08 OOMWOO ROS2 robot vacuum is simulation-ready but physical build not ready; avoid purchasing unvalidated vacuum parts.",
+    "Reel 01 Atticus is macOS agent software, not desk hardware."
+  ]
+}
