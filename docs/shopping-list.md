@@ -18,6 +18,10 @@
 
 **Without buying another data cable: €36.78.** This is only €3.00 more than the €36.43 previous monochrome-OLED basket.
 
+## Evaluate different attractive hardware paths before buying
+
+See the [full creator-versus-online options comparison](hardware-options.md) and [machine-readable hardware catalog](../hardware/options.json). The most interesting creator-aligned alternatives are **Physical Taby round 1.32-inch AMOLED** (integrated ESP32-S3 board, 466×466 touch, firmware supported, but official round case pending) and **Taby rectangular 1.64-inch AMOLED V1** (supported case STLs available). A Waveshare 1.43-inch AMOLED with built-in IMU is also a good independent platform. **These options are NOT drop-in substitutes for this repo's GC9A01 firmware or enclosure.** Never buy both the integrated board and the separate ESP32/GC9A01 basket unless you intentionally want two projects.
+
 ## Display alternatives (not drop-in compatible with current firmware)
 
 - **[Otronic 1.3 inch square ST7789 IPS 240×240](https://www.otronic.nl/en/1-3-inch-spi-tft-lcd-display-rgb-st7789-3-3v) — €6.25.** Good colors but square shape and different firmware/CAD; cheaper if a rectangular face is preferred.
@@ -32,5 +36,7 @@
 4. The optional BLK pin is intentionally left unconnected in the default design until the exact module's backlight operation is verified. If the display stays dark, check vendor documentation before changing this wire.
 5. The MPU-6050 breakout should keep its I²C pullups at 3.3 V. Measure actual parts before designing final board mounts.
 6. The printer must be identified from its label/display; the Academy URL is not confirmation of a particular Bambu printer.
+
+**Before purchase, check the [dimensionally honest front view](../assets/actual-scale-front.svg): Ø31.4 mm visible window in a 72 mm shell.** If you expected the face to fill most of the case like the stylized concept, choose a different display/body ratio first.
 
 **No products were purchased on your behalf.** 

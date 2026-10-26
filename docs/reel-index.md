@@ -1,19 +1,25 @@
-# Nine video inspirations — upstream resources
+# Nine original inspiration Reels — source index
 
-The nine uploaded Reels motivated this repository; **#02 and #06 show the same Mac AI Buddy at different development stages**.
+Research date **2026-10-26**. All nine uploaded Reels were inspected visually, but full verbatim audio transcription has **not** been completed. **02 and 06 are the same Mac AI Buddy project**. Technical specifics below are from creator/manufacturer docs, not guaranteed audible statements in the clips. For practical hardware comparisons and costs, see [Hardware choices](hardware-options.md).
 
-| Reel | Inspiration | Upstream / status |
+| Video | Project / source | Exact current status and practical takeaway |
 |---|---|---|
-| 01 | Atticus macOS agent | https://github.com/SaarthurR/atticus-mac — host-side automation inspiration |
-| 02 | Mac AI Buddy day 2 | https://github.com/AyhanSh/Mac-AI-Buddy — ESP32 + camera + pan/tilt |
-| 03 | Rocky desk robot | https://github.com/cgro00/desk-robot — MIT code; separate paid CAD bundle |
-| 04 | Neo Deskimon | https://creative-chance.com/en-usd/products/neo-deskimon — downloadable designs/firmware, firmware source not bundled |
-| 05 | Taby | https://github.com/TRIIIS-LABS/firmware-taby — 1.64-inch PCB **V1** supported, V2 not |
-| 06 | Mac AI Buddy day 1 | Same source as #02 — early expression/voice stage |
-| 07 | StackChan | https://github.com/m5stack/StackChan — fully integrated CoreS3 platform |
-| 08 | OOMWOO ROS 2 vacuum | https://github.com/makerspet/oomwoo — currently simulation-first |
-| 09 | Minimal I2C desk buddy | Exact original repository not identified; this build draws inspiration from the concept only |
+| **01** | [Atticus macOS agent](https://github.com/SaarthurR/atticus-mac) | Software agent/voice frontend. No electronics to purchase. Future Mac control-plane reference, with permission-gated robot tools. |
+| **02** | [Mac AI Buddy Day 2](https://github.com/AyhanSh/Mac-AI-Buddy) | ESP32 camera plus two SG90 servos for tracking/head movement; laptop hosts reasoning. Public repo **does not specify a license**. |
+| **03** | [Rocky](https://github.com/cgro00/desk-robot) | V1 footage matches [v1.0](https://github.com/cgro00/desk-robot/releases/tag/v1.0), **not** V2 main. Seeed XIAO ESP32-S3 Sense, speaker/amp, 2 servos and OLED. Code MIT; printed V2 build bundle separate. |
+| **04** | [Neo Deskimon](https://creative-chance.com/pages/world-of-deskimon) | Paid 3D character + firmware/build-kit files; creator-supplied product rather than open firmware code to copy. Good industrial/character design reference. |
+| **05** | [Physical Taby](https://github.com/TRIIIS-LABS/firmware-taby) | As of Oct 26, supports **Waveshare 1.64-inch AMOLED V1** (not V2) **and Waveshare round 1.32-inch AMOLED**. 1.64 STL/3MF available; round official case **coming soon**. Code/3D Apache-2.0; Taby animations/art **separately restricted**. |
+| **06** | [Mac AI Buddy Day 1](https://github.com/AyhanSh/Mac-AI-Buddy) | Same repo as 02: early face/audio/host integration. Don't count twice or assume V2 motors were present from Day 1. |
+| **07** | [M5Stack StackChan K151](https://github.com/m5stack/StackChan) | Fully assembled option (CoreS3, touch LCD, camera, mics, speaker, battery, two servo axes), **$99 base** before shipping. Software is in manufacturer ecosystem. |
+| **08** | [OOMWOO ROS 2 vacuum](https://github.com/makerspet/oomwoo) | [Simulation available now](https://github.com/makerspet/oomwoo/blob/main/README.md); **physical vacuum not buildable/validated**. Useful ROS 2/Gazebo/Nav2 study, **not** a parts shopping list today. |
+| **09** | Original DIY sensor-reactive desk buddy | No credible exact original repo established. Our independently authored **GC9A01 + ESP32-S3 + optional MPU-6050** build recreates the engineering concepts, **not the creator's display/model exactly**. |
 
-**Rights:** Mac AI Buddy publicly declares no license as inspected 2026-10-26; do not copy its code/assets without permission. Rocky's MIT code is distinct from paid personal-use build plans. StackChan's repository metadata likewise does not automatically grant reuse. All project references are links only; this repository carries original implementation and artwork.
+## Good next investigations
 
-**Why #09 first?** It supplies useful fundamentals (I2C, MCU GPIO, serial protocols, enclosure iteration) and a small, enjoyable Mac accessory before committing to audio, vision, servos or batteries. Later #02/#03 can be implemented with deliberate attribution and license checks.
+- **Fundamentals:** Build 09-inspired MacDesk Buddy, learn I²C, SPI, serial protocol, power, 3D printing, physical tests.
+- **Higher-fidelity display:** Reproduce 05 Taby **on its exact supported Waveshare board**, without trying to flash our GC9A01 build. For 1.64 **verify V1 PCB marking**. Avoid rebranding restricted Taby art.
+- **Physical motion and perception:** Build 03 Rocky V1 or study 02/06 Mac AI Buddy, including servo power, camera, microphone and Mac model pipeline.
+- **Integrated robotics reference:** Compare 07 StackChan K151 before buying separate motors/cameras.
+- **Robot autonomy:** Run 08 OOMWOO in simulation; investigate ROS 2 topics, odometry, TF and navigation before purchasing mechanical hardware.
+
+No Reel MP4s or third-party proprietary 3D/CAD art are included in this repository. Only source links and original work are checked in.

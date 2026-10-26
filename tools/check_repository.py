@@ -67,7 +67,7 @@ def check_options(data: dict) -> None:
         assert item["recommendation"].strip()
         assert all(isinstance(x, int) and 1 <= x <= 9 for x in item["related_reels"])
     taby = next(q for q in options if q["id"] == "taby-round-amoled")
-    assert "1.32" in taby["hardware"]
+    assert "1.32" in taby["name"]
     assert "not compatible" in taby["software"].lower()
     first = next(q for q in options if q["id"] == data["selected_track"])
     assert "GC9A01" in first["hardware"]
