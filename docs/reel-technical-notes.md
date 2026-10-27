@@ -1,5 +1,8 @@
 # Nine saved Instagram Reels — technical notes for future projects
 
+> Earlier inspiration research. Use the [2026-10-27 purchase audit](../reports/MacDesk%20Buddy%20purchase%20audit.md) for the current face-first recommendation and verification limits; original Reel files were unavailable during that audit.
+
+
 **Research checkpoint: 2026-10-26.** Nine MP4s, **eight distinct projects**: videos **02 and 06 are successive updates of the same Mac AI Buddy**. No original videos or creator images are distributed in this repository. The original study inspected video frames, legible captions and publicly linked project/manufacturer sources. **Complete verbatim audio transcription was not performed.** The table below separates **project-documented facts** from **proposed experiments**.
 
 ## Evidence notation

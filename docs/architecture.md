@@ -1,4 +1,6 @@
-# Architecture and verification
+# Architecture: implemented and planned
+
+## Implemented GC9A01 prototype
 
 ~~~text
 MacBook Pro M4
@@ -31,9 +33,19 @@ Valid expressions: neutral, happy, sad, sleepy, surprised, thinking. Invalid JSO
 ## Testing boundaries
 
 1. Python unit tests and simulator establish host protocol correctness only.
-2. ESP32 PlatformIO CI establishes compile/link for native USB and UART profiles only.
+2. The configured PlatformIO workflows check compile/link for native USB and UART profiles only; the latest audit did not rerun them or verify live CI.
 3. OpenSCAD mesh checks establish closed geometry, not FDM slicer success or PCB fit.
 4. Physical GPIO, voltage, backlight, color ordering, screen appearance, IMU and serial behavior require real components.
 5. Future AI work must separately benchmark memory, responsiveness, action accuracy, p50/p95/p99 command latency and safety limits on a 16 GB M4.
 
 No performance claims until results are measured under repeatable physical conditions.
+
+## Planned Mac companion
+
+The Mac gathers explicitly enabled events, decides the reaction, and sends bounded state or short-text messages over USB. The peripheral renders the face and occasional text. The current protocol only supports faces; timers, text and event adapters still need implementation. The leading Waveshare 1.64-inch AMOLED V2 candidate requires a separate display implementation and board-specific pinout, not the wiring above. See the [rectangular engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
+
+Start with deterministic manual/timer events, then add supported coding-agent hooks, foreground-app identity and authorized music metadata. A local model is optional. Session token counts differ from account quotas; supported Claude Code or Codex workflows do not establish access to every existing desktop chat. macOS has no general documented inbox for other apps' notification bodies.
+
+Screen awareness can later use opt-in screen capture and OCR/vision on the Mac. A camera is unnecessary for reading the Mac's screen. Capture scope, pause controls and any model data destination must be explicit; internal or partner data stays local. Lyrics need a suitable data source and display rights before implementation. No current feature requires motors, a battery or an IMU.
+
+See the [source-backed capability matrix](../reports/MacDesk%20Buddy%20purchase%20audit.md) for platform limits and the [first-build milestones](first-build.md) for the implementation order.

@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-  <strong>MacDesk Buddy · Build 01</strong><br>
-  One character. One compact screen. A practical route from software into electronics, sensing and physical AI.
+  <strong>MacDesk Buddy · Face-first prototype</strong><br>
+  One expressive character beside a MacBook. Occasional short text. Mac-driven reactions.
 </p>
 
 <p align="center">
@@ -15,7 +15,19 @@
   <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml"><img alt="OpenSCAD geometry checks" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg"></a>
 </p>
 
-**Status — software prototype.** The single-face PNG is the source used by ESP32 firmware, not a rendered robot or an expression gallery. Python tests, both PlatformIO configurations and CAD mesh validation pass in CI. **Real LCD brightness/colors, PCB wiring, printed fit and motion thresholds are not yet physically verified.** [Current build-readiness report](docs/release-readiness.md).
+**Status — software prototype; hardware untested.** The existing firmware controls a GC9A01 face over USB. Timers, notifications, music, coding-agent status and screen awareness are planned, not implemented. The 2026-10-27 audit passed 21 Python tests and the repository checker; firmware/CAD builds and live CI were not rechecked. [Readiness](docs/release-readiness.md).
+
+## Current direction
+
+**Current direction: a subtle rounded-rectangle face**, with one discreet USB cable for power and data. The leading documented board candidate is Waveshare ESP32-S3-Touch-AMOLED-1.64, SKU 31197, listed as V2; purchase remains gated on matching the delivered PCB revision to the drawing and schematic and verifying USB data. The existing GC9A01 firmware stays implemented; the new board needs its own display/UI path and Mac USB bridge. See the [engineering study](reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](docs/rectangular-build-plan.md). The 33.12 × 48 × 13 mm concept is provisional packaging scale, not proof of board fit.
+
+Start with one board, a data cable and a temporary desk stand. Confirm exact board variant, Finland checkout total and enclosure plan first. No camera, microphone, IMU, motors or battery is needed for the first companion. The existing SCAD is a desktop stand prototype; the new rear-lid CAD studies are provisional, not validated mounts.
+
+[**Rectangular engineering study**](reports/Rectangular%20buddy%20engineering%20study.md) · [Rectangular build plan](docs/rectangular-build-plan.md) · [Display choice](docs/display-choice.md) · [First-build milestones](docs/first-build.md)
+
+![Portrait, landscape and square form studies](assets/rectangular-placement-study.png)
+
+*Provisional scale studies; the MacBook lid geometry and physical fit remain unverified. [CAD sources, coupon and rebuild guide](cad/peeking-concepts/README.md).*
 
 ## Start on your MacBook
 
@@ -32,38 +44,30 @@ python3 -m macdesk.demo --simulate --face neutral --watch
 
 This runs **software-only tests and a synthetic simulation**; it does not talk to electronics or run AI. If your default Python is too old, follow the [verified macOS setup guide](docs/clone-and-run.md) to use Python 3.12 in a virtual environment.
 
-## First physical target
+## Existing GC9A01 learning prototype
 
-| Part | Purpose |
+| Part | Implemented target |
 |---|---|
-| ESP32-S3 **N16R8** | USB-connected microcontroller, reusable for later projects |
-| **1.28-inch GC9A01 IPS** | Round, full-color 240 × 240 screen showing the **one approved face** |
-| Optional **MPU-6050** | I²C motion input / shake reaction |
-| Parametric OpenSCAD stand | Printable open-back housing and small fit coupon |
-| MacBook Pro M4 | Python host now; optional MLX/local model integration later |
+| ESP32-S3 **N16R8** | USB-connected microcontroller |
+| **1.28-inch GC9A01 IPS** | Round 240×240 display using the face asset above |
+| Optional **MPU-6050** | Experimental shake reaction; defer for the face-first build |
+| OpenSCAD stand | Open-back desktop shell and fit coupon; physical fit unverified |
 
-The **estimated complete Otronic basket is €40.03 delivered to Finland**, not a checkout quote. **Confirm pre-soldered headers, the LCD backlight pin, actual module dimensions and the exact Bambu printer model before buying or printing.** [Shopping list](docs/shopping-list.md) · [Reel-matched vs online alternatives](docs/hardware-options.md). Alternative Taby/AMOLED/StackChan boards do **not** run this firmware unchanged.
-
-## How it works
+The dated [GC9A01 basket](docs/shopping-list.md) is an alternative learning build, not the AMOLED purchase list. Its **€40.03** total is a reference estimate, not a checkout quote. Headers, backlight wiring and physical fit remain unresolved. Do not buy both hardware tracks by default or flash GC9A01 firmware onto an AMOLED board.
 
 ~~~text
-MacBook (Python JSONL host, USB serial)
-                  |
-               ESP32-S3
-                /     \
-    SPI: GC9A01 LCD   I²C: optional MPU-6050
-     single character      motion events
+Implemented: Mac Python host → USB JSONL → ESP32-S3 → GC9A01 face
+Planned:     Mac events → companion logic → USB → face / brief text
 ~~~
 
-The **same character** handles neutral, happy, sad, sleepy, surprised and thinking commands via restrained overlays, plus a brief blink. The approved 240 × 240 PNG is reproducibly compiled into a small RGB565 asset in flash; no full-size model runs on the device. See [protocol and architecture](docs/architecture.md).
+Six commands select neutral, happy, sad, sleepy, surprised and thinking cues on the same character. Blink runs locally. The PNG is compiled into a flash-resident RGB565 asset; no model runs on the device. [Protocol and proposed integrations](docs/architecture.md).
 
-## Pick your next step
+## Guides and research
 
-- **No electronics yet:** [clone, simulate and build firmware on macOS](docs/clone-and-run.md).
-- **Ready for the first assembly:** [wiring and physical validation checklist](docs/first-build.md), [firmware ports](firmware/README.md), [3D printing](docs/printing.md).
-- **Choosing parts:** [priced BOM](docs/bom.md), [hardware options](docs/hardware-options.md), [true physical size diagram](assets/actual-scale-front.svg).
-- **Research background:** [nine-Reel technical notes](docs/reel-technical-notes.md), [short Reel index](docs/reel-index.md).
-- **After hardware works:** [Issue #1 — reproducible physical bring-up](https://github.com/imaddde867/physical_AI_exploration/issues/1) followed by [Issue #2 — optional Mac-local AI](https://github.com/imaddde867/physical_AI_exploration/issues/2).
+- [Rear-lid peeking concepts](cad/peeking-concepts/README.md): left/right/top scale studies and retractable versus detachable travel concepts; not print-ready mounts.
+- [Run the existing prototype on macOS](docs/clone-and-run.md), [GC9A01 wiring/firmware](firmware/README.md), [printing](docs/printing.md).
+- [Hardware alternatives](docs/hardware-options.md), [reference BOM](docs/bom.md), [actual GC9A01 front dimensions](assets/actual-scale-front.svg).
+- [Reel source index](docs/reel-index.md) and [technical notes](docs/reel-technical-notes.md) preserve earlier research; use the rectangular engineering study and build plan for current recommendations.
 
 ## Project boundaries and license
 

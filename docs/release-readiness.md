@@ -1,38 +1,28 @@
-# Release-readiness / first-build boundary
+# Build readiness
 
-**Status: clone-ready software and CAD prototype; physical hardware not validated.** This is the current summary for MacDesk Buddy. The initial OLED-era technical review is preserved [in the historical archive](archive/2026-10-26-initial-audit.md); **do not use that document for current purchasing or wiring**.
+**As of the 2026-10-27 audit: software prototype; no physical hardware validation.** The [rectangular engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md) are the current direction records. The [initial OLED audit](archive/2026-10-26-initial-audit.md) is historical.
 
-## Implemented and checked
+## Evidence and boundaries
 
-| Evidence | What it supports | What it does not support |
+| Evidence | Established | Still unverified |
 |---|---|---|
-| Python / repository CI | JSONL protocol tests, simulator, artwork checksum/encoding, hardware catalog and BOM arithmetic, local links/SVG | Physical display or serial reliability |
-| PlatformIO CI (native USB and UART) | ESP32-S3 N16R8 firmware compiles with pinned dependencies and generated face header | Actual board wiring, BLK, pixel colors or I²C health |
-| OpenSCAD + mesh CI | Prototype shell and circular aperture coupon render to watertight, single-component meshes | Slicer supports, printer profile or PCB fit |
-| One checked-in face image | Deterministic 240×240 source with SHA256-checked generated RGB565 payload | Backlight/black level, visual quality at 31.4 mm |
+| Local Python suite and repository checker | 21 tests passed; protocol, simulator, asset encoding, manifest arithmetic and links checked | Physical USB reliability, display output and sensor behavior |
+| PlatformIO workflows | Native USB and UART build jobs are configured with pinned dependencies | Not rerun in this audit; live CI status not checked |
+| CAD workflow | OpenSCAD render/mesh checks are configured | Not rerun in this audit; physical fit, slicer settings, installed nozzle/profile and mounting |
+| Face asset | One checked-in 240×240 image used by GC9A01 firmware | Appearance, brightness and colors on a real panel |
 
-CI badge status is live in the [README](../README.md). **No physical unit was assembled, flashed or tested. No hardware has been bought.** The mock simulator event is synthetic, not a recorded sensor measurement.
+The simulator's shake event is synthetic. Build success cannot prove that a write-only SPI panel illuminates. No unit has been assembled, flashed or physically tested in this project.
 
-## One supported starter build
+## Hardware tracks
 
-- **Controller:** ESP32-S3 N16R8, with the correct **native USB/OTG vs CH343P UART** environment.
-- **Screen:** Otronic GC9A01 1.28-inch 240×240 SPI IPS, showing **one approved face** only.
-- **Optional sensor:** MPU-6050, independent I²C GPIO8/9; reaction threshold remains experimental.
-- **Estimated single-store basket:** **€40.03 to Finland** including listed shipping, **not** an actual checkout.
-- **Mac host:** base M4, 10-core CPU, 10-core GPU and **16 GB shared memory**. No local model runs in V0.
+**Leading documented purchase candidate:** Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2. Purchase remains gated on mapping the delivered revision to the drawing/schematic and verifying USB data; its 33.12 × 48 × 13 mm concept scale does not establish fit. It needs separate firmware/UI and Mac USB work. No AMOLED implementation is claimed here. Taby 1.64 V1 support is separate.
 
-The independent Taby/AMOLED, Rocky and StackChan alternatives in [hardware-options.md](hardware-options.md) **require different software, parts and/or CAD**. Do not buy them as substitutes for the supported GC9A01 wiring guide.
+**Implemented learning prototype:** separate ESP32-S3 N16R8 + GC9A01 1.28-inch SPI display, with optional MPU-6050 on I²C. The dated €40.03 basket is an estimate, not a current checkout quote. LCD headers/BLK, board labels, 3.3 V logic, screen output, USB recovery and printed fit need physical checks. Alternative boards cannot use this firmware unchanged.
 
-## Unresolved physical gates
+## Feature readiness
 
-1. Supplier confirmation of **pre-soldered LCD headers** and exact **BLK backlight** wiring.
-2. Physical ESP32 board pinout/USB labeling and 3.3 V logic verification.
-3. Visual inspection of the real 240×240 screen (rotation, color order, brightness, blink and mood changes).
-4. Sensor false positives, USB disconnect/reconnect tests and observed command latency.
-5. Exact Bambu printer model, fit-coupon measurement, slicer supports and enclosure retention.
+Implemented: six facial mood commands, local blink, synthetic host simulation and optional experimental shake response. Not implemented: text, timers, Mac app events, notifications, coding-agent status/tokens, music, lyrics, screen capture or model inference.
 
-These are [Build Issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1), not software CI pass conditions. After hands-on evidence exists, investigate [Issue #2 — Mac-local AI](https://github.com/imaddde867/physical_AI_exploration/issues/2).
+The Mac target is a base M4 with **16 GB shared unified memory**, not a separate GPU memory pool. No model or cloud service is required for the current demo or a deterministic timer/event bridge.
 
-## Starting point
-
-Follow the [Mac clone-and-run guide](clone-and-run.md). It deliberately performs no package downloads beyond ordinary Python/PlatformIO setup, no cloud AI and no external GPU connections. Record the actual macOS/Python versions because the owner's specification document does **not** establish them.
+Follow the [first-build milestones](first-build.md). Existing [physical bring-up issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1) and [optional Mac AI issue #2](https://github.com/imaddde867/physical_AI_exploration/issues/2) are background tracking; this cleanup does not update their scope or status.

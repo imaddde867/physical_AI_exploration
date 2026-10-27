@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "selected_track": "gc9a01-separate-parts",
-  "methodology": "Maker/manufacturer documented specs; public list prices are not landed prices; video project options are not mechanically or firmware interchangeable.",
+  "methodology": "Catalog prices recorded 2026-10-26, not landed quotes; selected_track identifies the implemented GC9A01 firmware, not the leading purchase candidate. The 2026-10-27 engineering study favors Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2, as the leading documented candidate subject to drawing-to-PCB revision mapping and USB data verification; Taby 1.64 V1 support is separate. Alternatives are not mechanically or firmware interchangeable.",
   "options": [
     {
       "id": "gc9a01-separate-parts",
@@ -17,14 +17,14 @@
       "price": {
         "amount": "40.03",
         "currency": "EUR",
-        "covers": "complete planned Otronic basket, tracked Finland shipping included"
+        "covers": "Recorded 2026-10-26: GC9A01 reference basket with optional sensor and estimated Finland shipping; not a verified checkout"
       },
       "source_url": "https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino",
       "source_type": "seller",
       "software": "implemented in this repository",
       "mechanical": "source CAD; not physically fit-tested",
       "solder_free": "unconfirmed display pin header",
-      "recommendation": "Supported cheapest learning baseline; choose if you want to wire components and learn SPI/I2C."
+      "recommendation": "Implemented electronics-learning prototype; not the leading rectangular purchase candidate. Confirm LCD headers and BLK; defer the optional IMU."
     },
     {
       "id": "waveshare-round-cabled",
@@ -39,14 +39,34 @@
       "price": {
         "amount": "14.99",
         "currency": "USD",
-        "covers": "display module only; no VAT/delivery or MCU"
+        "covers": "Recorded 2026-10-26: display module only; no VAT/delivery or MCU"
       },
       "source_url": "https://www.waveshare.com/product/1.28inch-lcd-module.htm",
       "source_type": "manufacturer",
       "software": "driver-family match, but pin names, BLK and CAD dimensions require checks",
       "mechanical": "different module PCB: 40.4 x 37.5 mm",
       "solder_free": "supplied PH2.0 8-pin cable; cable termination at controller still required",
-      "recommendation": "Worth the premium if connector certainty matters more than the absolute lowest display price."
+      "recommendation": "Documented connector alternative for the GC9A01 learning prototype; verify MCU-end wiring, backlight and mechanical fit."
+    },
+    {
+      "id": "rectangular-164-v2",
+      "category": "first-build",
+      "related_reels": [],
+      "name": "Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197 V2",
+      "visual": "1.64 inch rounded-rectangle AMOLED, 280x456",
+      "hardware": "Integrated ESP32-S3, CO5300 QSPI AMOLED, 16MB flash, 8MB PSRAM",
+      "screen_driver": "CO5300 QSPI",
+      "price": {
+        "amount": "23.99",
+        "currency": "USD",
+        "covers": "Verified product listing price 2026-10-27; before shipping, taxes and checkout"
+      },
+      "source_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.64.htm",
+      "source_type": "manufacturer",
+      "software": "Custom display/UI and Mac USB integration required; not supported by Taby V1 firmware or this repository's GC9A01 firmware",
+      "mechanical": "Official drawing exists but mapping to delivered V2 PCB revision is unverified; provisional 33.12x48x13 mm packaging study is not fit proof",
+      "solder_free": "integrated board",
+      "recommendation": "Leading documented candidate for subtle rounded-rectangle face; buy only after delivered revision is mapped to drawing/schematic and USB power/data path is verified."
     },
     {
       "id": "taby-round-amoled",
@@ -61,15 +81,15 @@
       "price": {
         "amount": "21.99",
         "currency": "USD",
-        "covers": "development board only, no international shipping/taxes"
+        "covers": "Recorded 2026-10-26: development board only, no international shipping/taxes"
       },
       "source_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.32.htm",
       "source_type": "manufacturer",
       "firmware_url": "https://github.com/TRIIIS-LABS/firmware-taby",
-      "software": "Official Taby firmware supports exact 1.32 board (target round-1.32); not compatible with this repo's GC9A01 build",
+      "software": "Taby supports exact 1.32 board (target round-1.32); not compatible with this repo's GC9A01 build. Desired Mac USB bridge and custom UI integration still need development.",
       "mechanical": "Official Taby round printable case still listed as coming soon",
       "solder_free": "integrated screen; external peripherals use expansion connectors",
-      "recommendation": "Most attractive creator-matched compact option for experimenting with an already working expressive UI."
+      "recommendation": "Round 1.32 alternative; Taby supports this exact board, but Mac integration is still needed and the round case is pending."
     },
     {
       "id": "taby-rect-amoled",
@@ -84,7 +104,7 @@
       "price": {
         "amount": "23.99",
         "currency": "USD",
-        "covers": "board alone, before shipping/taxes"
+        "covers": "Recorded 2026-10-26: board alone, before shipping/taxes"
       },
       "source_url": "https://www.waveshare.com/ESP32-S3-Touch-AMOLED-1.64.htm",
       "source_type": "manufacturer",
@@ -92,7 +112,7 @@
       "software": "Official Taby supports only exact V1; V2 not supported (2026-10-26)",
       "mechanical": "Official STL/3MF files available for 1.64 case",
       "solder_free": "integrated board",
-      "recommendation": "Best ready-made creator-aligned alternative with printable case, if rectangular look is acceptable."
+      "recommendation": "Separate Taby-supported V1 alternative with case files; exact V1 required and Mac integration still needs development. This does not establish support for Waveshare SKU 31197 V2."
     },
     {
       "id": "waveshare-round-143-amoled",
@@ -105,14 +125,14 @@
       "price": {
         "amount": "26.99",
         "currency": "USD",
-        "covers": "manufacturer entry price; exact option and shipping extra"
+        "covers": "Recorded 2026-10-26: manufacturer entry price; exact option and shipping extra"
       },
       "source_url": "https://www.waveshare.com/product/esp32-s3-touch-amoled-1.43.htm",
       "source_type": "manufacturer",
       "software": "Waveshare SDK examples; NOT an official Taby supported board, requires separate project/firmware",
-      "mechanical": "version with CNC case available as alternate option",
+      "mechanical": "Case variant previously listed; exact option, inclusion and current price unverified in the 2026-10-27 audit",
       "solder_free": "integrated screen/IMU",
-      "recommendation": "Higher-spec custom display platform if you're ready to develop custom firmware instead of cloning our GC9A01 code."
+      "recommendation": "Later custom-firmware alternative; verify the exact revision and case SKU rather than treating it as support for the custom V2 candidate."
     },
     {
       "id": "stackchan-k151",
@@ -127,7 +147,7 @@
       "price": {
         "amount": "99.00",
         "currency": "USD",
-        "covers": "K151 robot, before shipping/taxes"
+        "covers": "Recorded 2026-10-26: K151 robot, before shipping/taxes"
       },
       "source_url": "https://shop.m5stack.com/products/stackchan-kawaii-co-created-open-source-ai-desktop-robot",
       "source_type": "manufacturer",
@@ -135,7 +155,7 @@
       "software": "Manufacturer-supported StackChan ecosystem; not the repo's GC9A01 firmware",
       "mechanical": "Assembled retail robot",
       "solder_free": "yes, prebuilt robot",
-      "recommendation": "Best immediate fully embodied reference; higher cost and less hands-on electronics learning."
+      "recommendation": "Later embodied-robot reference; camera, motors and battery are unnecessary for the first Mac-connected face."
     },
     {
       "id": "rocky-xiao",
@@ -150,14 +170,14 @@
       "price": {
         "amount": "100",
         "currency": "USD",
-        "covers": "rough V2 parts estimate from creator; paid print/board bundle, tools and taxes extra"
+        "covers": "Recorded 2026-10-26: rough V2 parts estimate from creator; paid print/board bundle, tools and taxes extra"
       },
       "source_url": "https://github.com/cgro00/desk-robot",
       "source_type": "creator",
       "software": "MIT code, version-specific build; V1 video matches release v1.0",
       "mechanical": "Creator offers separate paid V2 3D/CAD bundle",
       "solder_free": "no; creator calls for soldering",
-      "recommendation": "Best later step for motors, camera, speech and mechatronics after the first display/sensor build."
+      "recommendation": "Later soldering and mechatronics project; not needed for the first face-first display."
     }
   ],
   "access_notes": [

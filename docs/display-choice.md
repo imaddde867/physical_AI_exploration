@@ -1,6 +1,8 @@
-# Display decision: round color IPS
+# Display choice: rectangular AMOLED candidate, round IPS prototype
 
-The design target is a distinctive, small, high-quality-looking companion for a MacBook, rather than a monochrome diagnostic module.
+**Current direction (2026-10-27): a subtle rounded-rectangle face, powered and connected by one discreet USB cable.** Leading candidate: Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed as V2, subject to delivered PCB revision mapping to the drawing and schematic and USB data verification. The schematic source is Rev1.1 and its GPIO19/20 routing is not yet confirmed for retail V2. Taby 1.64 V1 support is a separate option and does not imply V2 support. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
+
+The existing **GC9A01 IPS** remains the implemented electronics-learning prototype. Its firmware, artwork pipeline and CAD are retained; they do not run unchanged on the AMOLED board. A provisional 33.12 × 48 × 13 mm rectangular concept is a packaging study, not a verified fit.
 
 ![The single approved 240×240 face, source used in firmware](../assets/face-idle-240.png)
 
@@ -8,9 +10,9 @@ The design target is a distinctive, small, high-quality-looking companion for a 
 
 [**Actual front dimensions: Ø31.4 mm face window in 72 mm body**](../assets/actual-scale-front.svg) — about **43.6%** of the shell's width. The on-screen PNG is a native-resolution source image; its appearance on a large monitor does **not** represent its actual 31.4 mm physical opening. For premium-looking alternatives with different layouts and processors, see [the creator-versus-online hardware matrix](hardware-options.md).
 
-## Decision and comparison (2026-10-26)
+## Implemented prototype comparison (prices recorded 2026-10-26)
 
-| Feature | Previous OLED (retired) | Selected IPS | Alternative IPS |
+| Feature | Previous OLED (retired) | Implemented IPS | Alternative IPS |
 |---|---|---|---|
 | Model | 0.96 inch unspecified SSD1306 | **1.28 inch Otronic OT8724 GC9A01** | 1.3 inch ST7789 |
 | Seller list price | €5.99 | **€8.99** | €6.25 |
@@ -19,7 +21,7 @@ The design target is a distinctive, small, high-quality-looking companion for a 
 | Interface | I²C | **SPI, 3.3 V** | SPI, 3.3 V |
 | Code library | Adafruit SSD1306 | **Adafruit GC9A01A 1.2.0** | Separate ST7789 implementation |
 
-The selected LCD has **32.4 mm circular active area**, manufacturer-stated module PCB dimensions 44 × 36 × 5 mm, and costs €8.99 at [Otronic](https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino). This costs **€3.00 more for the display module** than the earlier monochrome OLED; the complete basket is tracked separately in the [current BOM](bom.md).
+The prototype LCD has **32.4 mm circular active area**, manufacturer-stated module PCB dimensions 44 × 36 × 5 mm, and a recorded €8.99 list price at [Otronic](https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino). The [reference BOM](bom.md) is a dated estimate, not the current purchase recommendation or a checkout quote.
 
 [Adafruit's open-source Arduino GC9A01A driver](https://github.com/adafruit/Adafruit_GC9A01A) supports drawing geometric shapes, RGB colors and SPI display updates; the driver is a separately licensed dependency and not copied here. [GC9A01 breakout electrical reference](https://www.lcdwiki.com/index.php?title=1.28inch_IPS_Module) describes common BLK and SPI pins; **the Otronic module itself has not been inspected**, so these are not assumed to guarantee its backlight wiring.
 
@@ -32,11 +34,11 @@ The selected LCD has **32.4 mm circular active area**, manufacturer-stated modul
 - No LLM, image-generation inference, runtime PNG parsing or workstation is required for the display.
 - The visual on the real IPS LCD remains unverified until physical hardware is wired and photographed.
 
-## Technical changes
+## Implemented prototype wiring
 
-The screen moves from I²C to **SPI** using GPIO11 MOSI, GPIO12 CLK, GPIO10 CS, GPIO13 DC, GPIO14 RES. The motion sensor retains its **separate I²C bus on GPIO8/9**. The LCD is write-only, so a firmware initialization event cannot confirm successful illumination: ready packets deliberately say **init_sent_unverified**, requiring visual confirmation during hardware tests.
+The prototype uses **SPI** using GPIO11 MOSI, GPIO12 CLK, GPIO10 CS, GPIO13 DC, GPIO14 RES. The motion sensor retains its **separate I²C bus on GPIO8/9**. The LCD is write-only, so a firmware initialization event cannot confirm successful illumination: ready packets deliberately say **init_sent_unverified**, requiring visual confirmation during hardware tests.
 
-The new CAD fits a nominal **31.4 mm round visible aperture** inside an open-backed rounded shell. It is a fit-testable parametric prototype—not a validated mount. Measure the physical PCB, its glass position, headers and cable bend radius before finalizing.
+The prototype CAD fits a nominal **31.4 mm round visible aperture** inside an open-backed rounded shell. It is a fit-testable parametric prototype—not a validated mount. Measure the physical PCB, its glass position, headers and cable bend radius before finalizing.
 
 ## Remaining uncertainty
 

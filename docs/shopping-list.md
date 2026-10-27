@@ -1,26 +1,28 @@
-# MacDesk Buddy — color-display shopping basket
+# Hardware purchase status and GC9A01 reference basket
 
-**Updated 2026-10-26:** The old monochrome calculator-looking OLED is NOT in the basket. Prices are seller listings, not final checkout totals; VAT, stock and delivery may change.
+**Direction updated 2026-10-27:** build a subtle rounded-rectangle face with one discreet USB cable for power and data. The leading documented candidate is Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2, gated on drawing-to-PCB revision mapping and USB data verification. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
 
-## Buy from a single EU store: Otronic
+The basket below preserves the **implemented GC9A01 prototype** at prices recorded on 2026-10-26. It is a reference estimate, not a current buy list. Accessory lines were not individually rechecked; VAT, stock and delivery may change.
+
+## GC9A01 reference basket: Otronic
 
 | Quantity | Part | List € | Product link |
 |---:|---|---:|---|
 | 1 | ESP32-S3 N16R8 16 MB flash / 8 MB PSRAM | 9.95 | [Controller](https://www.otronic.nl/en/esp32-s3-n16r8-devboard-16mb-flash-en-8mb-psram.html) |
 | **1** | **OT8724 1.28 inch round GC9A01 240×240 IPS color LCD** | **8.99** | **[Round IPS screen](https://www.otronic.nl/en/1-28-round-tft-lcd-240-240-gc9a01-spi-for-arduino)** |
-| 1 | MPU-6050 I²C motion sensor | 3.75 | [Sensor](https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html) |
+| 1 | Optional MPU-6050 I²C motion sensor; defer initially | 3.75 | [Sensor](https://www.otronic.nl/en/acceleration-accelerometer-and-gyroscope-i2c-mpu.html) |
 | 1 | 830-hole solderless breadboard | 2.99 | [Breadboard](https://www.otronic.nl/en/breadboard-830-hole-for-prototyping.html) |
 | 1 | Female-female Dupont wires, 40 × 20 cm | 1.85 | [Female-female cables](https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-female-female-20cm.html) |
 | 1 | Male-female Dupont wires, 40 × 20 cm | 1.85 | [Male-female cables](https://www.otronic.nl/en/dupont-jumper-cables-40-pieces-male-female-20cm-dr.html) |
 | 1 | USB-C-to-USB-C DATA cable 1 m | 2.65 | [USB data cable](https://www.otronic.nl/en/usb-c-to-usb-c-1m-cable-for-data-and-fast-charging.html) |
 | — | [Estimated tracked Finland delivery](https://www.otronic.nl/nl/verzending) | 8.00 | Same seller |
-| | **Total estimated delivered** | **40.03** | |
+| | **Reference total with estimated shipping** | **40.03** | |
 
-**Without buying another data cable: €37.38.** The display costs €3.00 more than the retired OLED, and the breadboard now lists €0.60 higher than in the earlier basket.
+**Without another data cable: €37.38.** Both totals retain the optional sensor for comparison with the machine-readable BOM; they are not verified checkout totals.
 
-## Evaluate different attractive hardware paths before buying
+## Choose one hardware route
 
-See the [full creator-versus-online options comparison](hardware-options.md) and [machine-readable hardware catalog](../hardware/options.json). The most interesting creator-aligned alternatives are **Physical Taby round 1.32-inch AMOLED** (integrated ESP32-S3 board, 466×466 touch, firmware supported, but official round case pending) and **Taby rectangular 1.64-inch AMOLED V1** (supported case STLs available). A Waveshare 1.43-inch AMOLED with built-in IMU is also a good independent platform. **These options are NOT drop-in substitutes for this repo's GC9A01 firmware or enclosure.** Never buy both the integrated board and the separate ESP32/GC9A01 basket unless you intentionally want two projects.
+See the [full creator-versus-online options comparison](hardware-options.md) and [machine-readable hardware catalog](../hardware/options.json). The leading custom candidate is **Waveshare 1.64 V2 SKU 31197**; **Taby rectangular 1.64 V1** is a separate supported alternative with case STLs. The round Taby 1.32 remains another alternative. The Waveshare 1.43-inch AMOLED is retained as a later custom-firmware alternative; its exact case option and current price remain unverified. **These options are NOT drop-in substitutes for this repo's GC9A01 firmware or enclosure.** Never buy both the integrated board and the separate ESP32/GC9A01 basket unless you intentionally want two projects.
 
 ## Display alternatives (not drop-in compatible with current firmware)
 
@@ -28,15 +30,15 @@ See the [full creator-versus-online options comparison](hardware-options.md) and
 - **[Waveshare 1.28 inch round GC9A01](https://www.waveshare.com/product/1.28inch-lcd-module.htm) — $14.99 list.** Offers official documentation and an included 8-pin cable; check shipping if Otronic's header cannot be used without soldering.
 - **[Electrokit Waveshare module](https://www.electrokit.com/en/lcd-module-round-1.28240x240px-spi) — 199 SEK list.** Stock and Finland shipping require a live checkout check.
 
-## Required checks before payment
+## GC9A01 prototype checks before payment
 
 1. The Otronic OT8724 spec confirms GC9A01, 240×240 IPS, 2.8–3.3 V, 8 pins and a 44×36×5 mm board. **It does NOT confirm a pre-soldered header or how BLK is electrically controlled.** Ask the vendor; the first-build plan assumes no soldering.
 2. The LCD uses **SPI**, even though its SCL and SDA pads resemble I²C labels. They map to ESP32-S3 GPIO12 SCK and GPIO11 MOSI, with GPIO10 CS, GPIO13 DC and GPIO14 RES. MPU-6050 alone uses GPIO8 and GPIO9 for I²C.
 3. Check the ESP32 board header labels, 3V3 and native USB/OTG socket. Do not apply 5 V to ESP32 GPIO.
 4. The optional BLK pin is intentionally left unconnected in the default design until the exact module's backlight operation is verified. If the display stays dark, check vendor documentation before changing this wire.
 5. The MPU-6050 breakout should keep its I²C pullups at 3.3 V. Measure actual parts before designing final board mounts.
-6. The printer must be identified from its label/display; the Academy URL is not confirmation of a particular Bambu printer.
+6. The printer is confirmed as a Bambu Lab H2S; its installed nozzle remains to be identified.
 
-**Before purchase, check the [dimensionally honest front view](../assets/actual-scale-front.svg): Ø31.4 mm visible window in a 72 mm shell.** If you expected the face to fill most of the case like the stylized concept, choose a different display/body ratio first.
+**For the GC9A01 route, check the [dimensionally honest front view](../assets/actual-scale-front.svg): Ø31.4 mm visible window in a 72 mm shell.** If you expected the face to fill most of the case like the stylized concept, choose a different display/body ratio first.
 
 **No products were purchased on your behalf.** 

@@ -1,5 +1,8 @@
 # Nine original inspiration Reels — source index
 
+> Earlier inspiration research. Use the [2026-10-27 purchase audit](../reports/MacDesk%20Buddy%20purchase%20audit.md) for the current face-first recommendation and verification limits; original Reel files were unavailable during that audit.
+
+
 Research date **2026-10-26**. All nine uploaded Reels were inspected visually, but full verbatim audio transcription has **not** been completed. **02 and 06 are the same Mac AI Buddy project**. Technical specifics below are from creator/manufacturer docs, not guaranteed audible statements in the clips. For practical hardware comparisons and costs, see [Hardware choices](hardware-options.md).
 
 | Video | Project / source | Exact current status and practical takeaway |

@@ -1,0 +1,40 @@
+{
+  "source": "research_notes/Rectangular buddy engineering study/sources/waveshare/esp32-s3-touch-amoled-1_64.stp",
+  "sha256": "b595de2dbdb1fa6fdd66e53a3f7a6d154bb31d9478fa910647d945d089d144f0",
+  "measurement_method": "cadgen 0.7.26 read_scene; union of leaf bounding boxes, millimetres",
+  "all_leaves": 263,
+  "all_bounds_mm": {
+    "min": [
+      -14.56,
+      -22.700000225,
+      -12.3
+    ],
+    "max": [
+      14.56,
+      21.5,
+      1.6
+    ]
+  },
+  "without_pin_headers": {
+    "leaves": 261,
+    "bounds_mm": {
+      "min": [
+        -14.56,
+        -22.700000225,
+        -8.0000001
+      ],
+      "max": [
+        14.56,
+        21.5,
+        1.6
+      ]
+    },
+    "excluded_label_contains": "PIN_HEADER"
+  },
+  "limits": [
+    "CAD-to-retail V2 correspondence unverified",
+    "No mated USB plug or cable envelope",
+    "Header omission assumes not fitted on acquired board",
+    "Not a physical measurement"
+  ]
+}

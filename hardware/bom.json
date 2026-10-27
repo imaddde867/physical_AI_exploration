@@ -3,7 +3,7 @@
   "as_of": "2026-10-26",
   "id": "macdesk-buddy-gc9a01-v0",
   "currency": "EUR",
-  "estimate_type": "Advertised shop prices including tracked Finland delivery, not a confirmed cart",
+  "estimate_type": "GC9A01 prototype reference basket at 2026-10-26 advertised prices, with estimated Finland shipping; not a current buy list or confirmed cart",
   "supplier": "Otronic",
   "selected_display": "OT8724 GC9A01 SPI",
   "items": [
@@ -76,9 +76,11 @@
   "expected_total": "40.03",
   "expected_total_without_cable": "37.38",
   "notes": [
-    "No order placed.",
-    "Prices/stock are time sensitive.",
-    "No motors, batteries or external GPU included.",
-    "Other displays/boards are alternative hardware tracks; don't add them to this cart."
+    "No order placed. This BOM describes the implemented GC9A01 prototype, not the leading purchase candidate.",
+    "For the face-first goal, evaluate the exact Waveshare ESP32-S3-Touch-AMOLED-1.32; it needs different firmware and enclosure work.",
+    "Accessory prices were not individually rechecked in the 2026-10-27 audit; stock, VAT and final Finland checkout total remain unverified.",
+    "The optional MPU-6050 is retained in these reference totals; defer it for the first face-first build.",
+    "No motors, batteries, cameras or external GPU needed initially.",
+    "Choose one hardware route; do not combine an integrated display board with this separate ESP32/GC9A01 basket."
   ]
 }

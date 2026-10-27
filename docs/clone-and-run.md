@@ -2,6 +2,8 @@
 
 **Target:** MacBook Pro 14-inch (2024), **base M4 10-core CPU / 10-core GPU / 16 GB unified RAM**. See [development-host specifications](development-host.md). This guide starts with **no new hardware, no models and no cloud accounts**.
 
+**Scope:** these commands run or build the existing GC9A01 learning prototype. They do not run the leading AMOLED candidate or a Mac-aware companion. See the [first-build milestones](first-build.md) before ordering or flashing hardware.
+
 ## 1. Clone
 
 ~~~sh
@@ -50,7 +52,7 @@ The first build downloads the **pinned PlatformIO dependencies** and may take lo
 
 - [One approved screen-only face, exactly 240×240 source pixels](../assets/face-idle-240.png).
 - [Physical screen aperture versus body width](../assets/actual-scale-front.svg): Ø31.4 mm visible opening in a 72 mm-wide body.
-- [Part compatibility and price comparison](hardware-options.md) and [single-store basket](shopping-list.md).
+- [Part compatibility and price comparison](hardware-options.md) and [dated GC9A01 reference basket](shopping-list.md).
 - [Development milestones](first-build.md).
 
 **The existing Bambu Academy URL does not identify the printer model.** Verify the physical printer label before slicing. On Apple Silicon, the current [Homebrew OpenSCAD snapshot cask](https://formulae.brew.sh/cask/openscad%40snapshot) can be installed optionally:
@@ -61,7 +63,7 @@ brew install --cask openscad@snapshot
 
 Check its OS requirements first. The legacy `openscad` cask is disabled and Intel-only; do not add Rosetta just for an outdated CAD build.
 
-## 5. When electronics arrive
+## 5. When GC9A01 electronics arrive
 
 1. Check module revisions and **pre-soldered headers**, **LCD BLK pin** behavior, 3.3 V-safe sensor pull-ups and the ESP32 board's native USB/OTG labeling.
 2. Disconnect USB when wiring. Wire the GC9A01 on **SPI**, and the optional MPU-6050 on **separate I²C** pins.
