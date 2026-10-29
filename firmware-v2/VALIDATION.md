@@ -8,8 +8,8 @@ No board has been purchased, connected, flashed or physically tested.
 | Generated assets | PNG/HTML regenerate identically from pinned source | Reproducible software artifact |
 | C renderer | All twelve states match expected native RGB565 output byte-for-byte | Decoder, strip traversal, software rotation and wire byte ordering agree offline |
 | HTML script | All twelve RGBA canvas buffers match RGB565 expansion; controls/boundaries exercised using Node's VM and a minimal DOM | Script behavior checked without a browser; not browser-layout verification |
-| Python suite/repository | Final results recorded below after completion | No electronics involved |
-| Firmware compilation | In progress; final result will be recorded before review | Not a physical panel test |
+| Python suite/repository | 37 checks and repository checker passed locally; GitHub Python/repository job passed | No electronics involved |
+| Firmware compilation | PASS: V2 ESP-IDF 5.5.0 compile/link and both unchanged GC9A01 USB/UART profiles; GitHub firmware workflow also passed | Not a physical panel test |
 | Browser smoke test | Chromium unavailable; browser download returned truncated archives | PNG visually inspected; page layout still needs inspection on the user's Mac |
 
 The original driver files remain byte-identical to the pinned V2 vendor source.
@@ -18,3 +18,28 @@ vendor driver. Host C checks exercise the real portable rendering core; they do
 not execute ESP32 GPIO, QSPI, interrupts, USB or brightness commands.
 
 Physical board-arrival checks and exact reproduction commands are in [README](README.md).
+
+## Completed software checks
+
+Validated implementation tree: PR commit `7f9dddc5774c309bc7d6da1ef1fb1d5bb089cf50`.
+The subsequent validation-record update changes documentation only.
+
+```sh
+python3 -m unittest discover -s tests -q
+python3 tools/check_repository.py
+python3 -m platformio run -d firmware -e esp32s3_n16r8_usb
+python3 -m platformio run -d firmware -e esp32s3_n16r8_uart
+IDF_COMPONENT_MANAGER=0 python3 -m platformio run -d firmware-v2 -e waveshare_amoled_v2
+```
+
+All passed. The local V2 invocation disables ESP-IDF's optional component manager
+because its process lookup failed inside the execution environment. All required
+components are bundled; the project and vendor driver were not stubbed or changed
+to get the build through. The standard V2 command also passed on GitHub Actions.
+V2 linked static RAM: 13,288 bytes; flash: 465,509 bytes. Static RAM excludes
+runtime heap/stack allocation; these are build sizes, not measured device usage.
+
+GitHub runs for that implementation commit: [Python/repository](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40829185918),
+[all three firmware profiles](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40829185919),
+[CAD regression](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40829185915).
+All concluded successfully. No software result establishes physical screen behavior.

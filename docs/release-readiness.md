@@ -6,7 +6,7 @@ Audit date: **2026-10-29**. The [purchase decision](build-decision.md) selects W
 
 | Area | Evidence | Limit |
 |---|---|---|
-| Host code | 35 Python/C/JavaScript checks and repository checker passed locally | Synthetic/mock USB, no real device |
+| Host code | 37 Python/C/JavaScript checks and repository checker passed locally | Synthetic/mock USB, no real device |
 | V2 face | Twelve generated states; host C decoder output matches every native RGB565 pixel; self-contained Mac preview | Physical orientation, colors, USB, DMA timing and brightness unverified; see [validation](../firmware-v2/VALIDATION.md) |
 | Serial framing | Split acknowledgement and watch events survive read timeouts; overlong responses are bounded; incomplete ACK times out | Existing eight-read ACK budget remains; no reconnect service |
 | Hardware catalog | Purchase track and implemented firmware track recorded separately, with regression checks | Catalog arithmetic cannot verify a seller cart |
