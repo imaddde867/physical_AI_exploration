@@ -6,6 +6,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class SimRunnerTests(unittest.TestCase):
+    def test_demo_app_loads(self):
+        from sim.runner import load_app
+        app = load_app(str(ROOT / "experiments/hello_buddy.py"))
+        self.assertTrue(callable(app.update))
+
     def test_runner_import_is_headless(self):
         import sim.runner
         self.assertNotIn("tkinter", sys.modules)

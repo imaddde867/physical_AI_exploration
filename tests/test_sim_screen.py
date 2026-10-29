@@ -3,8 +3,6 @@ from pathlib import Path
 from sim.screen import Screen, WIDTH, HEIGHT
 from tools.face_asset import indexed_png, rgb565
 
-ROOT = Path(__file__).resolve().parents[1]
-
 def html_hex(color):
     v = rgb565(color)
     return "#%02x%02x%02x" % (round((v >> 11) * 255 / 31),
@@ -63,7 +61,7 @@ class SimBlitTests(unittest.TestCase):
     def test_blit_clips(self):
         s = Screen()
         s.blit_image(str(ROOT / "assets/face-idle-240.png"), 400, 50)   # hangs off right
-        s.blit_image(str(ROOT / "assets/face-idle-240.png"), -100, -100) # fully off-canvas
+        s.blit_image(str(ROOT / "assets/face-idle-240.png"), -100, -100) # off-canvas origin: only the visible quadrant paints
         self.assertLess(sum(hexv != "#000000" for hexv in s.rows()[49]), 456)
 
 if __name__ == "__main__":

@@ -41,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scale", type=int, default=1, help="integer window zoom, default 1")
     parser.add_argument("--frames", type=int, default=0, help="stop after N frames; 0 = until window close")
     args = parser.parse_args(argv)
+    args.scale = max(args.scale, 1)
 
     app = load_app(args.app)
 
@@ -58,14 +59,21 @@ def main(argv: list[str] | None = None) -> int:
     timestamps: list[float] = []
     t0 = time.perf_counter_ns()
     period = 1.0 / max(args.fps, 1)
+    item: list[int] = []
+    shown: list[object] = [viewer]  # hold the displayed PhotoImage or Tk GC repaints a dead name
 
     def draw(frame: int, t_ms: float) -> None:
         app.update(screen, t_ms)
         viewer.put("\n".join("{" + " ".join(r) + "}" for r in screen.rows()))
+        image: object = viewer
         if args.scale > 1:
-            canvas.delete("all")
-            canvas.create_image(0, 0, image=viewer.zoom(args.scale), anchor="nw")
-        elif frame % 10 == 0:
+            image = viewer.zoom(args.scale)
+            shown[0] = image
+        if item:
+            canvas.itemconfigure(item[0], image=image)
+        else:
+            item.append(canvas.create_image(0, 0, image=image, anchor="nw"))
+        if frame % 10 == 0:
             status.configure(text=f"fps {frames_per_second(timestamps)} · t {int(t_ms)} ms")
 
     def tick() -> None:
