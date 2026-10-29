@@ -10,3 +10,7 @@ __pycache__/
 *.gcode
 # Built from one checked-in approved 240x240 face PNG by PlatformIO:
 firmware/include/face_asset.h
+# V2 generated build inputs and local IDF configuration:
+firmware-v2/include/face_frames.h
+firmware-v2/sdkconfig.*
+!firmware-v2/sdkconfig.defaults

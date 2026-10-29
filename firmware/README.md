@@ -1,6 +1,6 @@
 # MacDesk Buddy: ESP32-S3 round color display firmware
 
-**Selected purchase:** [Waveshare 1.64 V2](../docs/build-decision.md) needs its own renderer, based on the revision-matched official V2 examples. Neither environment below targets that board.
+**Selected purchase:** [Waveshare 1.64 V2](../docs/build-decision.md) uses a [separate experimental renderer](../firmware-v2/README.md), based on the revision-matched official V2 examples. Neither environment below targets that board.
 
 **Scope:** this firmware is the GC9A01 learning prototype. It does not support the leading Waveshare AMOLED candidate or Mac app integrations. See [display choice](../docs/display-choice.md).
 

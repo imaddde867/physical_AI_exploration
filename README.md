@@ -15,7 +15,7 @@
   <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml"><img alt="OpenSCAD geometry checks" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg"></a>
 </p>
 
-**Status: purchase decision settled; physical build and AMOLED software unfinished.** Buy one Waveshare 1.64-inch AMOLED board, SKU 31197 V2, plus a USB data cable if needed. The existing firmware controls the older GC9A01 face. Mac integrations and the V2 renderer remain planned. Start with the [buying decision and build sequence](docs/build-decision.md); see [readiness](docs/release-readiness.md) for verification limits.
+**Status: purchase decision settled; AMOLED bench renderer and offline face preview added; physical build untested.** Buy one Waveshare 1.64-inch AMOLED board, SKU 31197 V2, plus a USB data cable if needed. The existing firmware controls the older GC9A01 face. The separate V2 implementation is ready for software review; Mac integrations remain planned. Start with the [buying decision and build sequence](docs/build-decision.md); see [readiness](docs/release-readiness.md) for verification limits.
 
 ## Current direction
 
@@ -44,6 +44,21 @@ python3 -m macdesk.demo --simulate --face neutral --watch
 
 This runs **software-only tests and a synthetic simulation**; it does not talk to electronics or run AI. If your default Python is too old, follow the [verified macOS setup guide](docs/clone-and-run.md) to use Python 3.12 in a virtual environment.
 
+## Inspect the selected AMOLED face without hardware
+
+![Landscape adaptation of the approved character](assets/face-idle-456.png)
+
+```sh
+python3 -m tools.amoled_face
+open assets/amoled-preview.html
+```
+
+The checked-in preview also opens directly. It shows six restrained expressions,
+blink hold and a deterministic scrub-able 12-second loop using the firmware's
+RGB565 pixels. No server, device, model or extra Python packages are required.
+[Preview and V2 firmware details](firmware-v2/README.md). This implements software;
+actual illumination, colors, rotation and USB behavior remain physically unverified.
+
 ## Existing GC9A01 learning prototype
 
 | Part | Implemented target |
@@ -71,4 +86,4 @@ Six commands select neutral, happy, sad, sleepy, surprised and thinking cues on 
 
 ## Project boundaries and license
 
-This is an independently authored **learning and research prototype**, not a finished consumer robot, an exact clone of a Reel or a proven physical AI agent. The Mac-first V0 uses only Python/USB and deterministic microcontroller logic; servos, voice, camera, networking and local models are **later, optional milestones**. The repository is [MIT licensed](LICENSE); linked third-party projects retain their own licenses and artwork restrictions.
+This is an independently authored **learning and research prototype**, not a finished consumer robot, an exact clone of a Reel or a proven physical AI agent. The Mac-first V0 uses only Python/USB and deterministic microcontroller logic; servos, voice, camera, networking and local models are **later, optional milestones**. Project-authored code is [MIT licensed](LICENSE); the bundled V2 vendor driver retains [Apache-2.0](firmware-v2/src/vendor/LICENSE). Linked third-party projects retain their own licenses and artwork restrictions.
