@@ -54,6 +54,14 @@ class ManifestTests(unittest.TestCase):
                 check_markdown_links(root),
             )
 
+    def test_downloaded_build_docs_are_ignored(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dependency = root / 'firmware/.pio/libdeps/example'
+            dependency.mkdir(parents=True)
+            (dependency/'README.md').write_text('[Missing vendor file](absent.md)')
+            self.assertEqual([], check_markdown_links(root))
+
     def test_firmware_assumptions(self):
         check_firmware_contract(ROOT)
 

@@ -37,7 +37,7 @@ Use the selected **landscape head on the upper right side**, approximately 25 mm
 
 ![Rear dock and arm study](../assets/selected-placement-rear.png)
 
-The eyes in these CAD renders are geometric placeholders. The [approved face image](../assets/face-idle-240.png) remains the character reference; it has not been ported to the 456 x 280 landscape display. The render does not prove that the electronics, USB plug or attachment fit. The dock and arm shown have no working latch or tested adhesive interface. Remove the head before carrying the Mac; do not close the lid over an untested cable or fixture.
+The eyes in these CAD renders are geometric placeholders. The [approved face image](../assets/face-idle-240.png) remains the character reference; its [456 x 280 adaptation and deterministic preview](../firmware-v2/README.md) now preserve that identity for the landscape display. The render does not prove that the electronics, USB plug or attachment fit. The dock and arm shown have no working latch or tested adhesive interface. Remove the head before carrying the Mac; do not close the lid over an untested cable or fixture.
 
 ## What the software needs
 
@@ -45,7 +45,7 @@ The Mac supplies events and any optional intelligence. The ESP32 renders eyes, e
 
 | Requested behavior | First implementation route | Status today |
 |---|---|---|
-| Expressive eyes, blink, happy/sleepy/thinking cues | Port approved face to selected landscape panel; animate locally | Existing GC9A01 version only |
+| Expressive eyes, blink, happy/sleepy/thinking cues | Port approved face to selected landscape panel; animate locally | GC9A01 version plus separate V2 bench renderer; hardware untested |
 | Touch interaction | Short tap action such as dismiss or change state | Hardware has touch; custom behavior unimplemented |
 | Battery, connected devices, timers, nudges | Mac event adapters and bounded USB messages | Planned |
 | Music reactions | Start with authorized track/playback metadata; amplitude/beat capture is separate | Planned |
@@ -61,7 +61,7 @@ This table records scope, not implemented features. Use the [architecture](archi
 
 The [official V2 repository](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.64-v2/tree/21b952243d306692774f3b5bfeb3eb5cff10f851) includes Arduino/ESP-IDF examples and schematics. Its Arduino display example bundles an `esp_lcd_sh8601` driver, while the product listing names CO5300. Driver naming alone does not identify the delivered panel. Use the exact revision's complete vendor initialization path and confirm it on the board; do not substitute a guessed driver.
 
-The example uses QSPI, a panel X offset and software landscape rotation. Our firmware uses Adafruit GC9A01A with a different bus, pins and asset layout. Adding a board name to PlatformIO would not supply a working V2 renderer. Keep the working round build as a reference until the new path compiles and shows the face on the actual board. Taby's V1 firmware is also unsuitable for V2.
+The example uses QSPI, a panel X offset and software landscape rotation. The older round firmware uses Adafruit GC9A01A with a different bus, pins and asset layout. Adding a board name to PlatformIO would not supply a working V2 renderer. The [separate V2 bench project](../firmware-v2/README.md) now implements that path and an offline pixel-parity check. Keep the working round build as a reference until the new path shows the face on the actual board. Taby's V1 firmware is also unsuitable for V2.
 
 ## What to do next, in order
 
@@ -72,4 +72,4 @@ The example uses QSPI, a panel X offset and software landscape rotation. Our fir
 5. Measure the Mac lid and cable route. Replace the appearance placeholders with a fitted shell, board retention, removable cover, strain relief and a tested detachable interface. Print a fit piece before a complete housing.
 6. Add timer and battery events, then one music or coding-tool integration. Add optional model decisions only after the deterministic companion is useful.
 
-The purchase and appearance decisions are settled here. A fitted mount and the selected-board firmware remain unfinished because no board has been bought or measured. The next work should validate this build, not reopen the screen comparison without evidence that the selected board fails a requirement.
+The purchase and appearance decisions are settled here. A fitted mount and physical validation of the selected-board firmware remain unfinished because no board has been bought or measured. The next work should validate this build, not reopen the screen comparison without evidence that the selected board fails a requirement.

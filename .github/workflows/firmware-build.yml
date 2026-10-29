@@ -20,3 +20,4 @@ jobs:
       - run: python -m pip install 'platformio==6.2.0'
       - run: pio run -d firmware -e esp32s3_n16r8_usb
       - run: pio run -d firmware -e esp32s3_n16r8_uart
+      - run: python -m platformio run -d firmware-v2 -e waveshare_amoled_v2

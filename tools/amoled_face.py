@@ -1,0 +1,166 @@
+"""Compose the approved raster for V2; stdlib only, no redraw/model/download.
+
+Run from repo root: python3 -m tools.amoled_face
+Writes deterministic PNG, standalone HTML and native-panel RLE C header.
+"""
+from __future__ import annotations
+
+import argparse
+import base64
+import hashlib
+import json
+from pathlib import Path
+import struct
+import zlib
+
+from tools.face_asset import indexed_png, rgb565
+
+ROOT = Path(__file__).resolve().parents[1]
+WIDTH, HEIGHT = 456, 280
+NATIVE_WIDTH, NATIVE_HEIGHT = 280, 456
+FACES = ("neutral", "happy", "sad", "sleepy", "surprised", "thinking")
+SOURCE_SHA = "32821513663d47fb2b0bb5aea8116cf91d84ef4f29240b7dbd81520884de908c"
+
+
+def source_frame(face: str, blink: bool) -> tuple[list, bytes]:
+    if face not in FACES:
+        raise ValueError("invalid face")
+    source = ROOT / "assets/face-idle-240.png"
+    if hashlib.sha256(source.read_bytes()).hexdigest() != SOURCE_SHA:
+        raise ValueError("approved source changed; review composition first")
+    palette, original = indexed_png(source)
+    pixels = bytearray(original)
+    black = palette.index((0, 0, 0))
+    warm = min(range(len(palette)), key=lambda i: sum((palette[i][c] - (255, 205, 157)[c]) ** 2 for c in range(3)))
+    dim = min(range(len(palette)), key=lambda i: sum((palette[i][c] - (188, 150, 120)[c]) ** 2 for c in range(3)))
+
+    def rect(x, y, w, h, color):
+        for yy in range(y, y + h):
+            pixels[yy * 240 + x:yy * 240 + x + w] = bytes([color]) * w
+
+    def line(x0, y0, x1, y1, color):
+        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for i in range(steps + 1):
+            x = x0 + round((x1 - x0) * i / steps)
+            y = y0 + round((y1 - y0) * i / steps)
+            pixels[y * 240 + x] = color
+
+    # Remove only the extremely dark round-head arc: it belongs to the round
+    # composition, not the eyes. Preserve eye textures, asymmetry and neutral mouth.
+    rect(0, 0, 240, 78, black)
+    rect(210, 78, 30, 22, black)
+    if face != "neutral":
+        rect(106, 148, 33, 20, black)
+        if face == "happy":
+            line(111, 153, 122, 159, warm)
+            line(122, 159, 134, 152, warm)
+        elif face == "sad":
+            line(111, 161, 121, 156, dim)
+            line(121, 156, 134, 162, dim)
+        elif face in ("sleepy", "thinking"):
+            line(111 if face == "sleepy" else 117, 157, 130 if face == "sleepy" else 132, 157, dim)
+        elif face == "surprised":
+            for y in range(152, 165):
+                for x in range(116, 129):
+                    if 18 <= (x - 122) ** 2 + (y - 158) ** 2 <= 32:
+                        pixels[y * 240 + x] = warm
+    if blink or face == "sleepy":
+        # Close along the existing sloping lids. Rectangular masks leave
+        # bright iris corners and a detached lower glow in landscape.
+        mouth = [pixels[y * 240 + 99:y * 240 + 137] for y in range(148, 170)]
+        for start, end, anchor_x, anchor_y, rise, span in (
+            (4, 117, 23, 106, 6, 75), (129, 234, 146, 116, 8, 68)
+        ):
+            for x in range(start, end):
+                edge = anchor_y + (x - anchor_x) * rise // span
+                for y in range(edge, 188):
+                    pixels[y * 240 + x] = black
+        line(23, 106, 97, 112, dim)
+        line(146, 116, 214, 124, dim)
+        for y, row in enumerate(mouth, 148):
+            pixels[y * 240 + 99:y * 240 + 137] = row
+    return palette, bytes(pixels)
+
+
+def compose(face="neutral", blink=False) -> tuple[list, bytes]:
+    palette, source = source_frame(face, blink)
+    # Uniform 3:2 scale, x=48, y=-40. No stretching the eyes to fit the panel.
+    # The unused lower round-screen area is cropped; all expressions have margin.
+    black = palette.index((0, 0, 0))
+    pixels = bytearray([black]) * (WIDTH * HEIGHT)
+    for y in range(HEIGHT):
+        sy = (y + 40) * 2 // 3
+        if sy >= 240:
+            continue
+        for x in range(48, 408):
+            sx = (x - 48) * 2 // 3
+            pixels[y * WIDTH + x] = source[sy * 240 + sx]
+    return palette, bytes(pixels)
+
+
+def png_bytes(palette, pixels):
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff)
+    raw = b"".join(b"\0" + pixels[y * WIDTH:(y + 1) * WIDTH] for y in range(HEIGHT))
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", WIDTH, HEIGHT, 8, 3, 0, 0, 0))
+            + chunk(b"PLTE", bytes(c for color in palette for c in color))
+            + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b""))
+
+
+def native_pixels(pixels):
+    """Landscape (x,y) -> native (279-y,x), software quarter turn only."""
+    return bytes(pixels[(HEIGHT - 1 - nx) * WIDTH + ny]
+                 for ny in range(NATIVE_HEIGHT) for nx in range(NATIVE_WIDTH))
+
+
+def pack_runs(pixels):
+    out = bytearray()
+    last, count = pixels[0], 0
+    for value in pixels:
+        if value != last or count == 65535:
+            out.extend(struct.pack("<HB", count, last))
+            last, count = value, 0
+        count += 1
+    out.extend(struct.pack("<HB", count, last))
+    return bytes(out)
+
+
+def generate(output: Path, header: Path):
+    output.mkdir(parents=True, exist_ok=True)
+    palette, neutral = compose()
+    (output / "face-idle-456.png").write_bytes(png_bytes(palette, neutral))
+    frames = []
+    lines = ["// Generated by python3 -m tools.amoled_face; do not edit.",
+             f"// Approved source SHA256: {SOURCE_SHA}", "#pragma once", "#include <stdint.h>", "#include <stddef.h>",
+             "static const uint16_t buddy_palette[] = {" + ",".join(str(rgb565(c)) for c in palette) + "};"]
+    for face in FACES:
+        for blink in (False, True):
+            _, pixels = compose(face, blink)
+            frames.append(base64.b64encode(pack_runs(pixels)).decode())
+            runs = pack_runs(native_pixels(pixels))
+            name = f"buddy_{face}_{int(blink)}"
+            lines.append(f"static const uint8_t {name}[] = {{")
+            lines.extend(",".join(str(v) for v in runs[i:i+48]) + "," for i in range(0, len(runs), 48))
+            lines.append("};")
+    lines.append("static const BuddyFrame buddy_frames[] = {")
+    lines.extend(f"{{buddy_{face}_{int(blink)}, sizeof(buddy_{face}_{int(blink)})}}," for face in FACES for blink in (False, True))
+    lines.extend(["};", ""])
+    header.parent.mkdir(parents=True, exist_ok=True)
+    header.write_text("\n".join(lines), encoding="utf-8")
+    template = (ROOT / "tools/amoled_preview.html").read_text(encoding="utf-8")
+    preview = (template.replace("__FRAMES__", json.dumps(frames)).replace("__FACES__", json.dumps(FACES))
+               .replace("__PALETTE__", json.dumps([rgb565(c) for c in palette])))
+    (output / "amoled-preview.html").write_text(preview, encoding="utf-8")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=ROOT / "assets")
+    parser.add_argument("--header", type=Path, default=ROOT / "firmware-v2/include/face_frames.h")
+    args = parser.parse_args()
+    generate(args.output, args.header)
+    print(f"456x280 face and offline preview: {args.output}")
+
+
+if __name__ == "__main__":
+    main()
