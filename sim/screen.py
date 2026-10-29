@@ -6,7 +6,9 @@ browser preview and the panel driver receive.
 """
 from __future__ import annotations
 
-from tools.face_asset import rgb565
+from pathlib import Path
+
+from tools.face_asset import indexed_png, rgb565
 
 WIDTH, HEIGHT = 456, 280
 
@@ -43,6 +45,15 @@ class Screen:
 
     def clear(self, rgb: tuple[int, int, int]) -> None:
         self.fill_rect(0, 0, WIDTH, HEIGHT, rgb)
+
+    def blit_image(self, path: str | Path, x: int, y: int) -> None:
+        # indexed_png() exposes indices flat, so the 240x240 approved asset shape is assumed.
+        palette, source = indexed_png(Path(path))
+        for index, value in enumerate(source):
+            px, py = index % 240, index // 240
+            dx, dy = x + px, y + py
+            if 0 <= dx < WIDTH and 0 <= dy < HEIGHT:
+                self._rows[dy][dx] = _hex(palette[value])
 
     def rows(self) -> list[list[str]]:
         return self._rows

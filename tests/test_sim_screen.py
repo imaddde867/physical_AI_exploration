@@ -1,6 +1,9 @@
 import unittest
+from pathlib import Path
 from sim.screen import Screen, WIDTH, HEIGHT
-from tools.face_asset import rgb565
+from tools.face_asset import indexed_png, rgb565
+
+ROOT = Path(__file__).resolve().parents[1]
 
 def html_hex(color):
     v = rgb565(color)
@@ -43,6 +46,25 @@ class SimScreenTests(unittest.TestCase):
         s = Screen()
         s.set_pixel(0, 0, (255, 255, 255)); s.clear((10, 20, 30))
         self.assertEqual(s.rows()[0][0], html_hex((10, 20, 30)))
+
+ROOT = Path(__file__).resolve().parents[1]
+
+class SimBlitTests(unittest.TestCase):
+    def test_blit_puts_face_asset_pixels(self):
+        palette, source = indexed_png(ROOT / "assets/face-idle-240.png")
+        s = Screen()
+        s.blit_image(str(ROOT / "assets/face-idle-240.png"), 10, 20)
+        rows = s.rows()
+        # top-left pixel of the asset lands at (10,20), quantized like the HTML preview
+        self.assertEqual(rows[20][10], html_hex(palette[source[0]]))
+        touched = sum(hexv != "#000000" for r in rows for hexv in r)
+        self.assertGreater(touched, 1000)
+
+    def test_blit_clips(self):
+        s = Screen()
+        s.blit_image(str(ROOT / "assets/face-idle-240.png"), 400, 50)   # hangs off right
+        s.blit_image(str(ROOT / "assets/face-idle-240.png"), -100, -100) # fully off-canvas
+        self.assertLess(sum(hexv != "#000000" for hexv in s.rows()[49]), 456)
 
 if __name__ == "__main__":
     unittest.main()
