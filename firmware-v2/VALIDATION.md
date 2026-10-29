@@ -43,3 +43,17 @@ GitHub runs for that implementation commit: [Python/repository](https://github.c
 [all three firmware profiles](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40829185919),
 [CAD regression](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40829185915).
 All concluded successfully. No software result establishes physical screen behavior.
+
+## Greptile review follow-up
+
+Command handling now updates state only; the main loop owns redraws and updates
+its cached frame after drawing. Rejected commands do not invalidate the cache.
+The preview check now advances queued animation callbacks with a fake clock,
+covering blink boundaries, the 12-second wrap, paused time, resume and rapid
+pause/resume. Pending callbacks are cancelled on pause or scrub to avoid
+duplicate animation chains.
+
+All 37 checks and the repository checker pass after these changes. The V2
+firmware recompiles and links: 13,288 bytes static RAM and 465,493 bytes flash.
+The unchanged GC9A01 profiles retain the passing validation above. Final CI
+results are attached to the PR head. Physical validation remains outstanding.

@@ -1,89 +1,66 @@
-# Physical AI Exploration
+# MacDesk Buddy
+
+A quiet, expressive assistant beside your MacBook. One character, subtle reactions, and a small landscape display.
 
 <p align="center">
-  <img src="assets/face-idle-240.png" alt="Approved single digital face: understated, heavy-lidded eyes on a dark 240 × 240 display" width="240" height="240">
+  <img src="assets/face-idle-456.png" alt="MacDesk Buddy: heavy-lidded blue eyes and warm highlights on a black landscape display" width="456" height="280">
 </p>
 
-<p align="center">
-  <strong>MacDesk Buddy · Face-first prototype</strong><br>
-  One expressive character beside a MacBook. Occasional short text. Mac-driven reactions.
-</p>
+[![Python and repository checks](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml)
+[![Firmware builds](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml)
+[![CAD checks](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg)](https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml)
 
-<p align="center">
-  <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml"><img alt="Python and repository checks" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/python-tests.yml/badge.svg"></a>
-  <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml"><img alt="ESP32 firmware build" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/firmware-build.yml/badge.svg"></a>
-  <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml"><img alt="OpenSCAD geometry checks" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg"></a>
-</p>
+**Status:** the 456×280 face, offline preview and separate Waveshare V2 bench firmware are implemented. Software tests and firmware builds pass. No board has been purchased or physically tested; the fitted enclosure and Mac event integrations remain unfinished.
 
-**Status: purchase decision settled; AMOLED bench renderer and offline face preview added; physical build untested.** Buy one Waveshare 1.64-inch AMOLED board, SKU 31197 V2, plus a USB data cable if needed. The existing firmware controls the older GC9A01 face. The separate V2 implementation is ready for software review; Mac integrations remain planned. Start with the [buying decision and build sequence](docs/build-decision.md); see [readiness](docs/release-readiness.md) for verification limits.
-
-## Current direction
-
-The selected design is a matte rounded rectangle in landscape orientation on the upper right side of the lid, about 25 mm below the top, angled inward by 10 degrees. A fixed arm and head detach for transport. The CAD establishes appearance and spacing; the enclosure, cable exit and dock still need physical measurements.
-
-The selected hardware is **Waveshare ESP32-S3-Touch-AMOLED-1.64 V2, SKU 31197**. Use one USB cable for power and data. Its [official V2 examples](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.64-v2/tree/21b952243d306692774f3b5bfeb3eb5cff10f851) are the bring-up starting point. The GC9A01 firmware and Taby V1 images must not be flashed as this board's display firmware.
-
-[Buying decision and feature scope](docs/build-decision.md) · [Shopping list](docs/shopping-list.md) · [Printing](docs/printing.md) · [Detailed build plan](docs/rectangular-build-plan.md)
-
-![Selected landscape placement](assets/selected-placement-iso.png)
-
-*Placement study with placeholder eyes. Physical fit and retention remain unverified. [CAD source and checks](cad/peeking-concepts/README.md).*
-
-## Start on your MacBook
-
-Target: **14-inch MacBook Pro (2024), base M4 (Mac16,1), 10-core CPU, 10-core GPU, 16 GB unified RAM**. The GPU has **no separate 16 GB VRAM**. A local LLM, workstation or cloud account is **not required** for this first build. See [development-host notes](docs/development-host.md).
-
-~~~sh
-git clone https://github.com/imaddde867/physical_AI_exploration.git
-cd physical_AI_exploration
-python3 --version                     # Requires Python >= 3.11; see Mac setup guide
-python3 -m unittest discover -s tests -v
-python3 tools/check_repository.py
-python3 -m macdesk.demo --simulate --face neutral --watch
-~~~
-
-This runs **software-only tests and a synthetic simulation**; it does not talk to electronics or run AI. If your default Python is too old, follow the [verified macOS setup guide](docs/clone-and-run.md) to use Python 3.12 in a virtual environment.
-
-## Inspect the selected AMOLED face without hardware
-
-![Landscape adaptation of the approved character](assets/face-idle-456.png)
+## Try it on your Mac
 
 ```sh
-python3 -m tools.amoled_face
+git clone https://github.com/imaddde867/physical_AI_exploration.git
+cd physical_AI_exploration
 open assets/amoled-preview.html
 ```
 
-The checked-in preview also opens directly. It shows six restrained expressions,
-blink hold and a deterministic scrub-able 12-second loop using the firmware's
-RGB565 pixels. No server, device, model or extra Python packages are required.
-[Preview and V2 firmware details](firmware-v2/README.md). This implements software;
-actual illumination, colors, rotation and USB behavior remain physically unverified.
+The preview opens directly in Safari. Choose an expression, hold a blink, scrub time or play the fixed 12-second loop. It uses the firmware's RGB565 pixels and needs no hardware, server, model or installation.
 
-## Existing GC9A01 learning prototype
+The face preserves the [original character](assets/face-idle-240.png): heavy lids, cool textured eyes, warm highlights and a small mouth. Six restrained moods share the same identity: neutral, happy, sad, sleepy, surprised and thinking.
 
-| Part | Implemented target |
+## Selected build
+
+**Waveshare ESP32-S3-Touch-AMOLED-1.64 V2, SKU 31197**, powered and controlled over one USB data cable. The intended placement is near the upper-right side of the MacBook lid, in a removable landscape head.
+
+![Selected placement study](assets/selected-placement-iso.png)
+
+*The placement render uses placeholder eyes. Board fit, cable routing, retention and the detachable mount still need physical measurements.*
+
+| Track | Use |
 |---|---|
-| ESP32-S3 **N16R8** | USB-connected microcontroller |
-| **1.28-inch GC9A01 IPS** | Round 240×240 display using the face asset above |
-| Optional **MPU-6050** | Experimental shake reaction; defer for the face-first build |
-| OpenSCAD stand | Open-back desktop shell and fit coupon; physical fit unverified |
+| [AMOLED V2](firmware-v2/README.md) | Selected board: separate ESP-IDF renderer, USB face commands, local blink and idle dim/blank |
+| [GC9A01 prototype](firmware/README.md) | Earlier round 240×240 learning build; preserved with its own firmware and wiring |
 
-The dated [GC9A01 basket](docs/shopping-list.md) is an alternative learning build, not the AMOLED purchase list. Its **€40.03** total is a reference estimate, not a checkout quote. Headers, backlight wiring and physical fit remain unresolved. Do not buy both hardware tracks by default or flash GC9A01 firmware onto an AMOLED board.
+The firmware images are hardware-specific. Run the [pinned official V2 example](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.64-v2/tree/21b952243d306692774f3b5bfeb3eb5cff10f851) first when the board arrives. Compilation does not establish illumination, orientation, colors, brightness or sustained display behavior.
 
-~~~text
-Implemented: Mac Python host → USB JSONL → ESP32-S3 → GC9A01 face
-Planned:     Mac events → companion logic → USB → face / brief text
-~~~
+[Buying decision](docs/build-decision.md) · [Build plan](docs/rectangular-build-plan.md) · [Printing and clearance coupon](docs/printing.md) · [Readiness](docs/release-readiness.md)
 
-Six commands select neutral, happy, sad, sleepy, surprised and thinking cues on the same character. Blink runs locally. The PNG is compiled into a flash-resident RGB565 asset; no model runs on the device. [Protocol and proposed integrations](docs/architecture.md).
+## Develop and validate
 
-## Guides and research
+Python **3.11+** is required for repository checks. See [Mac setup](docs/clone-and-run.md) if your system Python is older.
 
-- [Rear-lid peeking concepts](cad/peeking-concepts/README.md): left/right/top scale studies and retractable versus detachable travel concepts; not print-ready mounts.
-- [Run the existing prototype on macOS](docs/clone-and-run.md), [GC9A01 wiring/firmware](firmware/README.md), [printing](docs/printing.md).
-- [Hardware alternatives](docs/hardware-options.md), [reference BOM](docs/bom.md), [actual GC9A01 front dimensions](assets/actual-scale-front.svg).
-- [Reel source index](docs/reel-index.md) and [technical notes](docs/reel-technical-notes.md) preserve earlier research; use the rectangular engineering study and build plan for current recommendations.
+```sh
+python3 -m unittest discover -s tests -v
+python3 tools/check_repository.py
+python3 -m tools.amoled_face
+```
 
-## Project boundaries and license
+[Build the V2 firmware](firmware-v2/README.md#build-do-not-infer-a-working-screen) · [Validation evidence](firmware-v2/VALIDATION.md) · [Protocol and architecture](docs/architecture.md)
 
-This is an independently authored **learning and research prototype**, not a finished consumer robot, an exact clone of a Reel or a proven physical AI agent. The Mac-first V0 uses only Python/USB and deterministic microcontroller logic; servos, voice, camera, networking and local models are **later, optional milestones**. Project-authored code is [MIT licensed](LICENSE); the bundled V2 vendor driver retains [Apache-2.0](firmware-v2/src/vendor/LICENSE). Linked third-party projects retain their own licenses and artwork restrictions.
+Development host: 14-inch MacBook Pro M4 (Mac16,1), 16 GB unified memory. No local LLM or cloud account is required. [Host details](docs/development-host.md).
+
+## Next milestones
+
+Validate the received board, measure the enclosure and mount, then add deterministic Mac events such as timers and battery status. Short text, music reactions and optional Mac-local intelligence remain planned. Touch, voice, camera and motors are outside the current implementation.
+
+[CAD studies](cad/peeking-concepts/README.md) · [Hardware research](docs/hardware-options.md) · [Video reference index](docs/reel-index.md) · [Technical notes](docs/reel-technical-notes.md)
+
+## License
+
+Independently authored research prototype. Project code is [MIT licensed](LICENSE); the bundled V2 vendor driver retains [Apache-2.0](firmware-v2/src/vendor/LICENSE). Linked projects retain their own licenses and artwork restrictions.

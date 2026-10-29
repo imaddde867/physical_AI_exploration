@@ -33,8 +33,6 @@ static void command(const char *line, uint64_t now) {
         else {
             active_face = i;
             last_command_ms = now;
-            buddy_display_brightness(64); // modest bench default; not calibrated luminance
-            buddy_display_frame(i * 2);
             printf("{\"type\":\"ack\",\"face\":\"%s\"}\n", faces[i]);
         }
     }
@@ -57,7 +55,7 @@ void app_main(void) {
         char ch;
         while (read(STDIN_FILENO, &ch, 1) == 1) {
             if (ch == '\n') {
-                if (!dropping) { line[length] = '\0'; command(line, now); previous_frame = -1; }
+                if (!dropping) { line[length] = '\0'; command(line, now); }
                 length = 0; dropping = false;
             } else if (ch != '\r' && !dropping) {
                 if (ch == '\0' || length >= sizeof(line) - 1) {

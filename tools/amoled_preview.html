@@ -19,8 +19,8 @@ const mood=document.getElementById('mood'), time=document.getElementById('time')
 names.forEach(n=>mood.add(new Option(n[0].toUpperCase()+n.slice(1),n)));
 const frames=encoded.map(s=>{const bytes=atob(s), data=new Uint8ClampedArray(456*280*4);let pixel=0;for(let j=0;j<bytes.length;j+=3){const count=bytes.charCodeAt(j)|(bytes.charCodeAt(j+1)<<8), c=palette[bytes.charCodeAt(j+2)];for(let n=0;n<count;n++){const i=pixel++*4;data[i]=Math.round((c>>11)*255/31);data[i+1]=Math.round(((c>>5)&63)*255/63);data[i+2]=Math.round((c&31)*255/31);data[i+3]=255;}}if(pixel!==456*280)throw Error('Invalid face data');return new ImageData(data,456,280);});
 function draw(){const t=Number(time.value), blink=closed.checked||(t>=4000&&t<4135)||(t>=9000&&t<9135);ctx.putImageData(frames[names.indexOf(mood.value)*2+Number(blink)],0,0);canvas.setAttribute('aria-label',`MacDesk Buddy ${mood.value}${blink?' blinking':''} face`);document.getElementById('stamp').value=t+' ms';}
-let playing=false, start=0;
-function tick(now){if(!playing)return;time.value=Math.floor(now-start)%12000;draw();requestAnimationFrame(tick);}
-play.onclick=()=>{playing=!playing;play.textContent=playing?'Pause':'Play fixed loop';if(playing){start=performance.now()-Number(time.value);requestAnimationFrame(tick);}};
-time.oninput=()=>{if(playing){playing=false;play.textContent='Play fixed loop';}draw();};mood.onchange=draw;closed.onchange=draw;draw();
+let playing=false, start=0, animation;
+function tick(now){if(!playing)return;time.value=Math.floor(now-start)%12000;draw();animation=requestAnimationFrame(tick);}
+play.onclick=()=>{playing=!playing;play.textContent=playing?'Pause':'Play fixed loop';if(playing){start=performance.now()-Number(time.value);animation=requestAnimationFrame(tick);}else cancelAnimationFrame(animation);};
+time.oninput=()=>{if(playing){playing=false;cancelAnimationFrame(animation);play.textContent='Play fixed loop';}draw();};mood.onchange=draw;closed.onchange=draw;draw();
 </script></html>
