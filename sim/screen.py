@@ -13,6 +13,7 @@ from tools.face_asset import indexed_png, rgb565
 WIDTH, HEIGHT = 456, 280
 
 _hex_cache: dict[tuple[int, int, int], str] = {}
+_asset_cache: dict[str, tuple[list[tuple[int, int, int]], bytes]] = {}
 
 
 def _hex(rgb: tuple[int, int, int]) -> str:
@@ -47,8 +48,11 @@ class Screen:
         self.fill_rect(0, 0, WIDTH, HEIGHT, rgb)
 
     def blit_image(self, path: str | Path, x: int, y: int) -> None:
-        # indexed_png() exposes indices flat, so the 240x240 approved asset shape is assumed.
-        palette, source = indexed_png(Path(path))
+        # Decode cached: mini-apps re-blit each frame; a fresh PNG decode every call measured 28 ms/frame.
+        key = str(path)
+        if key not in _asset_cache:
+            _asset_cache[key] = indexed_png(Path(path))
+        palette, source = _asset_cache[key]
         for index, value in enumerate(source):
             px, py = index % 240, index // 240
             dx, dy = x + px, y + py
