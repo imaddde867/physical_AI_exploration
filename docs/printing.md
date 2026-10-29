@@ -1,25 +1,53 @@
-# Rounded-rectangle face — printing and mechanical fit
+# First print: a small clearance coupon
 
-For the new rear-lid-mounted direction, start with the [peeking concept studies](../cad/peeking-concepts/README.md). These explore appearance and travel arrangements; they are not print-ready pieces.
+The selected appearance is the [landscape rear-lid buddy](build-decision.md). **Print only the fit coupon at this stage.** The selected placement model is solid reference geometry with placeholder electronics and dock; it is not a functional shell or mount STL.
 
-**Scope:** the current SCAD remains the GC9A01 desktop stand prototype. It is not the rectangular V2 candidate housing or a verified laptop-edge mount. The proposed 33.12 × 48 × 13 mm face is provisional scale, not actual fit. Measure the chosen board before a functional shell; keep cable routing outside the lid closure path.
+## What the printer photos establish
 
-The source [desk-buddy.scad](../cad/desk-buddy.scad) now models a **circular face opening**, a subtle front bezel, a rounded enclosure and an open-back service cavity. There is also a separate **fit_coupon** part to print before the full housing.
+The supplied photos identify a **Bambu Lab H2S** and an **AMS 2 Pro** filament feeder. The separate tool kit contains hotends marked 0.4, but this does not establish which nozzle is installed. Black, gray and blue describe color; the photos do not identify PLA/PETG, brand or the material profile. Read the spool label or the printer's loaded-material information before slicing.
 
-For visual realism, inspect the [dimensional front-view illustration](../assets/actual-scale-front.svg) before deciding whether the screen is big enough: **31.4 mm aperture / 72 mm body width = 43.6%**. The approved PNG represents **screen pixels**, not the relative size of the finished enclosure. Smaller body dimensions would require verifying internal board and cable clearances.
+You can use one loaded spool. There is no need to change colors, unload the feeder or buy three filaments. Prefer an available PLA spool for the first fit gauge. If black is another material, use the identified PLA color instead. For the later load-bearing arm, PETG is a candidate requiring its own fit and retention tests; do not treat a PLA coupon as proof of PETG fit.
 
-**Manufacturer/seller nominal dimensions:** active round LCD diameter 32.4 mm; external display board about 44×36×5 mm. The default visible aperture diameter is **31.4 mm** to hide the extreme screen edge and the display PCB. The LCD must sit behind the front wall, with its active area centered on the opening.
+The shared printer's local booking and personal-project rules still apply. Confirm permission locally before starting a print. The photos and local notices remain outside the public repository.
 
-**Local geometrical checks (2026-10-26):** OpenSCAD compiled both configurations. Watertight meshes with one connected component: shell outer bounds **82×54×78.5 mm**; coupon **47×47×2.8 mm**. This is **not a verified part fit**, and not a tested Bambu Studio slicing profile.
+## File to bring
 
-## Steps
+Download [fit_coupon.stl](../cad/peeking-concepts/STL/fit_coupon.stl) onto a USB stick, or copy it from the repository. This is a clearance gauge with **two separate objects**, not the old round display aperture coupon:
 
-1. Use the confirmed Bambu Lab H2S and identify its installed nozzle and matching Bambu Studio profile.
-2. Obtain the actual LCD module and measure PCB, viewing-glass location, header protrusion and wire bend radius with a caliper.
-3. Open the SCAD in OpenSCAD; set **part = "fit_coupon"**, render F6 and export STL. This existing coupon is for the round GC9A01 prototype; the rectangular concept needs its own verified board/case interface.
-4. Revise **opening_d**, **face_height**, body dimensions and tolerances if needed. Set **part = "shell"**, render F6 and export STL.
-5. Import the exported model into Bambu Studio with the H2S profile matching its installed nozzle; inspect supports and orientation.
-6. Use PLA, ~0.2 mm layers, 3 walls and ~15% infill as **initial slicing suggestions**, not validated settings.
-7. Print, photograph the assembly, and test actual LCD and connector clearances. Avoid touching or trapping LCD glass. For a durable version, design proper mounts/standoffs after measuring the real PCB.
+- A strip with three holes, left to right: 4.2 x 8.2, 4.4 x 8.4 and 4.6 x 8.6 mm.
+- A 4 x 8 mm peg on a foot.
 
-The [actual approved 240×240 sprite](../assets/face-idle-240.png) is firmware's idle screen source; it is enlarged by browsers and is not a photograph of the real LCD. The [dimensioned aperture diagram](../assets/actual-scale-front.svg) describes geometry, **not** a second character design. Final aesthetics depend on actual filament finish, screen black-level, backlight, fit and print quality.
+The overall mesh envelope is **45 x 27.5 x 8 mm**. The hole sizes provide 0.2, 0.4 and 0.6 mm total dimensional clearance relative to the peg. Mesh inspection found two closed components. That establishes file geometry, not printed accuracy or latch strength.
+
+## In Bambu Studio
+
+1. Import the STL in millimetres at **100% scale**. Keep both objects; do not merge them or place one on top of the other. Keep their flat bases on the build plate.
+2. Select **Bambu Lab H2S** and the installed nozzle diameter. If it is 0.4 mm, start with **0.20 mm Standard**, 3 walls and 15% infill. These are proposed first-print settings, not a validated slicer preset.
+3. Select the actual installed plate and the identified spool's material profile. Map both objects to **one filament slot**. Use the profile's temperatures and calibration defaults; avoid manual nozzle/bed guesses.
+4. Slice and inspect the preview. Both pieces should begin on the plate, their holes should remain open, and no support should fill the holes. The gauge was designed for a flat print without supports; if the slicer proposes supports, recheck placement before proceeding.
+5. Record estimated time and filament mass, then follow local booking and print procedures. Watch the first layer. Ask the printer custodian for help with a material mismatch or failed start.
+6. Let the plate cool before removing the parts. Check each hole gently with the peg, without forcing it. Record material, nozzle, profile, measured dimensions and which fit feels right. Do not enlarge or rescale the whole model as a fit correction.
+
+For later documentation, record results in this form:
+
+```text
+Date / printer / nozzle / plate:
+Material and spool profile:
+Layer height / walls / infill:
+Slice time and grams:
+Peg measured X/Y:
+Hole 0.2 / 0.4 / 0.6: loose, sliding, tight, or will not enter:
+Warping or first-layer issues:
+```
+
+## Before a fitted enclosure
+
+Measure the received board, display position, USB plug body and cable bend, buttons, holes, headers and mass. Measure the Mac's actual lid geometry and cable route. The current 48 x 33.12 x 13 mm landscape housing is an appearance envelope. It lacks board retention, serviceable fastening, verified button/antenna clearance, strain relief and a tested detachable dock. Adhesion to bare laptop finish and lid closure are unverified.
+
+Print a measured board-fit piece before a full enclosure. Keep electronics out until it fits without glass pressure or exposed-contact shorts. A working latch, repeated detach cycles and lid/cable clearance must be checked before mounting or transport.
+
+## Earlier GC9A01 stand
+
+[cad/desk-buddy.scad](../cad/desk-buddy.scad) is the earlier desktop round-screen shell. Its `fit_coupon` setting produces a **different**, circular aperture gauge for the GC9A01. Neither that shell nor its aperture belongs to the selected AMOLED order. Keep it as a historical learning prototype.
+
+The [CAD README](../cad/peeking-concepts/README.md) lists the current placement source, historical rebuild toolchains and coupon checks. No slicer session or physical print was performed during this audit.

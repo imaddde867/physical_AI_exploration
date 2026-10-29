@@ -4,6 +4,20 @@ import json
 import time
 from macdesk.protocol import FACES, face_command, parse_response
 
+MAX_RESPONSE_BYTES = 512
+
+
+def read_response(device, pending: bytearray) -> dict | None:
+    # A serial timeout can return a fragment without the JSONL newline.
+    pending.extend(device.readline(MAX_RESPONSE_BYTES + 1 - len(pending)))
+    if len(pending) > MAX_RESPONSE_BYTES:
+        raise ValueError(f"response exceeds {MAX_RESPONSE_BYTES} bytes")
+    if not pending.endswith(b"\n"):
+        return None
+    line = bytes(pending)
+    pending.clear()
+    return parse_response(line)
+
 
 def run_simulated(face: str, watch: bool = False) -> None:
     request = face_command(face)
@@ -24,11 +38,11 @@ def run_device(port: str, face: str, watch: bool = False, baudrate: int = 115200
         device.reset_input_buffer()
         device.write(face_command(face))
         device.flush()
+        pending = bytearray()
         for _ in range(8):
-            data = device.readline()
-            if not data:
+            response = read_response(device, pending)
+            if response is None:
                 continue
-            response = parse_response(data)
             print(response)
             if response["type"] == "ack" and response.get("face") == face:
                 break
@@ -40,9 +54,9 @@ def run_device(port: str, face: str, watch: bool = False, baudrate: int = 115200
             print("Watching sensor events (Ctrl-C to stop) ...")
             try:
                 while True:
-                    data = device.readline()
-                    if data:
-                        print(parse_response(data))
+                    response = read_response(device, pending)
+                    if response is not None:
+                        print(response)
             except KeyboardInterrupt:
                 print("Stopped.")
 

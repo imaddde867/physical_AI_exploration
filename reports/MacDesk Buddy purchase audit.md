@@ -1,5 +1,7 @@
 # Choose the screen before buying
 
+> Decision update, 2026-10-29: [the first build decision](../docs/build-decision.md) supersedes the purchasing advice below. Select one Waveshare 1.64 V2 for bench testing, then verify the received board before flashing or fitting. This dated report preserves earlier research.
+
 *Purchase audit, 2026-10-27*
 
 **Recommendation — hold the order until seller and integration checks are closed.** For your priority—an expressive face beside the MacBook, with occasional short text—the **Waveshare 1.32-inch round AMOLED is the strongest hardware candidate**: the vendor lists 466×466 and 500 cd/m², and Taby supports this board. The 500 cd/m² figure is a specification, not a measured comparison or glare test. Its nominal 1.32-inch diagonal is just 0.04 inch larger than the 1.28-inch GC9A01; the upgrade is primarily pixel density, not a much larger face. Taby is separate firmware; its support does not supply the desired Mac USB bridge, and custom firmware/UI integration is still needed. Taby’s round case is “coming soon.” Confirm stock, checkout total and enclosure path before buying. ([Waveshare 1.32](https://www.waveshare.com/product/esp32-s3-touch-amoled-1.32.htm), [Taby install matrix](https://github.com/TRIIIS-LABS/firmware-taby/blob/main/INSTALL.md), [Taby project](https://github.com/TRIIIS-LABS/firmware-taby))

@@ -1,28 +1,28 @@
 # Build readiness
 
-**As of the 2026-10-27 audit: software prototype; no physical hardware validation.** The [rectangular engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md) are the current direction records. The [initial OLED audit](archive/2026-10-26-initial-audit.md) is historical.
+Audit date: **2026-10-29**. The [purchase decision](build-decision.md) selects Waveshare 1.64 V2 SKU 31197. No board has been purchased, flashed, mounted or physically tested. The selected-board firmware and functional mount are unfinished.
 
-## Evidence and boundaries
+## Verification record
 
-| Evidence | Established | Still unverified |
+| Area | Evidence | Limit |
 |---|---|---|
-| Local Python suite and repository checker | 21 tests passed; protocol, simulator, asset encoding, manifest arithmetic and links checked | Physical USB reliability, display output and sensor behavior |
-| PlatformIO workflows | Native USB and UART build jobs are configured with pinned dependencies | Not rerun in this audit; live CI status not checked |
-| CAD workflow | OpenSCAD render/mesh checks are configured | Not rerun in this audit; physical fit, slicer settings, installed nozzle/profile and mounting |
-| Face asset | One checked-in 240×240 image used by GC9A01 firmware | Appearance, brightness and colors on a real panel |
+| Host code | 29 Python tests and repository checker passed locally | Synthetic/mock USB, no real device |
+| Serial framing | Split acknowledgement and watch events survive read timeouts; overlong responses are bounded; incomplete ACK times out | Existing eight-read ACK budget remains; no reconnect service |
+| Hardware catalog | Purchase track and implemented firmware track recorded separately, with regression checks | Catalog arithmetic cannot verify a seller cart |
+| Existing firmware | Baseline d05e934 live GitHub firmware workflow passed when checked on October 29 | GC9A01 native USB/UART compile only; not selected-board firmware or physical display output |
+| Existing OpenSCAD | Baseline d05e934 live CAD workflow passed | Older round desktop shell/coupon only |
+| Selected CAD | cadgen 0.8.1 model built with nine valid solids; checks measure 25 mm top offset, 2 mm side gap and 10 degree inward face; no pod/lid solid intersection | Assumed lid and pod envelope; no fitted enclosure, latch, cable or attachment validation |
+| Printable gauge | Published STL checked as two closed components, 45 x 27.5 x 8 mm | No Bambu Studio slice or physical print |
+| Photos | H2S and AMS 2 Pro identified; spare hotends marked 0.4 | Installed nozzle, material and plate profile not established |
 
-The simulator's shake event is synthetic. Build success cannot prove that a write-only SPI panel illuminates. No unit has been assembled, flashed or physically tested in this project.
+Baseline workflow evidence: [Python](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40456528007), [firmware](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40456527921), [OpenSCAD](https://github.com/imaddde867/physical_AI_exploration/actions/runs/40456527922). These links refer to the prior baseline, not the new changes. Check the runs attached to the final pushed commit separately.
 
-## Hardware tracks
+## Remaining work
 
-**Leading documented purchase candidate:** Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2. Purchase remains gated on mapping the delivered revision to the drawing/schematic and verifying USB data; its 33.12 × 48 × 13 mm concept scale does not establish fit. It needs separate firmware/UI and Mac USB work. No AMOLED implementation is claimed here. Taby 1.64 V1 support is separate.
+The official V2 display example uses a vendor QSPI initialization/driver path and software rotation. Our existing Adafruit GC9A01A target cannot drive it. Match the received revision to the [pinned V2 source](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.64-v2/tree/21b952243d306692774f3b5bfeb3eb5cff10f851); bring up that example before porting our character and protocol. Neither a compile nor a ready message proves that the physical panel is lit.
 
-**Implemented learning prototype:** separate ESP32-S3 N16R8 + GC9A01 1.28-inch SPI display, with optional MPU-6050 on I²C. The dated €40.03 basket is an estimate, not a current checkout quote. LCD headers/BLK, board labels, 3.3 V logic, screen output, USB recovery and printed fit need physical checks. Alternative boards cannot use this firmware unchanged.
+Implemented today: six GC9A01 face commands, local blink, synthetic host demo and optional experimental motion reaction. Timers, short text, automatic Mac events, music, lyrics, token integrations, clips, screen awareness and model inference remain planned. The [decision's capability table](build-decision.md#what-the-software-needs) records how each request would be approached.
 
-## Feature readiness
+A Mac-local model is optional and has not been selected or benchmarked. The base M4 has 16 GB shared unified memory. No model, external GPU or cloud subscription is needed to test the current demo or plan deterministic event handling.
 
-Implemented: six facial mood commands, local blink, synthetic host simulation and optional experimental shake response. Not implemented: text, timers, Mac app events, notifications, coding-agent status/tokens, music, lyrics, screen capture or model inference.
-
-The Mac target is a base M4 with **16 GB shared unified memory**, not a separate GPU memory pool. No model or cloud service is required for the current demo or a deterministic timer/event bridge.
-
-Follow the [first-build milestones](first-build.md). Existing [physical bring-up issue #1](https://github.com/imaddde867/physical_AI_exploration/issues/1) and [optional Mac AI issue #2](https://github.com/imaddde867/physical_AI_exploration/issues/2) are background tracking; this cleanup does not update their scope or status.
+Proceed with the [first-build sequence](build-decision.md#what-to-do-next-in-order). A functional enclosure needs the actual board and laptop measurements. Sustained power/heat, display readability, USB reconnect, finish safety, retention, cable routing and transport all need physical checks.

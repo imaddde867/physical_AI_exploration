@@ -1,6 +1,10 @@
 # Display choice: rectangular AMOLED candidate, round IPS prototype
 
-**Current direction (2026-10-27): a subtle rounded-rectangle face, powered and connected by one discreet USB cable.** Leading candidate: Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed as V2, subject to delivered PCB revision mapping to the drawing and schematic and USB data verification. The schematic source is Rev1.1 and its GPIO19/20 routing is not yet confirmed for retail V2. Taby 1.64 V1 support is a separate option and does not imply V2 support. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
+> Current purchase decision: [one Waveshare 1.64 V2 and a USB data cable](build-decision.md). Earlier comparisons and the GC9A01 basket below remain reference material. Check the delivered revision before flashing or finalizing a case.
+
+The earlier comparison follows. Its revision and purchase gates were superseded by the decision linked above.
+
+**Research direction recorded 2026-10-27:** a subtle rounded-rectangle face, powered and connected by one discreet USB cable.** Leading candidate: Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed as V2, subject to delivered PCB revision mapping to the drawing and schematic and USB data verification. The schematic source is Rev1.1 and its GPIO19/20 routing is not yet confirmed for retail V2. Taby 1.64 V1 support is a separate option and does not imply V2 support. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
 
 The existing **GC9A01 IPS** remains the implemented electronics-learning prototype. Its firmware, artwork pipeline and CAD are retained; they do not run unchanged on the AMOLED board. A provisional 33.12 × 48 × 13 mm rectangular concept is a packaging study, not a verified fit.
 

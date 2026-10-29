@@ -1,5 +1,7 @@
 # MacDesk Buddy: ESP32-S3 round color display firmware
 
+**Selected purchase:** [Waveshare 1.64 V2](../docs/build-decision.md) needs its own renderer, based on the revision-matched official V2 examples. Neither environment below targets that board.
+
 **Scope:** this firmware is the GC9A01 learning prototype. It does not support the leading Waveshare AMOLED candidate or Mac app integrations. See [display choice](../docs/display-choice.md).
 
 **Target hardware:** ESP32-S3 N16R8 development board, **GC9A01 1.28 inch circular IPS LCD** (240×240 pixels; SPI; 2.8–3.3 V supply) and optional MPU-6050 I²C motion sensor. The old monochrome OLED firmware is retired.

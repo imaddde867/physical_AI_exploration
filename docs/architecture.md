@@ -33,7 +33,7 @@ Valid expressions: neutral, happy, sad, sleepy, surprised, thinking. Invalid JSO
 ## Testing boundaries
 
 1. Python unit tests and simulator establish host protocol correctness only.
-2. The configured PlatformIO workflows check compile/link for native USB and UART profiles only; the latest audit did not rerun them or verify live CI.
+2. The PlatformIO workflow checks compile/link for the GC9A01 native USB and UART profiles only. Live runs for baseline commit d05e934 passed when checked on 2026-10-29; this does not check AMOLED support or physical display behavior.
 3. OpenSCAD mesh checks establish closed geometry, not FDM slicer success or PCB fit.
 4. Physical GPIO, voltage, backlight, color ordering, screen appearance, IMU and serial behavior require real components.
 5. Future AI work must separately benchmark memory, responsiveness, action accuracy, p50/p95/p99 command latency and safety limits on a 16 GB M4.

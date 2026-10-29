@@ -20,6 +20,24 @@ class ManifestTests(unittest.TestCase):
     def test_option_ids_and_compatibility(self):
         check_options(read_json(ROOT / "hardware/options.json"))
 
+    def test_purchase_can_differ_from_implemented_track(self):
+        data = read_json(ROOT / "hardware/options.json")
+        data["selected_track"] = "rectangular-164-v2"
+        data["implemented_track"] = "gc9a01-separate-parts"
+        check_options(data)
+
+    def test_missing_implemented_track_is_rejected(self):
+        data = read_json(ROOT / "hardware/options.json")
+        data.pop("implemented_track", None)
+        with self.assertRaises(AssertionError):
+            check_options(data)
+
+    def test_unimplemented_board_is_not_accepted_as_firmware_target(self):
+        data = read_json(ROOT / "hardware/options.json")
+        data["implemented_track"] = "rectangular-164-v2"
+        with self.assertRaises(AssertionError):
+            check_options(data)
+
     def test_local_links_and_svgs(self):
         self.assertEqual([], check_markdown_links(ROOT))
         self.assertEqual([], check_svgs(ROOT))

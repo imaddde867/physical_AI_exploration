@@ -15,19 +15,19 @@
   <a href="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml"><img alt="OpenSCAD geometry checks" src="https://github.com/imaddde867/physical_AI_exploration/actions/workflows/cad-check.yml/badge.svg"></a>
 </p>
 
-**Status — software prototype; hardware untested.** The existing firmware controls a GC9A01 face over USB. Timers, notifications, music, coding-agent status and screen awareness are planned, not implemented. The 2026-10-27 audit passed 21 Python tests and the repository checker; firmware/CAD builds and live CI were not rechecked. [Readiness](docs/release-readiness.md).
+**Status: purchase decision settled; physical build and AMOLED software unfinished.** Buy one Waveshare 1.64-inch AMOLED board, SKU 31197 V2, plus a USB data cable if needed. The existing firmware controls the older GC9A01 face. Mac integrations and the V2 renderer remain planned. Start with the [buying decision and build sequence](docs/build-decision.md); see [readiness](docs/release-readiness.md) for verification limits.
 
 ## Current direction
 
-**Current direction: a subtle rounded-rectangle face**, with one discreet USB cable for power and data. The leading documented board candidate is Waveshare ESP32-S3-Touch-AMOLED-1.64, SKU 31197, listed as V2; purchase remains gated on matching the delivered PCB revision to the drawing and schematic and verifying USB data. The existing GC9A01 firmware stays implemented; the new board needs its own display/UI path and Mac USB bridge. See the [engineering study](reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](docs/rectangular-build-plan.md). The 33.12 × 48 × 13 mm concept is provisional packaging scale, not proof of board fit.
+The selected design is a matte rounded rectangle in landscape orientation on the upper right side of the lid, about 25 mm below the top, angled inward by 10 degrees. A fixed arm and head detach for transport. The CAD establishes appearance and spacing; the enclosure, cable exit and dock still need physical measurements.
 
-Start with one board, a data cable and a temporary desk stand. Confirm exact board variant, Finland checkout total and enclosure plan first. No camera, microphone, IMU, motors or battery is needed for the first companion. The existing SCAD is a desktop stand prototype; the new rear-lid CAD studies are provisional, not validated mounts.
+The selected hardware is **Waveshare ESP32-S3-Touch-AMOLED-1.64 V2, SKU 31197**. Use one USB cable for power and data. Its [official V2 examples](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.64-v2/tree/21b952243d306692774f3b5bfeb3eb5cff10f851) are the bring-up starting point. The GC9A01 firmware and Taby V1 images must not be flashed as this board's display firmware.
 
-[**Rectangular engineering study**](reports/Rectangular%20buddy%20engineering%20study.md) · [Rectangular build plan](docs/rectangular-build-plan.md) · [Display choice](docs/display-choice.md) · [First-build milestones](docs/first-build.md)
+[Buying decision and feature scope](docs/build-decision.md) · [Shopping list](docs/shopping-list.md) · [Printing](docs/printing.md) · [Detailed build plan](docs/rectangular-build-plan.md)
 
-![Portrait, landscape and square form studies](assets/rectangular-placement-study.png)
+![Selected landscape placement](assets/selected-placement-iso.png)
 
-*Provisional scale studies; the MacBook lid geometry and physical fit remain unverified. [CAD sources, coupon and rebuild guide](cad/peeking-concepts/README.md).*
+*Placement study with placeholder eyes. Physical fit and retention remain unverified. [CAD source and checks](cad/peeking-concepts/README.md).*
 
 ## Start on your MacBook
 

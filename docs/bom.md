@@ -1,6 +1,8 @@
 # GC9A01 prototype — reference bill of materials
 
-This is the dated basket for the **implemented GC9A01 learning prototype**, not the current purchase recommendation. The leading documented candidate is Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2, subject to revision/drawing and USB verification; it requires separate firmware and enclosure work. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md).
+> Current purchase decision: [one Waveshare 1.64 V2 and a USB data cable](build-decision.md). Earlier comparisons and the GC9A01 basket below remain reference material. Check the delivered revision before flashing or finalizing a case.
+
+This is the dated basket for the **implemented GC9A01 learning prototype**, not the current purchase recommendation. The selected purchase is one Waveshare 1.64 V2; its custom renderer and fitted enclosure remain work to complete. Use the decision linked above for the order.
 
 ## Reference basket (Otronic; advertised prices recorded 2026-10-26)
 

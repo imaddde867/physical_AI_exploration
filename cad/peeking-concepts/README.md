@@ -2,7 +2,19 @@
 
 **Current direction:** matte rounded rectangle, one USB power/data cable, Bambu Lab H2S. Start with the [rectangular engineering study](../../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](../../docs/rectangular-build-plan.md). The round studies below are earlier alternatives.
 
-**Throwaway appearance and mechanism exploration, not print-ready pieces.** The original intent was a small round face looking at the user from beyond the left, right or top edge, supported entirely from behind the MacBook lid. For travel, compare retracting the pod behind the lid with removing the pod/arm while leaving a small dock attached. The user has not selected either mechanism.
+**Selected arrangement:** a landscape face beside the upper right lid edge, its top 25 mm below the lid top and its face angled inward 10 degrees. Remove the face and arm for travel, leaving a small rear dock. The dimensions remain provisional and the attachment is unresolved. The earlier round and three-form comparison studies below record alternatives.
+
+## Selected placement on the current CAD runtime
+
+`src/selected_placement.py` uses cadgen 0.8.1 and shows the selected arrangement against an upright reference lid. It checks nine valid positive-volume solids, a 2 mm side clearance, a 25 mm top offset, a 10-degree inward display normal, a 1 mm minimum rear envelope, and zero pod/lid intersection. The 48 × 33.12 × 13 mm body is an appearance envelope. The dock and arm are placeholders, with no latch, retention, cable route or strength qualification. The reference lid height and thickness remain assumptions.
+
+```sh
+cadgen +0.8.1 run cad/peeking-concepts/src/selected_placement.py
+```
+
+The assertions run inside the model build. The command prints the document ID for inspection, snapshots and optional STEP export. This model replaces the older comparison preview for the selected placement; it does not validate board fit or a safe laptop attachment.
+
+The other scripts below use the retired cadgen 0.7 API. Their old commands are retained as provenance and do not work with cadgen 0.8.1. Their generated STEP files can still be opened as reference geometry. A full source migration is deferred because those studies are alternatives, not the selected build.
 
 ## Scale and assumptions
 
@@ -56,7 +68,7 @@ The official Waveshare STEP contains 263 leaves and measures **29.12 × 44.2 × 
 
 Use the **H2S profile matching the installed nozzle**, not a generic Bambu printer. A 0.4 mm nozzle / 0.20 mm Standard process is a proposed starting point only if that nozzle is installed; use the actual PLA or PETG spool profile. The coupon requires slicer preview and physical fit checks before its clearances inform another part. Do not scale to compensate for fit.
 
-Saved-STEP validation: `checks/check_rectangular.py`. Mesh evidence: `checks/fit_coupon_dfam.json`, generated with the installed DfAM tool at a 45° threshold. The exported STL is watertight with two bodies, 45 × 27.5 × 8 mm overall, sampled minimum thickness 2 mm, pooled p05 3 mm, and zero measured unsupported down-facing area. Those exceed the bundled FDM default unsupported-wall guideline of 1.6 mm, but sampling, print calibration and real fit remain limitations. No slicing or printing has been performed.
+Historical saved-STEP validation: `checks/check_rectangular.py` (cadgen 0.7 API). Mesh evidence: `checks/fit_coupon_dfam.json`, generated with the installed DfAM tool at a 45° threshold. The exported STL is watertight with two bodies, 45 × 27.5 × 8 mm overall, sampled minimum thickness 2 mm, pooled p05 3 mm, and zero measured unsupported down-facing area. Those exceed the bundled FDM default unsupported-wall guideline of 1.6 mm, but sampling, print calibration and real fit remain limitations. A 2026-10-29 independent binary STL check confirmed 100 triangles, every mesh edge shared by two triangles, two connected components, the stated bounds and 2076.120 mm³ total signed volume matching the source dimensions. No slicing or printing has been performed.
 
 ```sh
 uvx --no-config --managed-python --python 3.13 --from cadgen==0.7.26 python cad/peeking-concepts/src/rectangular_study.py

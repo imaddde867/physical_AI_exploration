@@ -1,6 +1,8 @@
 # Hardware decisions: Reel originals vs independently sourced alternatives
 
-**Current direction (2026-10-27): subtle rounded-rectangle face, one discreet USB power-and-data cable.** The **Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2**, is the leading documented purchase candidate behind revision/drawing/schematic and USB verification gates. The **GC9A01** remains the implemented prototype. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
+> Current purchase decision: [one Waveshare 1.64 V2 and a USB data cable](build-decision.md). Earlier comparisons and the GC9A01 basket below remain reference material. Check the delivered revision before flashing or finalizing a case.
+
+**Historical comparison recorded 2026-10-27:** subtle rounded-rectangle face, one discreet USB power-and-data cable.** The **Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2**, is the leading documented purchase candidate behind revision/drawing/schematic and USB verification gates. The **GC9A01** remains the implemented prototype. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
 
 This catalog preserves alternatives without implying electrical or firmware compatibility. Prices below were recorded on 2026-10-26; the audit did not recheck every listing, accessory or checkout total.
 

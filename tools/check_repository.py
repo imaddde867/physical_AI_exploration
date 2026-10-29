@@ -61,6 +61,7 @@ def check_options(data: dict) -> None:
     ids = [item["id"] for item in options]
     assert len(ids) == len(set(ids)), "Duplicate option ID"
     assert data["selected_track"] in ids
+    assert data.get("implemented_track") in ids, "Missing or unknown implemented track"
     for item in options:
         assert item["source_url"].startswith("https://")
         assert int(Decimal(item["price"]["amount"])) >= 0
@@ -70,9 +71,9 @@ def check_options(data: dict) -> None:
     taby = next(q for q in options if q["id"] == "taby-round-amoled")
     assert "1.32" in taby["name"]
     assert "not compatible" in taby["software"].lower()
-    first = next(q for q in options if q["id"] == data["selected_track"])
-    assert "GC9A01" in first["hardware"]
-    assert first["price"]["currency"] == "EUR"
+    implemented = next(q for q in options if q["id"] == data["implemented_track"])
+    assert "GC9A01" in implemented["hardware"], "Firmware currently implements GC9A01 only"
+    assert implemented["price"]["currency"] == "EUR"
 
 
 def check_markdown_links(root: Path) -> list[str]:

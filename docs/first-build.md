@@ -4,11 +4,11 @@
 
 ## Leading custom rectangular candidate: work still needed
 
-1. Gate purchase of Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197 (listed V2) on delivered PCB revision mapping to the official mechanical drawing and schematic, native USB data verification and Finland checkout. Rev1.1 schematic routes native USB D+/D− on GPIO19/20, but retail V2 mapping is unconfirmed. Do not treat Taby’s separate 1.64 V1 support as V2 support.
+1. Follow the [settled purchase decision](build-decision.md): buy one Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197 V2 after confirming Finland checkout cost. On receipt match its marking to the official V2 examples and schematic, then verify native USB and display output. Taby V1 and our GC9A01 firmware do not support V2.
 2. Bench the board and cable, measure its envelope and test native USB power/data before implementing the 1.64 display path and Mac USB event interface. Existing GC9A01 firmware and wiring below do not apply.
 3. Treat 33.12 × 48 × 13 mm as provisional concept packaging only; verify face, colors, short-label readability, USB reconnect and board/cable dimensions on the desk.
 4. Add a Mac timer/manual-event bridge, then supported coding-agent and music events one integration at a time. Screen capture is a later opt-in feature; lyrics and arbitrary notification access remain unresolved.
-5. Build a custom rounded-rectangle case and USB-port opening around measured board and plug dimensions; the 33.12 × 48 × 13 mm concept is only a starting scale. Design any stand or removable laptop mount only after measuring weight, clearance and cable routing. The current CAD is a desktop prototype.
+5. Build a custom rounded-rectangle case and USB-port opening around measured board and plug dimensions; the 33.12 × 48 × 13 mm concept is only a starting scale. Design any stand or removable laptop mount only after measuring weight, clearance and cable routing. The selected CAD establishes placement only; the older OpenSCAD is a desktop prototype.
 
 Start with one board and a data cable. Defer the IMU, microphone, camera, motors and battery.
 

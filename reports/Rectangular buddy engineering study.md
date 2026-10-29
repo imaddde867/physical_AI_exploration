@@ -1,5 +1,7 @@
 # Build a rectangular MacDesk Buddy carefully
 
+> Decision update, 2026-10-29: [the first build decision](../docs/build-decision.md) supersedes the purchasing advice below. Select one Waveshare 1.64 V2 for bench testing, then verify the received board before flashing or fitting. This dated report preserves earlier research.
+
 Start with a **matte, rounded-rectangle face**, one short USB cable for both power and data, and a small locally rendered display module. Treat the Waveshare ESP32-S3-Touch-AMOLED-1.64 (SKU 31197, listed V2) as the leading documented purchase candidate only after its delivered revision, mechanical drawing, native USB CDC path, and Finland shipping are confirmed. Keep the LILYGO T-Display-AMOLED-Lite as a compact alternative, not a default buy: it is listed sold out, its official sources disagree on the display driver, and its older CAD does not contain the full electronic assembly. First concepts can establish appearance and scale, but neither Apple’s published specifications nor board drawings establish a safe lid fit. This is a wired prototype plan, not a travel-ready mount or measured performance claim.
 
 ## A documented rectangle is the best first scaling target

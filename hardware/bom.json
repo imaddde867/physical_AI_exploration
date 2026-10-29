@@ -77,7 +77,7 @@
   "expected_total_without_cable": "37.38",
   "notes": [
     "No order placed. This BOM describes the implemented GC9A01 prototype, not the leading purchase candidate.",
-    "For the face-first goal, evaluate the exact Waveshare ESP32-S3-Touch-AMOLED-1.32; it needs different firmware and enclosure work.",
+    "Current purchase decision: one Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197 V2 plus a USB data cable; see docs/build-decision.md. This historical basket is not the selected purchase.",
     "Accessory prices were not individually rechecked in the 2026-10-27 audit; stock, VAT and final Finland checkout total remain unverified.",
     "The optional MPU-6050 is retained in these reference totals; defer it for the first face-first build.",
     "No motors, batteries, cameras or external GPU needed initially.",

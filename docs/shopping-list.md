@@ -1,8 +1,21 @@
-# Hardware purchase status and GC9A01 reference basket
+# Shopping list for the selected build
 
-**Direction updated 2026-10-27:** build a subtle rounded-rectangle face with one discreet USB cable for power and data. The leading documented candidate is Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2, gated on drawing-to-PCB revision mapping and USB data verification. See the [engineering study](../reports/Rectangular%20buddy%20engineering%20study.md) and [build plan](rectangular-build-plan.md).
+Decision: 2026-10-29. Buy **one Waveshare ESP32-S3-Touch-AMOLED-1.64 V2, SKU 31197**, and reuse a USB-C data cable. Read the [full decision](build-decision.md) for quality, software and print limits.
 
-The basket below preserves the **implemented GC9A01 prototype** at prices recorded on 2026-10-26. It is a reference estimate, not a current buy list. Accessory lines were not individually rechecked; VAT, stock and delivery may change.
+| Buy now | Selection |
+|---|---|
+| 1 integrated board | [Waveshare SKU 31197](https://www.waveshare.com/ESP32-S3-Touch-AMOLED-1.64.htm), manufacturer reference $23.99 before tax/delivery |
+| 0 or 1 USB cable | Flexible USB-C to USB-C data cable, approximately 0.5-1 m for bench testing; reuse an existing one first |
+
+[OpenELAB lists the same SKU](https://openelab.io/products/waveshare-esp32-s3-amoled-touch) at EUR 27.25 including VAT, with EUR 7.95 published shipping for selected EU destinations. Finland's actual tax, dispatch warehouse, stock and total are unverified. Confirm the exact board revision and final cost in the cart. My suggested board-plus-cable ceiling is EUR 45 delivered; it is not a verified quote or user-set budget.
+
+Borrow a caliper and use available single-color PLA for the coupon. Defer a separate ESP32, display, IMU, battery, breadboard, jumper wires, camera, microphone, speaker and AI subscription. No purchase has been made on your behalf.
+
+The board needs a new firmware path. Start its physical bring-up with the [official V2 examples](https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.64-v2/tree/21b952243d306692774f3b5bfeb3eb5cff10f851), matched to its received marking. Existing GC9A01 and Taby V1 firmware do not drive it.
+
+## Historical alternative, retained for reproducibility
+
+The following is the earlier round GC9A01 learning basket, recorded 2026-10-26. Do not add these parts to the selected integrated-board order.
 
 ## GC9A01 reference basket: Otronic
 
@@ -19,10 +32,6 @@ The basket below preserves the **implemented GC9A01 prototype** at prices record
 | | **Reference total with estimated shipping** | **40.03** | |
 
 **Without another data cable: €37.38.** Both totals retain the optional sensor for comparison with the machine-readable BOM; they are not verified checkout totals.
-
-## Choose one hardware route
-
-See the [full creator-versus-online options comparison](hardware-options.md) and [machine-readable hardware catalog](../hardware/options.json). The leading custom candidate is **Waveshare 1.64 V2 SKU 31197**; **Taby rectangular 1.64 V1** is a separate supported alternative with case STLs. The round Taby 1.32 remains another alternative. The Waveshare 1.43-inch AMOLED is retained as a later custom-firmware alternative; its exact case option and current price remain unverified. **These options are NOT drop-in substitutes for this repo's GC9A01 firmware or enclosure.** Never buy both the integrated board and the separate ESP32/GC9A01 basket unless you intentionally want two projects.
 
 ## Display alternatives (not drop-in compatible with current firmware)
 

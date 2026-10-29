@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
-  "as_of": "2026-10-27",
-  "selected_track": "gc9a01-separate-parts",
-  "methodology": "Catalog prices recorded 2026-10-26, not landed quotes; selected_track identifies the implemented GC9A01 firmware, not the leading purchase candidate. The 2026-10-27 engineering study favors Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197, listed V2, as the leading documented candidate subject to drawing-to-PCB revision mapping and USB data verification; Taby 1.64 V1 support is separate. Alternatives are not mechanically or firmware interchangeable.",
+  "as_of": "2026-10-29",
+  "selected_track": "rectangular-164-v2",
+  "implemented_track": "gc9a01-separate-parts",
+  "methodology": "selected_track identifies the recommended first bench purchase; implemented_track identifies this repository's existing firmware. Buy one Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197 V2 and use its official V2 examples after checking the received revision. Measure and test USB/display before final enclosure work. Prices retain their individual recorded dates and are not Finland landed quotes. Taby V1 support is separate; alternatives are not mechanically or firmware interchangeable.",
   "options": [
     {
       "id": "gc9a01-separate-parts",
@@ -10,7 +11,7 @@
       "related_reels": [
         9
       ],
-      "name": "MacDesk Buddy — separate ESP32-S3 and GC9A01 round IPS",
+      "name": "MacDesk Buddy \u2014 separate ESP32-S3 and GC9A01 round IPS",
       "visual": "1.28 inch round IPS, 240x240",
       "hardware": "ESP32-S3 N16R8 + Otronic GC9A01 OT8724 + optional MPU-6050",
       "screen_driver": "GC9A01 SPI",
@@ -54,19 +55,20 @@
       "related_reels": [],
       "name": "Waveshare ESP32-S3-Touch-AMOLED-1.64 SKU 31197 V2",
       "visual": "1.64 inch rounded-rectangle AMOLED, 280x456",
-      "hardware": "Integrated ESP32-S3, CO5300 QSPI AMOLED, 16MB flash, 8MB PSRAM",
-      "screen_driver": "CO5300 QSPI",
+      "hardware": "Integrated ESP32-S3, QSPI AMOLED, 16MB flash, 8MB PSRAM",
+      "screen_driver": "Product lists CO5300; pinned official V2 example uses esp_lcd_sh8601. Match received revision and complete vendor initialization.",
       "price": {
         "amount": "23.99",
         "currency": "USD",
-        "covers": "Verified product listing price 2026-10-27; before shipping, taxes and checkout"
+        "covers": "Manufacturer listing observed 2026-10-29; before shipping, taxes and checkout"
       },
       "source_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.64.htm",
       "source_type": "manufacturer",
-      "software": "Custom display/UI and Mac USB integration required; not supported by Taby V1 firmware or this repository's GC9A01 firmware",
+      "firmware_url": "https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.64-v2/tree/21b952243d306692774f3b5bfeb3eb5cff10f851",
+      "software": "Official V2 Arduino and ESP-IDF examples exist; custom face renderer and Mac USB integration required. Not supported by Taby V1 firmware or this repository's GC9A01 firmware",
       "mechanical": "Official drawing exists but mapping to delivered V2 PCB revision is unverified; provisional 33.12x48x13 mm packaging study is not fit proof",
       "solder_free": "integrated board",
-      "recommendation": "Leading documented candidate for subtle rounded-rectangle face; buy only after delivered revision is mapped to drawing/schematic and USB power/data path is verified."
+      "recommendation": "Recommended first bench purchase: one V2 board plus USB data cable. Confirm Finland checkout total before ordering; match received revision to the official V2 examples, then test USB/display and measure the board before enclosure design."
     },
     {
       "id": "taby-round-amoled",
@@ -74,7 +76,7 @@
       "related_reels": [
         5
       ],
-      "name": "Physical Taby round — Waveshare ESP32-S3-Touch-AMOLED-1.32",
+      "name": "Physical Taby round \u2014 Waveshare ESP32-S3-Touch-AMOLED-1.32",
       "visual": "1.32 inch round AMOLED, 466x466 touch",
       "hardware": "Integrated ESP32-S3 + display + microphone + audio interface; separate speaker may be needed",
       "screen_driver": "CO5300 QSPI; CST820 touch",
@@ -97,7 +99,7 @@
       "related_reels": [
         5
       ],
-      "name": "Physical Taby 1.64 rectangular AMOLED — exact V1",
+      "name": "Physical Taby 1.64 rectangular AMOLED \u2014 exact V1",
       "visual": "1.64 inch rectangular AMOLED, 280x456 touch",
       "hardware": "Waveshare ESP32-S3-Touch-AMOLED-1.64 V1 integrated display/ESP32/IMU",
       "screen_driver": "CO5300 QSPI; FT3168 touch",
