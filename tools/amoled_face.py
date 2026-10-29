@@ -65,10 +65,20 @@ def source_frame(face: str, blink: bool) -> tuple[list, bytes]:
                     if 18 <= (x - 122) ** 2 + (y - 158) ** 2 <= 32:
                         pixels[y * 240 + x] = warm
     if blink or face == "sleepy":
-        rect(35, 119, 70, 40, black)
-        rect(135, 119, 75, 40, black)
-        line(42, 132, 97, 135, dim)
-        line(145, 134, 201, 136, dim)
+        # Close along the existing sloping lids. Rectangular masks leave
+        # bright iris corners and a detached lower glow in landscape.
+        mouth = [pixels[y * 240 + 99:y * 240 + 137] for y in range(148, 170)]
+        for start, end, anchor_x, anchor_y, rise, span in (
+            (4, 117, 23, 106, 6, 75), (129, 234, 146, 116, 8, 68)
+        ):
+            for x in range(start, end):
+                edge = anchor_y + (x - anchor_x) * rise // span
+                for y in range(edge, 188):
+                    pixels[y * 240 + x] = black
+        line(23, 106, 97, 112, dim)
+        line(146, 116, 214, 124, dim)
+        for y, row in enumerate(mouth, 148):
+            pixels[y * 240 + 99:y * 240 + 137] = row
     return palette, bytes(pixels)
 
 

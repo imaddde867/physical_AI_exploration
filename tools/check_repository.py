@@ -80,7 +80,7 @@ def check_markdown_links(root: Path) -> list[str]:
     broken = []
     for path in sorted(root.rglob("*.md")):
         # Exclude hidden transient checkout/cache locations if run locally.
-        if ".git" in path.parts or ".venv" in path.parts:
+        if any(part in path.parts for part in (".git", ".venv", ".pio")):
             continue
         text = path.read_text(encoding="utf-8")
         destinations = [m.group(1) for m in MD_LINKS.finditer(text)]

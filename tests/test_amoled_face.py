@@ -94,6 +94,17 @@ class AmoledFaceTests(unittest.TestCase):
             data = (ROOT / 'firmware-v2/src/vendor' / name).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), sha)
 
+    def test_blink_preserves_mouth_and_clears_lower_iris(self):
+        from tools.amoled_face import source_frame
+        for face in FACES:
+            palette, awake = source_frame(face, False)
+            _, closed = source_frame(face, True)
+            for y in range(148, 170):
+                self.assertEqual(awake[y*240+99:y*240+137], closed[y*240+99:y*240+137])
+            black = palette.index((0, 0, 0))
+            for x, y in ((24, 126), (87, 150), (153, 144), (202, 151)):
+                self.assertEqual(closed[y*240+x], black, (face, x, y))
+
     def test_invalid_expression_rejected(self):
         with self.assertRaises(ValueError):
             compose('emoji')
