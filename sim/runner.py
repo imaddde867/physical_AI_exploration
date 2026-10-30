@@ -8,11 +8,13 @@ import argparse
 import importlib.util
 import sys
 import time
+from collections import deque
 from pathlib import Path
 
 from sim.screen import WIDTH, HEIGHT, Screen
 
 UPDATE_CONTRACT = "mini-app must define update(screen, t_ms)"
+FPS_WINDOW_MS = 1000.0  # reporting window; also the history slice kept in tick()
 
 
 def load_app(path: str) -> object:
@@ -27,7 +29,7 @@ def load_app(path: str) -> object:
     return module
 
 
-def frames_per_second(timestamps: list[float], window_ms: float = 1000.0) -> int:
+def frames_per_second(timestamps: list[float], window_ms: float = FPS_WINDOW_MS) -> int:
     if not timestamps:
         return 0
     newest = timestamps[-1]
@@ -43,7 +45,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     args.scale = max(args.scale, 1)
 
-    app = load_app(args.app)
+    try:
+        app = load_app(args.app)
+    except (ValueError, OSError) as exc:  # expected load failure: bad path or missing update
+        print(exc, file=sys.stderr)
+        return 2
 
     import tkinter as tk
 
@@ -56,7 +62,9 @@ def main(argv: list[str] | None = None) -> int:
     status.pack()
 
     screen = Screen()
-    timestamps: list[float] = []
+    timestamps: deque[float] = deque()  # only the last FPS_WINDOW_MS, pruned each tick
+    frame_count = [0]  # total frames ever drawn; timestamps is a bounded window, not the count
+    failure: list[BaseException] = []  # first mini-app error, reported after the window closes
     t0 = time.perf_counter_ns()
     period = 1.0 / max(args.fps, 1)
     item: list[int] = []
@@ -79,18 +87,29 @@ def main(argv: list[str] | None = None) -> int:
     def tick() -> None:
         start = time.perf_counter_ns()
         t_ms = (time.perf_counter_ns() - t0) / 1e6
-        draw(len(timestamps), t_ms)
-        timestamps.append(t_ms)
+        try:
+            draw(frame_count[0], t_ms)
+            timestamps.append(t_ms)
+            frame_count[0] += 1
+            while timestamps and timestamps[0] <= t_ms - FPS_WINDOW_MS:
+                timestamps.popleft()
+        except Exception as exc:
+            failure.append(exc)
+            root.destroy()
+            return
         slept = (time.perf_counter_ns() - start) / 1e9
         if slept < period:
             time.sleep(period - slept)
-        if args.frames and len(timestamps) >= args.frames:
+        if args.frames and frame_count[0] >= args.frames:
             root.destroy()
         else:
             root.after(1, tick)
 
     root.after(1, tick)
     root.mainloop()
+    if failure:
+        print(f"mini-app raised: {failure[0]!r}", file=sys.stderr)
+        return 3
     return 0
 
 
