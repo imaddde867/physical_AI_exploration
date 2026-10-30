@@ -22,6 +22,16 @@ open assets/amoled-preview.html
 
 The preview opens directly in Safari. Choose an expression, hold a blink, scrub time or play the fixed 12-second loop. It uses the firmware's RGB565 pixels and needs no hardware, server, model or installation.
 
+## Live desktop simulator
+
+Any mini-app (a Python file defining `update(screen, t_ms)`) runs pixel-exact in a desktop window:
+
+```sh
+sim/run.sh experiments/hello_buddy.py --fps 60 --scale 2
+```
+
+The launcher picks a Tcl/Tk that renders on this Mac; the system Python's bundled Tk can open windows that stay blank (known Tk 8.6.8 macOS issue).
+
 The face preserves the [original character](assets/face-idle-240.png): heavy lids, cool textured eyes, warm highlights and a small mouth. Six restrained moods share the same identity: neutral, happy, sad, sleepy, surprised and thinking.
 
 ## Selected build
