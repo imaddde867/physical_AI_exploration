@@ -7,16 +7,6 @@ import math
 from sim.screen import HEIGHT, WIDTH
 
 
-def arc_px(cx, cy, r, a0, a1, step_deg=2.0):
-    out = []
-    a = a0
-    while a <= a1:
-        out.append((cx + r * math.cos(math.radians(a)),
-                    cy + r * math.sin(math.radians(a))))
-        a += step_deg
-    return out
-
-
 def update(screen, t_ms) -> None:
     # scrolling hue gradient (quantization banding visible while moving)
     shift = t_ms * 0.08

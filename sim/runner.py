@@ -97,9 +97,9 @@ def main(argv: list[str] | None = None) -> int:
             failure.append(exc)
             root.destroy()
             return
-        slept = (time.perf_counter_ns() - start) / 1e9
-        if slept < period:
-            time.sleep(period - slept)
+        elapsed = (time.perf_counter_ns() - start) / 1e9
+        if elapsed < period:
+            time.sleep(period - elapsed)
         if args.frames and frame_count[0] >= args.frames:
             root.destroy()
         else:

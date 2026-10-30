@@ -8,4 +8,4 @@ if [ -z "$uv_lib" ]; then
     exit 1
 fi
 export TCL_LIBRARY="$uv_lib/lib/tcl8.6" TK_LIBRARY="$uv_lib/lib/tk8.6"
-exec "$HOME/.local/bin/python3.12" -m sim.runner "$@"
+exec "$uv_lib/bin/python3.12" -m sim.runner "$@"

@@ -17,16 +17,17 @@ python3 tools/check_repository.py
 
 There is also a **live simulator** (`sim/`, purely additive): a mini-app is one
 Python file defining `update(screen, t_ms)`, drawn each frame into the same
-quantized 456×280 view at up to a 30 fps cap:
+quantized 456×280 view at a configurable fps cap (default 30):
 
 ```sh
-python3 -m sim.runner experiments/hello_buddy.py      # populates a tkinter window
-python3 -m sim.runner experiments/hello_buddy.py --fps 30 --scale 1 --frames 0
+sim/run.sh experiments/hello_buddy.py      # populates a tkinter window
+sim/run.sh experiments/hello_buddy.py --fps 30 --scale 1 --frames 0
 ```
 
-On this Mac run it with `/usr/bin/python3` (Tk works there; the uv-managed
-`python3` lacks a Tcl runtime). Browser pixels and sim pixels still prove
-nothing about panel color, brightness or timing.
+On this Mac use `sim/run.sh`: the system Python's bundled Tk 8.6.8 opens windows
+that stay blank, so the launcher points the uv Python's Tcl/Tk at its own
+libraries. Browser pixels and sim pixels still prove nothing about panel color,
+brightness or timing.
 
 You can also open the checked-in HTML directly. It is self-contained, uses no
 network, and starts paused at neutral. Select a mood, hold blink, scrub time or

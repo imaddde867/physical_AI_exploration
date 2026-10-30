@@ -59,10 +59,18 @@ class SimBlitTests(unittest.TestCase):
         self.assertGreater(touched, 1000)
 
     def test_blit_clips(self):
+        palette, source = indexed_png(ROOT / "assets/face-idle-240.png")
         s = Screen()
         s.blit_image(str(ROOT / "assets/face-idle-240.png"), 400, 50)   # hangs off right
-        s.blit_image(str(ROOT / "assets/face-idle-240.png"), -100, -100) # off-canvas origin: only the visible quadrant paints
-        self.assertLess(sum(hexv != "#000000" for hexv in s.rows()[49]), 456)
+        rows = s.rows()
+        # asset (55, 87) lands on the last column; one pixel left of the blit stays black
+        self.assertEqual(rows[137][455], html_hex(palette[source[87 * 240 + 55]]))
+        self.assertEqual(rows[137][399], "#000000")
+        s2 = Screen()
+        s2.blit_image(str(ROOT / "assets/face-idle-240.png"), -100, -100)  # only the visible quadrant paints
+        rows2 = s2.rows()
+        self.assertEqual(rows2[0][58], html_hex(palette[source[100 * 240 + 158]]))
+        self.assertEqual(rows2[140][58], "#000000")
 
 if __name__ == "__main__":
     unittest.main()
