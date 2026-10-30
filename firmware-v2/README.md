@@ -26,8 +26,9 @@ sim/run.sh experiments/hello_buddy.py --fps 30 --scale 1 --frames 0
 
 On this Mac use `sim/run.sh`: the system Python's bundled Tk 8.6.8 opens windows
 that stay blank, so the launcher points the uv Python's Tcl/Tk at its own
-libraries. Browser pixels and sim pixels still prove nothing about panel color,
-brightness or timing.
+libraries. Install that interpreter first with
+`brew install uv && uv python install 3.12`. Browser pixels and sim pixels still
+prove nothing about panel color, brightness or timing.
 
 You can also open the checked-in HTML directly. It is self-contained, uses no
 network, and starts paused at neutral. Select a mood, hold blink, scrub time or
