@@ -61,7 +61,7 @@ def indexed_png(source: Path, size: tuple[int, int] = (SIZE, SIZE)) -> tuple[lis
             break
     if not (header_found and end_found and colors and compressed):
         raise ValueError("PNG missing required data")
-    if sum(map(len, compressed)) > width * height * 3:
+    if sum(map(len, compressed)) > width * height * 3 + 64:  # zlib header/checksum + chunk overhead
         raise ValueError("PNG compressed input unexpectedly large")
     decoded = zlib.decompress(b"".join(compressed))
     if len(decoded) != height * (width + 1):

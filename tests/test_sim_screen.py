@@ -72,6 +72,12 @@ class SimBlitTests(unittest.TestCase):
         self.assertEqual(rows2[0][58], html_hex(palette[source[100 * 240 + 158]]))
         self.assertEqual(rows2[140][58], "#000000")
 
+    def test_blit_fully_offscreen_keeps_rows_intact(self):
+        s = Screen()
+        s.blit_image(str(ROOT / "assets/face-idle-240.png"), -300, 0)
+        s.blit_image(str(ROOT / "assets/face-idle-240.png"), WIDTH + 5, 0)
+        self.assertTrue(all(len(r) == WIDTH for r in s.rows()))
+
     def test_blit_full_landscape_frame(self):
         palette, source = indexed_png(ROOT / "assets/face-idle-456.png", (456, 280))
         s = Screen()

@@ -49,7 +49,7 @@ class Screen:
         self.fill_rect(0, 0, WIDTH, HEIGHT, rgb)
 
     def blit_image(self, path: str | Path, x: int, y: int) -> None:
-        """Blit an 8-bit indexed PNG of any size (<=256 colors) at (x, y), clipped."""
+        """Blit an 8-bit indexed PNG of any size (<=32 colors) at (x, y), clipped."""
         # Decode cached: mini-apps re-blit each frame; a fresh PNG decode every call measured 28 ms/frame.
         key = str(path)
         if key not in _asset_cache:
@@ -59,6 +59,8 @@ class Screen:
         colors, source, w = _asset_cache[key]
         h = len(source) // w
         x0, x1 = max(x, 0), min(x + w, WIDTH)
+        if x0 >= x1:
+            return
         for py in range(max(y, 0), min(y + h, HEIGHT)):
             line = source[(py - y) * w + (x0 - x):(py - y) * w + (x1 - x)]
             self._rows[py][x0:x1] = [colors[v] for v in line]
