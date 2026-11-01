@@ -1,20 +1,20 @@
 """Pixel-exact stand-in for the 456x280 V2 AMOLED landscape view (stdlib only).
 
-Colors quantize through the firmware's RGB565 path and reconstruct with the
-same rounding as assets/amoled-preview.html, so sim pixels match what the
-browser preview and the panel driver receive.
+Colors quantize to RGB565 and reconstruct with round(), so sim pixels match
+what a 16-bit panel driver receives.
 """
 from __future__ import annotations
 
-import struct
-from pathlib import Path
-
-from tools.face_asset import indexed_png, rgb565
+import math
 
 WIDTH, HEIGHT = 456, 280
 
 _hex_cache: dict[tuple[int, int, int], str] = {}
-_asset_cache: dict[str, tuple[list[str], bytes, int]] = {}
+
+
+def rgb565(color: tuple[int, int, int]) -> int:
+    r, g, b = color
+    return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
 
 
 def _hex(rgb: tuple[int, int, int]) -> str:
@@ -48,22 +48,10 @@ class Screen:
     def clear(self, rgb: tuple[int, int, int]) -> None:
         self.fill_rect(0, 0, WIDTH, HEIGHT, rgb)
 
-    def blit_image(self, path: str | Path, x: int, y: int) -> None:
-        """Blit an 8-bit indexed PNG of any size (<=32 colors) at (x, y), clipped."""
-        # Decode cached: mini-apps re-blit each frame; a fresh PNG decode every call measured 28 ms/frame.
-        key = str(path)
-        if key not in _asset_cache:
-            w, h = struct.unpack(">II", Path(path).read_bytes()[16:24])
-            palette, source = indexed_png(Path(path), (w, h))
-            _asset_cache[key] = ([_hex(c) for c in palette], source, w)
-        colors, source, w = _asset_cache[key]
-        h = len(source) // w
-        x0, x1 = max(x, 0), min(x + w, WIDTH)
-        if x0 >= x1:
-            return
-        for py in range(max(y, 0), min(y + h, HEIGHT)):
-            line = source[(py - y) * w + (x0 - x):(py - y) * w + (x1 - x)]
-            self._rows[py][x0:x1] = [colors[v] for v in line]
+    def fill_circle(self, cx: int, cy: int, r: int, rgb: tuple[int, int, int]) -> None:
+        for dy in range(-r, r + 1):
+            half = int(math.sqrt(r * r - dy * dy) + 0.5)
+            self.fill_rect(cx - half, cy + dy, 2 * half + 1, 1, rgb)
 
     def rows(self) -> list[list[str]]:
         return self._rows

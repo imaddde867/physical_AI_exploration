@@ -22,7 +22,7 @@ silver aluminium, readable size.
 - Mount plate, snap/connector mechanism and cable routing over the lid edge are not designed. Old arm/clip are placeholders.
 - Cable must survive lid open/close: check where it exits and the hinge-side routing.
 - MacBook model is a simplified slab (lid height 214 mm, bezels assumed). Only width/depth are published.
-- Face art (456x280) is the old one; new faces still to design.
+- Face art: old designs discarded 2026-11-01; placeholder is two round eyes (`experiments/hello_buddy.py`). Real face still to design.
 
 ## Files
 - `src/placement.py`, `src/scale_compare.py` (60/70/80 vs lid), `src/export_parts.py` (STL per part)

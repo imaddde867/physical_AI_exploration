@@ -1,7 +1,6 @@
-import bpy, bmesh, math, sys, os
+import bpy, math, sys, os
 from mathutils import Vector, Matrix
 here = os.path.dirname(os.path.abspath(__file__))
-face_png = os.path.abspath(os.path.join(here, "../../../assets/face-idle-456.png"))
 bpy.ops.wm.read_factory_settings(use_empty=True)
 import glob
 for f in sorted(glob.glob(os.path.join(here, "../tmp/parts", "*.stl"))):
@@ -20,14 +19,6 @@ alu = pbr("alu", (0.78, 0.79, 0.81, 1), 1, 0.30)
 dark = pbr("glass", (0.008, 0.008, 0.01, 1), 0, 0.04)
 arm = pbr("arm", (0.55, 0.57, 0.6, 1), 1, 0.4)
 
-face = bpy.data.materials.new("face"); face.use_nodes = True
-nt = face.node_tree; nt.nodes.clear()
-tex = nt.nodes.new("ShaderNodeTexImage"); tex.image = bpy.data.images.load(face_png)
-tex.interpolation = "Closest"; tex.extension = "CLIP"
-em = nt.nodes.new("ShaderNodeEmission"); em.inputs["Strength"].default_value = 1.6
-out = nt.nodes.new("ShaderNodeOutputMaterial")
-nt.links.new(tex.outputs["Color"], em.inputs["Color"]); nt.links.new(em.outputs[0], out.inputs[0])
-
 objs = [o for o in sc.objects if o.type == "MESH"]
 print("OBJS", [o.name for o in objs])
 hinge = Vector((0, 0, 4)); R = Matrix.Translation(hinge) @ Matrix.Rotation(math.radians(-15), 4, 'X') @ Matrix.Translation(-hinge)
@@ -40,24 +31,6 @@ for o in objs:
         o.matrix_world = R @ o.matrix_world
 
 glass = next(o for o in objs if "glass" in o.name.lower())
-glass.data.materials.append(face)
-me = glass.data; mw = glass.matrix_world
-bm = bmesh.new(); bm.from_mesh(me)
-uv = bm.loops.layers.uv.verify()
-front = min(bm.faces, key=lambda f: (mw.to_3x3() @ f.normal).normalized().dot(Vector((0, 1, 0.25)).normalized()))
-fn = front.normal.copy()
-ffs = [f for f in bm.faces if f.normal.dot(fn) > 0.999]
-for f in ffs: f.material_index = 1
-nrm = (mw.to_3x3() @ front.normal).normalized()
-right = Vector((0, 0, 1)).cross(nrm).normalized(); up = nrm.cross(right).normalized()
-fv = {v for f in ffs for v in f.verts}
-ctr = sum((mw @ v.co for v in fv), Vector()) / len(fv)
-AW, AH = 57.0, 35.0
-for f in ffs:
-  for l in f.loops:
-    d = mw @ l.vert.co - ctr
-    l[uv].uv = (0.5 + d.dot(right) / AW, 0.5 + d.dot(up) / AH)
-bm.to_mesh(me); bm.free()
 
 # lit display on the lid front
 bpy.ops.mesh.primitive_plane_add(size=1, location=(0, -4.55, 112)); sp = bpy.context.active_object
