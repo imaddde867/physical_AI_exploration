@@ -6,6 +6,7 @@ browser preview and the panel driver receive.
 """
 from __future__ import annotations
 
+import struct
 from pathlib import Path
 
 from tools.face_asset import indexed_png, rgb565
@@ -13,7 +14,7 @@ from tools.face_asset import indexed_png, rgb565
 WIDTH, HEIGHT = 456, 280
 
 _hex_cache: dict[tuple[int, int, int], str] = {}
-_asset_cache: dict[str, tuple[list[tuple[int, int, int]], bytes]] = {}
+_asset_cache: dict[str, tuple[list[str], bytes, int]] = {}
 
 
 def _hex(rgb: tuple[int, int, int]) -> str:
@@ -48,16 +49,21 @@ class Screen:
         self.fill_rect(0, 0, WIDTH, HEIGHT, rgb)
 
     def blit_image(self, path: str | Path, x: int, y: int) -> None:
+        """Blit an 8-bit indexed PNG of any size (<=32 colors) at (x, y), clipped."""
         # Decode cached: mini-apps re-blit each frame; a fresh PNG decode every call measured 28 ms/frame.
         key = str(path)
         if key not in _asset_cache:
-            _asset_cache[key] = indexed_png(Path(path))
-        palette, source = _asset_cache[key]
-        for index, value in enumerate(source):
-            px, py = index % 240, index // 240
-            dx, dy = x + px, y + py
-            if 0 <= dx < WIDTH and 0 <= dy < HEIGHT:
-                self._rows[dy][dx] = _hex(palette[value])
+            w, h = struct.unpack(">II", Path(path).read_bytes()[16:24])
+            palette, source = indexed_png(Path(path), (w, h))
+            _asset_cache[key] = ([_hex(c) for c in palette], source, w)
+        colors, source, w = _asset_cache[key]
+        h = len(source) // w
+        x0, x1 = max(x, 0), min(x + w, WIDTH)
+        if x0 >= x1:
+            return
+        for py in range(max(y, 0), min(y + h, HEIGHT)):
+            line = source[(py - y) * w + (x0 - x):(py - y) * w + (x1 - x)]
+            self._rows[py][x0:x1] = [colors[v] for v in line]
 
     def rows(self) -> list[list[str]]:
         return self._rows

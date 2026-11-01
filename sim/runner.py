@@ -97,13 +97,11 @@ def main(argv: list[str] | None = None) -> int:
             failure.append(exc)
             root.destroy()
             return
-        elapsed = (time.perf_counter_ns() - start) / 1e9
-        if elapsed < period:
-            time.sleep(period - elapsed)
         if args.frames and frame_count[0] >= args.frames:
             root.destroy()
-        else:
-            root.after(1, tick)
+        else:  # after(), not sleep(): keeps the window responsive between frames
+            elapsed = (time.perf_counter_ns() - start) / 1e9
+            root.after(max(1, round((period - elapsed) * 1000)), tick)
 
     root.after(1, tick)
     root.mainloop()

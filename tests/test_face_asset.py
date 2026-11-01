@@ -1,5 +1,7 @@
 """Validate actual approved screen pixels, without a display or Pillow."""
 import hashlib
+import struct
+import zlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -41,6 +43,17 @@ class FaceAssetTests(unittest.TestCase):
             dest.write_bytes(blob)
             with self.assertRaises(ValueError):
                 indexed_png(dest)
+
+    def test_one_pixel_png_loads(self):
+        def chunk(kind, data):
+            return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+        blob = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 3, 0, 0, 0))
+                + chunk(b"PLTE", b"\x10\x20\x30") + chunk(b"IDAT", zlib.compress(b"\x00\x00"))
+                + chunk(b"IEND", b""))
+        with tempfile.TemporaryDirectory() as tmp:
+            dest = Path(tmp) / "one.png"
+            dest.write_bytes(blob)
+            self.assertEqual(indexed_png(dest, (1, 1)), ([(0x10, 0x20, 0x30)], b"\x00"))
 
 
 if __name__ == "__main__":

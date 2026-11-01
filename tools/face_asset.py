@@ -24,8 +24,9 @@ def _paeth(a: int, b: int, c: int) -> int:
     return b if db <= dc else c
 
 
-def indexed_png(source: Path) -> tuple[list[tuple[int, int, int]], bytes]:
-    """Load a CRC-checked, 8-bit indexed 240x240 PNG, no Pillow dependency."""
+def indexed_png(source: Path, size: tuple[int, int] = (SIZE, SIZE)) -> tuple[list[tuple[int, int, int]], bytes]:
+    """Load a CRC-checked, 8-bit indexed PNG (default 240x240), no Pillow dependency."""
+    width, height = size
     data = source.read_bytes()
     if not data.startswith(PNG_SIGNATURE):
         raise ValueError("Not a PNG")
@@ -46,8 +47,8 @@ def indexed_png(source: Path) -> tuple[list[tuple[int, int, int]], bytes]:
         off = end
         if kind == b"IHDR":
             vals = struct.unpack(">IIBBBBB", value)
-            if vals != (SIZE, SIZE, 8, 3, 0, 0, 0):
-                raise ValueError("Expected 240x240 8-bit indexed, non-interlaced PNG")
+            if vals != (width, height, 8, 3, 0, 0, 0):
+                raise ValueError(f"Expected {width}x{height} 8-bit indexed, non-interlaced PNG")
             header_found = True
         elif kind == b"PLTE":
             if len(value) % 3 or not (1 <= len(value) // 3 <= 32):
@@ -60,19 +61,19 @@ def indexed_png(source: Path) -> tuple[list[tuple[int, int, int]], bytes]:
             break
     if not (header_found and end_found and colors and compressed):
         raise ValueError("PNG missing required data")
-    if sum(map(len, compressed)) > SIZE * SIZE * 3:
+    if sum(map(len, compressed)) > width * height * 3 + 64:  # zlib header/checksum + chunk overhead
         raise ValueError("PNG compressed input unexpectedly large")
     decoded = zlib.decompress(b"".join(compressed))
-    if len(decoded) != SIZE * (SIZE + 1):
+    if len(decoded) != height * (width + 1):
         raise ValueError("Unexpected PNG scanline length")
-    previous = bytearray(SIZE)
+    previous = bytearray(width)
     rows = []
-    for y in range(SIZE):
-        filter_id = decoded[y * (SIZE + 1)]
+    for y in range(height):
+        filter_id = decoded[y * (width + 1)]
         if filter_id > 4:
             raise ValueError("Unsupported PNG row filter")
-        encoded = decoded[y * (SIZE + 1) + 1:(y + 1) * (SIZE + 1)]
-        row = bytearray(SIZE)
+        encoded = decoded[y * (width + 1) + 1:(y + 1) * (width + 1)]
+        row = bytearray(width)
         for x, byte in enumerate(encoded):
             left = row[x - 1] if x else 0
             top = previous[x]

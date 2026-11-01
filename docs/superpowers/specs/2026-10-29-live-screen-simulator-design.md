@@ -1,6 +1,6 @@
 # Live screen simulator — design
 
-**Date:** 2026-10-29 · **Status:** awaiting approval
+**Date:** 2026-10-29 · **Status:** implemented
 **Approached as:** small change (short design)
 
 ## Intent & why
@@ -17,6 +17,7 @@ See, live on the Mac, what would show up on the Waveshare ESP32-S3-Touch-AMOLED-
 
 ## Non-goals / anti-goals
 
+- **Not** physical size: pixels are 1:1, but the 1.64" panel (~278 ppi) is about 3x smaller on the lid than a 456-point window on a Mac.
 - **Not** hardware truth: does not predict real panel color, brightness, tearing, fps, or ESP timing. Hardware checks in `firmware-v2/README.md` remain the gate.
 - **Not** interactive input (keyboard/touch/tap) in v1.
 - **Not** a porting automation; moving a mini-app into portable C stays manual.
