@@ -11,16 +11,20 @@ silver aluminium, readable size.
 - **Placement:** flush side-car on the lid's right edge. Gap 0.6 mm, back and display plane flush with the lid,
   top edge 1/4 of the lid height (about 53 mm) below the lid top. Assumed reading of "1/4 of the screen
   height"; adjust `placement.py` if the buddy centre was meant instead. Not re-rendered after this change.
+- **Mount (decided 2026-11-01):** a permanent mount plate stays stuck to the lid's back with a USB-C cable built in.
+  The screen part snaps onto it (cable connects on attach) and can be removed, leaving only the mount behind.
+- **Connectivity and power:** one fixed USB-C cable to a Thunderbolt port carries power and data. No battery, no Wi-Fi needed.
 - **Look:** black edge-to-edge glass, hairline aluminium frame, rear arm + clip hidden behind the lid.
 
 ## Open
 - No panel chosen. Waveshare's largest ESP32-S3 AMOLED board is 2.41" (600x450, 4:3), too small for 60 mm
   wide without visible border. Likely a bare ~3" panel plus a small controller board.
-- Rear mount (arm/clip) is a placeholder, not designed or tested for the lid.
+- Mount plate, snap/connector mechanism and cable routing over the lid edge are not designed. Old arm/clip are placeholders.
+- Cable must survive lid open/close: check where it exits and the hinge-side routing.
 - MacBook model is a simplified slab (lid height 214 mm, bezels assumed). Only width/depth are published.
 - Face art (456x280) is the old one; new faces still to design.
 
 ## Files
 - `src/placement.py`, `src/scale_compare.py` (60/70/80 vs lid), `src/export_parts.py` (STL per part)
-- Renders: Blender script `tools/render.py` (regenerate with `cadgen run src/export_parts.py`
+- Renders and STLs (regenerable, gitignored `tmp/`): Blender script `tools/render.py` (regenerate with `cadgen run src/export_parts.py`
   then `Blender -b -P tools/render.py`). Run cadgen via `~/.local/bin/cadgen +0.8.4 run`.
