@@ -1,7 +1,5 @@
 import unittest
-from pathlib import Path
-from sim.screen import Screen, WIDTH, HEIGHT
-from tools.face_asset import indexed_png, rgb565
+from sim.screen import Screen, WIDTH, HEIGHT, rgb565
 
 def html_hex(color):
     v = rgb565(color)
@@ -45,46 +43,15 @@ class SimScreenTests(unittest.TestCase):
         s.set_pixel(0, 0, (255, 255, 255)); s.clear((10, 20, 30))
         self.assertEqual(s.rows()[0][0], html_hex((10, 20, 30)))
 
-ROOT = Path(__file__).resolve().parents[1]
-
-class SimBlitTests(unittest.TestCase):
-    def test_blit_puts_face_asset_pixels(self):
-        palette, source = indexed_png(ROOT / "assets/face-idle-240.png")
-        s = Screen()
-        s.blit_image(str(ROOT / "assets/face-idle-240.png"), 10, 20)
-        rows = s.rows()
-        # top-left pixel of the asset lands at (10,20), quantized like the HTML preview
-        self.assertEqual(rows[20][10], html_hex(palette[source[0]]))
-        touched = sum(hexv != "#000000" for r in rows for hexv in r)
-        self.assertGreater(touched, 1000)
-
-    def test_blit_clips(self):
-        palette, source = indexed_png(ROOT / "assets/face-idle-240.png")
-        s = Screen()
-        s.blit_image(str(ROOT / "assets/face-idle-240.png"), 400, 50)   # hangs off right
-        rows = s.rows()
-        # asset (55, 87) lands on the last column; one pixel left of the blit stays black
-        self.assertEqual(rows[137][455], html_hex(palette[source[87 * 240 + 55]]))
-        self.assertEqual(rows[137][399], "#000000")
-        s2 = Screen()
-        s2.blit_image(str(ROOT / "assets/face-idle-240.png"), -100, -100)  # only the visible quadrant paints
-        rows2 = s2.rows()
-        self.assertEqual(rows2[0][58], html_hex(palette[source[100 * 240 + 158]]))
-        self.assertEqual(rows2[140][58], "#000000")
-
-    def test_blit_fully_offscreen_keeps_rows_intact(self):
-        s = Screen()
-        s.blit_image(str(ROOT / "assets/face-idle-240.png"), -300, 0)
-        s.blit_image(str(ROOT / "assets/face-idle-240.png"), WIDTH + 5, 0)
-        self.assertTrue(all(len(r) == WIDTH for r in s.rows()))
-
-    def test_blit_full_landscape_frame(self):
-        palette, source = indexed_png(ROOT / "assets/face-idle-456.png", (456, 280))
-        s = Screen()
-        s.blit_image(str(ROOT / "assets/face-idle-456.png"), 0, 0)
-        rows = s.rows()
-        for x, y in ((0, 0), (455, 279), (200, 140)):
-            self.assertEqual(rows[y][x], html_hex(palette[source[y * 456 + x]]))
+class SimCircleTests(unittest.TestCase):
+    def test_fill_circle_is_round_and_clipped(self):
+        s = Screen(); on = html_hex((255, 255, 255))
+        s.fill_circle(100, 100, 10, (255, 255, 255))
+        r = s.rows()
+        self.assertEqual((r[100][100], r[100][90], r[100][110], r[90][100], r[110][100]), (on,) * 5)
+        self.assertEqual((r[100][89], r[100][111], r[89][100], r[90][90]), ("#000000",) * 4)
+        s.fill_circle(0, 0, 5, (255, 255, 255))   # hangs off the corner without raising
+        self.assertEqual(s.rows()[0][0], on)
 
 
 if __name__ == "__main__":

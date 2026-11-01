@@ -29,6 +29,12 @@ class SimRunnerTests(unittest.TestCase):
         from sim.runner import frames_per_second
         self.assertEqual(frames_per_second([100.0, 1050.0, 1200.0], window_ms=600.0), 2)
 
+    def test_real_scale(self):
+        from sim.runner import real_scale, zoom_steps
+        self.assertAlmostEqual(real_scale(25.4, 100, 100), 1.0)
+        self.assertEqual(zoom_steps(0.658), (2, 3))
+        self.assertEqual(zoom_steps(2.0), (2, 1))
+
     def test_main_reports_missing_update_without_traceback(self):
         import contextlib
         import io

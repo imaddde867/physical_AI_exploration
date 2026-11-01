@@ -13,6 +13,8 @@ brew install uv && uv python install 3.12
 sim/run.sh experiments/hello_buddy.py
 ```
 
+The window opens at real physical size (60 mm panel width by default). Tk misreports screen density, so set your screen's points-per-inch with `--ppi` (default 127 = 14" MacBook Pro) and check it with a ruler. `--width-mm` changes the panel width, and `--scale 1` gives the pixel-exact view.
+
 ## CAD
 
 `cad/slab/` holds the slab buddy and MacBook scale/placement models (build123d via cadgen) and a Blender render script.
