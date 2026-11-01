@@ -72,5 +72,14 @@ class SimBlitTests(unittest.TestCase):
         self.assertEqual(rows2[0][58], html_hex(palette[source[100 * 240 + 158]]))
         self.assertEqual(rows2[140][58], "#000000")
 
+    def test_blit_full_landscape_frame(self):
+        palette, source = indexed_png(ROOT / "assets/face-idle-456.png", (456, 280))
+        s = Screen()
+        s.blit_image(str(ROOT / "assets/face-idle-456.png"), 0, 0)
+        rows = s.rows()
+        for x, y in ((0, 0), (455, 279), (200, 140)):
+            self.assertEqual(rows[y][x], html_hex(palette[source[y * 456 + x]]))
+
+
 if __name__ == "__main__":
     unittest.main()

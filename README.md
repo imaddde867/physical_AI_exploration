@@ -29,8 +29,10 @@ Any mini-app (a Python file defining `update(screen, t_ms)`) runs pixel-exact in
 ```sh
 brew install uv          # or see the uv install docs
 uv python install 3.12
-sim/run.sh experiments/hello_buddy.py --fps 60 --scale 2
+sim/run.sh experiments/hello_buddy.py
 ```
+
+Pixels are 1:1, but the real 1.64" panel is about 3x smaller than this window on a Mac. The fps label is the simulator's rate, not the ESP's.
 
 The launcher points that Python's Tcl/Tk at its own libraries, so the window renders.
 
