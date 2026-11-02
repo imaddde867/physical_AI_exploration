@@ -18,6 +18,11 @@ def pbr(name, col, metal, rough):
 alu = pbr("alu", (0.78, 0.79, 0.81, 1), 1, 0.30)
 dark = pbr("glass", (0.008, 0.008, 0.01, 1), 0, 0.04)
 arm = pbr("arm", (0.55, 0.57, 0.6, 1), 1, 0.4)
+gold = pbr("contact_gold", (0.95, 0.65, 0.12, 1), 0.8, 0.28)
+polymer = pbr("insulating_polymer", (0.88, 0.81, 0.66, 1), 0, 0.55)
+magnet = pbr("magnet", (0.15, 0.16, 0.18, 1), 0.75, 0.37)
+bond = pbr("bondline", (0.34, 0.38, 0.42, 1), 0, 0.62)
+rubber = pbr("cable", (0.025, 0.028, 0.033, 1), 0, 0.72)
 
 objs = [o for o in sc.objects if o.type == "MESH"]
 print("OBJS", [o.name for o in objs])
@@ -26,7 +31,14 @@ R = Matrix.Identity(4)
 for o in objs:
     n = o.name.lower()
     o.data.materials.clear()
-    o.data.materials.append(dark if "glass" in n else arm if ("arm" in n or "clip" in n) else alu)
+    mat = (dark if "glass" in n else
+           bond if "magnet_bond" in n else
+           magnet if "magnet" in n else
+           polymer if ("insulator" in n or "carrier" in n or "grommet" in n) else
+           gold if "contact_" in n else
+           rubber if "cable" in n else
+           arm if ("arm" in n or "clip" in n) else alu)
+    o.data.materials.append(mat)
     for p in o.data.polygons: p.use_smooth = False
     if "deck" not in n:
         o.matrix_world = R @ o.matrix_world
@@ -46,7 +58,8 @@ fl = bpy.context.active_object; fl.data.materials.append(pbr("floor", (0.55, 0.4
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True
 w.node_tree.nodes["Background"].inputs[0].default_value = (0.75, 0.78, 0.85, 1)
 w.node_tree.nodes["Background"].inputs[1].default_value = 0.8
-for loc, e in (((250, -400, 500), 120000), ((-300, -200, 300), 40000)):
+for loc, e in (((250, -400, 500), 120000), ((-300, -200, 300), 40000),
+               ((260, 240, 280), 60000)):
     bpy.ops.object.light_add(type='AREA', location=loc); L = bpy.context.active_object
     L.data.energy = e; L.data.size = 300
     L.rotation_euler = (Vector((0, 0, 100)) - Vector(loc)).to_track_quat('-Z', 'Y').to_euler()
@@ -66,3 +79,22 @@ def shot(name, loc, target, lens):
 pod_c = sum((glass.matrix_world @ Vector(c) for c in glass.bound_box), Vector()) / 8
 shot("render_wide.png", (330, -650, 250), (40, 0, 115), 40)
 shot("render_close.png", (260, -330, 235), tuple(pod_c), 85)
+
+# The ordinary exterior views conceal the dock. Render each mating half alone.
+# The mount front view shows the recessed contact carrier and the rear screen
+# view shows pogo barrels, insulation, locating dowels, and magnet pockets.
+sp.hide_render = True
+sc.render.resolution_x, sc.render.resolution_y = ((800, 500) if smoke else (2000, 1250))
+for o in objs:
+    n = o.name.lower()
+    o.hide_render = not any(k in n for k in (
+        "mount_plate", "insulating_contact_carrier", "mount_contact_",
+        "captive_cable_grommet"))
+shot("render_mount_detail.png", (200, -150, 182), (177, 0.8, 151), 55)
+
+for o in objs:
+    n = o.name.lower()
+    o.hide_render = not any(k in n for k in (
+        "screen_shell", "screen_glass", "screen_contact_",
+        "contact_insulator_", "magnet"))
+shot("render_screen_back.png", (215, 145, 183), (187, 0, 152), 70)

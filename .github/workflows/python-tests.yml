@@ -11,10 +11,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Compile Python sources
@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Install geometry kernel and Blender
@@ -57,19 +57,25 @@ jobs:
           test -n "$(find ../tmp/parts -name '*mount_plate.stl' -print -quit)"
           test -n "$(find ../tmp/parts -name '*captive_cable_grommet.stl' -print -quit)"
           test "$(find ../tmp/parts -name '*.stl' | wc -l)" -ge 25
-      - name: Headless Blender actual render, both views
+      - name: Headless Blender actual render, four views
         run: |
-          rm -f cad/slab/tmp/render_wide.png cad/slab/tmp/render_close.png
+          rm -f cad/slab/tmp/render_*.png
           MACDESK_RENDER_SMOKE=1 blender -b -t 2 --python cad/slab/tools/render.py
           python - <<'PY'
           import struct
           from pathlib import Path
-          for name in ("render_wide.png", "render_close.png"):
+          expected_sizes = {
+              "render_wide.png": (320, 200),
+              "render_close.png": (320, 200),
+              "render_mount_detail.png": (800, 500),
+              "render_screen_back.png": (800, 500),
+          }
+          for name, expected in expected_sizes.items():
               file = Path("cad/slab/tmp") / name
               data = file.read_bytes()
               assert data[:8] == bytes((137,80,78,71,13,10,26,10)), name
               width, height = struct.unpack(">II", data[16:24])
-              assert (width, height) == (320, 200), (name,width,height)
+              assert (width, height) == expected, (name,width,height,expected)
               assert len(data) > 1000, (name,len(data))
               print(f"{name}: {width}x{height} {len(data)} bytes")
           PY
