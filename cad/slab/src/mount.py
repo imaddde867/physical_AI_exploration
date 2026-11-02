@@ -177,7 +177,7 @@ def build():
     pcb_y = P.pogo_pcb_y()
     for name, px in zip(P.POGO_NAMES, P.contact_x_positions()):
         # PCB-to-pad tip height = Harwin's 1.90mm nominal compressed height.
-        shell -= cyl_y(px, zc, P.POGO_SHELL_BORE, pcb_y-0.10, P.ADH_T+0.05)
+        shell -= cyl_y(px, zc, P.POGO_SHELL_BORE, pcb_y-0.25, P.ADH_T+0.05)
         bush = cyl_y(px, zc, P.POGO_SLEEVE_OD, pcb_y-0.05, P.ADH_T-P.CARRIER_FRONT_FLANGE_T-0.05)
         bush -= cyl_y(px, zc, P.POGO_SLEEVE_ID, pcb_y-0.15, P.ADH_T-P.CARRIER_FRONT_FLANGE_T+0.05)
         bush.label, bush.color = f"contact_insulator_{name}", "#f5eee1"
