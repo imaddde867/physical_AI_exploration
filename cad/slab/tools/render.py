@@ -21,7 +21,7 @@ arm = pbr("arm", (0.55, 0.57, 0.6, 1), 1, 0.4)
 
 objs = [o for o in sc.objects if o.type == "MESH"]
 print("OBJS", [o.name for o in objs])
-hinge = Vector((0, 0, 4)); R = Matrix.Translation(hinge) @ Matrix.Rotation(math.radians(-15), 4, 'X') @ Matrix.Translation(-hinge)
+# Static nominal CAD view only. Rotating the lid would require deforming the cable.\nR = Matrix.Identity(4)
 for o in objs:
     n = o.name.lower()
     o.data.materials.clear()
