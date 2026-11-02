@@ -27,7 +27,7 @@ MAGNET_DX, MAGNET_DZ = 18.0, 10.0
 MAGNET_ADHESIVE_T = 0.10      # reference bondline; force and adhesion unverified
 MAGNET_BACK_RECESS = 0.10    # magnet is recessed from plate
 POGO_NAMES = ("GND", "D_MINUS", "D_PLUS", "VBUS")  # separate supply poles
-POGO_PITCH, POGO_PAD = 2.54, 1.8
+POGO_PITCH, POGO_PAD = 3.00, 1.8
 PAD_EDGE_INSULATION = 1.0     # minimum polymer between each pad perimeter and the insert edge
 PAD_WELL_CLEARANCE = 0.05     # assembly allowance around the metal pad/lead
 PAD_DEPTH, PAD_VIA_D = 0.25, 0.7
@@ -35,10 +35,10 @@ PAD_RECESS = 0.20           # front face recessed inside the dielectric well
 # Candidate SMT contact: Harwin P70-5000045R; selected for reference geometry,
 # NOT approved for the device until current, PCB, spring force and wear are verified.
 POGO_PART = "Harwin P70-5000045R"
-POGO_FREE_H, POGO_WORK_H = 2.40, 1.90
+POGO_FREE_H, POGO_WORK_H = 2.40, 1.925  # midpoint of candidate working-height range
 POGO_WORK_MIN, POGO_WORK_MAX = 1.85, 2.00
 POGO_BARREL_H, POGO_BARREL_D, POGO_TIP_D = 1.78, 1.50, 0.60
-POGO_SLEEVE_OD, POGO_SLEEVE_ID, POGO_SHELL_BORE = 2.00, 1.56, 2.30
+POGO_SLEEVE_OD, POGO_SLEEVE_ID, POGO_SHELL_BORE = 2.10, 1.70, 2.40
 CARRIER_FIT_CLEARANCE = 0.15  # on each side of the insert inside the steel through-window
 CARRIER_FLANGE_OVERHANG = 0.8 # rear lip overlap past the cutout, not total clearance
 CARRIER_FLANGE_T = 0.35       # rear retaining lip, included in stack thickness
@@ -64,6 +64,11 @@ CABLE_NOTCH_CLEARANCE = 0.25  # between sleeve outside and steel edges
 CABLE_GROMMET_EXTENSION = 1.5 # sleeve extends below steel plate for edge protection
 GROMMET_ANCHOR_D, GROMMET_HOLE_D, GROMMET_HEAD_D = 1.50, 1.90, 2.20
 GROMMET_ANCHOR_DX, GROMMET_ANCHOR_BELOW_ENTRY = 4.0, 1.2
+# The molded head and opposing rear collar capture the steel with limited axial float.
+# Snap insertion, polymer fatigue and actual manufacturing tolerances are UNVERIFIED.
+GROMMET_FRONT_HEAD_Y0, GROMMET_FRONT_HEAD_Y1 = 0.20, 0.36
+GROMMET_REAR_COLLAR_D, GROMMET_REAR_COLLAR_T = 2.40, 0.40
+GROMMET_REAR_COLLAR_GAP = 0.05
 Z_OUT = PORT_Z + PLUG_H / 2 + CABLE_ARC_R
 HINGE_AXIS_Y = -LID_T / 2    # ASSUMED
 HINGE_SWING_DEG = 135.0       # ASSUMED max lid sweep
@@ -118,13 +123,29 @@ def grommet_anchor_positions() -> tuple[tuple[float, float], ...]:
     return ((x-GROMMET_ANCHOR_DX, z), (x+GROMMET_ANCHOR_DX, z))
 
 
+def grommet_axial_play() -> float:
+    """Nominal opposing-stop clearance, NOT an as-built tolerance estimate."""
+    return (ADH_T - GROMMET_FRONT_HEAD_Y1) + GROMMET_REAR_COLLAR_GAP
+
+
+def grommet_min_lid_clearance_under_play() -> float:
+    """Rigid nominal worst-position head/lid gap without deformation."""
+    return GROMMET_FRONT_HEAD_Y0 - GROMMET_REAR_COLLAR_GAP
+
+
 def dimensions() -> dict[str, float]:
     """Nominal stack projections, excluding any unselected circuit and tolerances."""
     return {"display_w_mm": W, "display_h_mm": H, "screen_body_mm": SCREEN_T,
             "tape_and_steel_mm": ADH_T+PLATE_T,
             "front_to_carrier_rear_mm": SCREEN_T+PLATE_T+CARRIER_FLANGE_T,
             "front_to_cable_rear_mm": LID_T+CABLE_Y+CABLE_D/2,
-            "front_to_grommet_rear_mm": LID_T+CABLE_Y+CABLE_D/2+CABLE_GROMMET_WALL}
+            "front_to_grommet_rear_mm": LID_T+CABLE_Y+CABLE_D/2+CABLE_GROMMET_WALL,
+            "grommet_nominal_axial_play_mm": grommet_axial_play(),
+            "grommet_min_lid_clearance_under_play_mm": grommet_min_lid_clearance_under_play(),
+            "pogo_working_height_mm": POGO_WORK_H,
+            "pogo_nominal_axial_headroom_mm": min(POGO_WORK_H-POGO_WORK_MIN,
+                                                  POGO_WORK_MAX-POGO_WORK_H),
+            "shell_interbore_web_mm": POGO_PITCH-POGO_SHELL_BORE}
 
 
 def cable_entry_z() -> float:

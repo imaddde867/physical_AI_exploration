@@ -42,10 +42,18 @@ class MountClearances(unittest.TestCase):
         self.assertLess(drift+P.POGO_TIP_D/2, P.POGO_PAD/2)
         self.assertGreaterEqual(P.pad_face_y()-P.pogo_pcb_y(), P.POGO_WORK_MIN)
         self.assertLessEqual(P.pad_face_y()-P.pogo_pcb_y(), P.POGO_WORK_MAX)
+        self.assertAlmostEqual(P.POGO_WORK_H-P.POGO_WORK_MIN,
+                               P.POGO_WORK_MAX-P.POGO_WORK_H, places=3)
+        self.assertGreaterEqual(P.POGO_PITCH-P.POGO_SHELL_BORE, 0.60-1e-9)
+        self.assertGreaterEqual((P.POGO_SLEEVE_ID-P.POGO_BARREL_D)/2, 0.10-1e-9)
+        self.assertGreaterEqual((P.POGO_SLEEVE_OD-P.POGO_SLEEVE_ID)/2, 0.20-1e-9)
 
     def test_captive_geometry_and_local_stack(self):
         self.assertGreater(P.GROMMET_HEAD_D, P.GROMMET_HOLE_D)
+        self.assertGreater(P.GROMMET_REAR_COLLAR_D, P.GROMMET_HOLE_D)
         self.assertLess(P.GROMMET_ANCHOR_D, P.GROMMET_HOLE_D)
+        self.assertLessEqual(P.grommet_axial_play(), 0.12)
+        self.assertGreaterEqual(P.grommet_min_lid_clearance_under_play(), 0.10)
         self.assertGreater(P.CARRIER_FLANGE_OVERHANG, P.CARRIER_FIT_CLEARANCE)
         self.assertGreater(P.dimensions()["front_to_grommet_rear_mm"],
                            P.dimensions()["front_to_carrier_rear_mm"])

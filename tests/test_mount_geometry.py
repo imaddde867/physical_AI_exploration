@@ -124,7 +124,11 @@ class MountSolidTests(unittest.TestCase):
         height = P.pad_face_y()-P.pogo_pcb_y()
         self.assertGreaterEqual(height, P.POGO_WORK_MIN)
         self.assertLessEqual(height, P.POGO_WORK_MAX)
-        self.assertAlmostEqual(P.POGO_FREE_H-height, 0.5, places=3)
+        self.assertAlmostEqual(P.POGO_FREE_H-height, 0.475, places=3)
+        self.assertAlmostEqual(P.POGO_WORK_H-P.POGO_WORK_MIN,
+                               P.POGO_WORK_MAX-P.POGO_WORK_H, places=3)
+        self.assertGreaterEqual((P.POGO_SLEEVE_ID-P.POGO_BARREL_D)/2, 0.10-1e-9)
+        self.assertGreaterEqual((P.POGO_SLEEVE_OD-P.POGO_SLEEVE_ID)/2, 0.20-1e-9)
         for n in P.POGO_NAMES:
             pin = self.by_label[f"screen_contact_{n}"]
             pad = self.by_label[f"mount_contact_{n}"]
@@ -137,6 +141,16 @@ class MountSolidTests(unittest.TestCase):
                               f"bushing / shell")
             self.assert_clear(bush, self.by_label["insulating_contact_carrier"],
                               0.04, f"bushing / carrier")
+        # Confirm the post-boolean inter-bore aluminum ligament actually exists.
+        shell = self.by_label["screen_shell"]
+        xs = P.contact_x_positions()
+        for left, right in zip(xs, xs[1:]):
+            web = box(left+P.POGO_SHELL_BORE/2, right-P.POGO_SHELL_BORE/2,
+                      P.pogo_pcb_y()-0.05, P.pogo_pcb_y()+0.05,
+                      P.screen_z_center()-0.20, P.screen_z_center()+0.20,
+                      "interbore_web", "#fff")
+            self.assertGreaterEqual(web.bounding_box().size.X, 0.60-1e-8)
+            self.assertAlmostEqual((shell & web).volume, web.volume, delta=0.0005)
 
     def test_magnet_bondlines_and_clearance(self):
         self.assertEqual(len(self.magnets), 4)
@@ -155,15 +169,26 @@ class MountSolidTests(unittest.TestCase):
         cable = self.by_label["cable"]
         tape = self.by_label["mount_adhesive"]
         self.assertGreater(P.GROMMET_HEAD_D, P.GROMMET_HOLE_D)
+        self.assertGreater(P.GROMMET_REAR_COLLAR_D, P.GROMMET_HOLE_D)
+        self.assertLessEqual(P.grommet_axial_play(), 0.12)
+        self.assertGreaterEqual(P.grommet_min_lid_clearance_under_play(), 0.10)
         self.assert_clear(steel, grommet, 0.03, "captive grommet / plate")
         self.assert_clear(cable, steel, 0.05, "cable / steel")
         self.assert_clear(cable, grommet, P.CABLE_GROMMET_BORE_CLEARANCE-0.02,
                           "cable / sleeve bore")
         self.assert_clear(grommet, tape, 0, "mushroom heads / tape")
         for ax, az in P.grommet_anchor_positions():
-            head = cyl_y(ax, az, P.GROMMET_HEAD_D-0.02, 0.15, 0.34)
+            head = cyl_y(ax, az, P.GROMMET_HEAD_D-0.02,
+                         P.GROMMET_FRONT_HEAD_Y0+0.015, P.GROMMET_FRONT_HEAD_Y1-0.015)
+            rear_y = P.ADH_T+P.PLATE_T+P.GROMMET_REAR_COLLAR_GAP
+            collar = cyl_y(ax, az, P.GROMMET_REAR_COLLAR_D-0.02,
+                           rear_y+0.015, rear_y+P.GROMMET_REAR_COLLAR_T-0.015)
             self.assertGreater((grommet & head).volume, 0.01)
-            self.assert_clear(head, steel, 0.04, "capture head on opposite steel face")
+            self.assertGreater((grommet & collar).volume, 0.01)
+            self.assert_clear(head, steel, P.ADH_T-P.GROMMET_FRONT_HEAD_Y1-0.01,
+                              "front snap head / steel")
+            self.assert_clear(collar, steel, P.GROMMET_REAR_COLLAR_GAP-0.01,
+                              "rear retaining collar / steel")
         lid = box(-P.LID_W/2, P.LID_W/2, -P.LID_T, 0, P.BASE_T,
                   P.BASE_T+P.LID_H, "lid", "#fff")
         for part in (cable, grommet):

@@ -105,8 +105,8 @@ def build():
         mount_contacts.append(contact)
     carrier.label, carrier.color = "insulating_contact_carrier", "#f5eee1"
 
-    # Open-bottom cable sleeve is captive in TWO closed steel holes via molded
-    # mushroom barbs. Barb compliance, peel/pull-out and cable grip are not tested.
+    # Closed-hole molded snap heads and closely spaced rear collars constrain
+    # nominal axial motion. Snap fatigue and cable grip are not tested.
     nx0, nx1, nz0, nz1 = P.cable_notch_bounds()
     plate -= box(nx0, nx1, P.ADH_T-0.1, plate_back+0.1, nz0, nz1,
                  "cable_exit_notch", "#000000")
@@ -126,7 +126,12 @@ def build():
     for ax, az in P.grommet_anchor_positions():
         side = -1 if ax < xe else 1
         sleeve += cyl_y(ax, az, P.GROMMET_ANCHOR_D, 0.28, 3.2)
-        sleeve += cyl_y(ax, az, P.GROMMET_HEAD_D, 0.12, 0.36)
+        sleeve += cyl_y(ax, az, P.GROMMET_HEAD_D,
+                        P.GROMMET_FRONT_HEAD_Y0, P.GROMMET_FRONT_HEAD_Y1)
+        # Rear collar sits adjacent to steel; the original arm was 1.05 mm away.
+        collar_start = plate_back + P.GROMMET_REAR_COLLAR_GAP
+        sleeve += cyl_y(ax, az, P.GROMMET_REAR_COLLAR_D,
+                        collar_start, collar_start+P.GROMMET_REAR_COLLAR_T)
         xl, xr = sorted((xe+side*1.90, ax))
         sleeve += box(xl, xr, 2.65, 3.35, az-0.55, az+0.55,
                       "grommet_anchor_arm", "#2d2d31")
