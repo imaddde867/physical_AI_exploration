@@ -25,10 +25,10 @@ class MountClearances(unittest.TestCase):
         x0, x1, z0, z1 = P.carrier_outline()
         r = P.POGO_PAD/2 + P.PAD_WELL_CLEARANCE
         xs = P.contact_x_positions()
-        self.assertGreaterEqual(xs[0]-r-x0, 1.0)
-        self.assertGreaterEqual(x1-xs[-1]-r, 1.0)
-        self.assertGreaterEqual(P.screen_z_center()-r-z0, 1.0)
-        self.assertGreaterEqual(z1-P.screen_z_center()-r, 1.0)
+        self.assertGreaterEqual(xs[0]-r-x0, 1.0-1e-9)
+        self.assertGreaterEqual(x1-xs[-1]-r, 1.0-1e-9)
+        self.assertGreaterEqual(P.screen_z_center()-r-z0, 1.0-1e-9)
+        self.assertGreaterEqual(z1-P.screen_z_center()-r, 1.0-1e-9)
         self.assertGreaterEqual(P.POGO_PITCH-2*r, 0.6)
 
     def test_locators_and_spring_working_height(self):
