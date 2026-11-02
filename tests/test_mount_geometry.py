@@ -171,7 +171,7 @@ class MountSolidTests(unittest.TestCase):
 
     def test_glass_fit_and_reported_extremities(self):
         shell, glass = self.by_label["screen_shell"], self.by_label["screen_glass"]
-        self.assert_clear(shell, glass, 0.04, "glass seat")
+        self.assert_clear(shell, glass, 0.019, "glass seat at glass recess back")
         self.assertAlmostEqual(glass.bounding_box().min.Y, -P.LID_T)
         self.assertAlmostEqual(shell.bounding_box().min.Y, -P.LID_T)
         self.assertAlmostEqual(shell.bounding_box().max.Y-P.LID_T*(-1), P.SCREEN_T)
