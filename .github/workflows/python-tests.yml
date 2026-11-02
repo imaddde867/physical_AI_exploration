@@ -11,36 +11,74 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Unit tests (no CAD runtime)
+      - name: Compile Python sources
+        run: python -m compileall -q cad sim experiments tests
+      - name: Unit tests without CAD kernel
         run: python -m unittest discover -s tests -v
 
   cad-geometry:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install CAD geometry kernel
-        run: python -m pip install build123d==0.13.0
-      - name: Solid overlap and clearance regression tests
-        run: python -m unittest discover -s tests -p 'test_mount_geometry.py' -v
-      - name: Generate nominal CAD geometry
+      - name: Install geometry kernel and Blender
+        run: |
+          python -m pip install build123d==0.13.0
+          sudo apt-get update -qq
+          sudo apt-get install -y blender
+      - name: Complete suite including solid tests
+        run: |
+          python -c "import build123d; print('CAD kernel loaded')"
+          python -m unittest discover -s tests -v
+      - name: Generate nominal assembly
         working-directory: cad/slab/src
         run: python mount.py
-      - name: Export nominal STL assembly, removing stale parts
+      - name: Export parts and remove stale STLs
         working-directory: cad/slab/src
         run: |
           mkdir -p ../tmp/parts
-          printf 'stale model' > ../tmp/parts/old_pod.stl
+          printf 'stale' > ../tmp/parts/old_pod.stl
           python export_parts.py
           test ! -e ../tmp/parts/old_pod.stl
-          test -n "$(find ../tmp/parts -name '*.stl' -print -quit)"
+          test -e ../tmp/parts/00_lid.stl
+          test -e ../tmp/parts/01_deck.stl
+          test -e ../tmp/parts/02_screen_shell.stl
+          test -n "$(find ../tmp/parts -name '*mount_plate.stl' -print -quit)"
+          test -n "$(find ../tmp/parts -name '*captive_cable_grommet.stl' -print -quit)"
+          test "$(find ../tmp/parts -name '*.stl' | wc -l)" -ge 25
+      - name: Headless Blender actual render, both views
+        run: |
+          rm -f cad/slab/tmp/render_wide.png cad/slab/tmp/render_close.png
+          MACDESK_RENDER_SMOKE=1 blender -b -t 2 --python cad/slab/tools/render.py
+          python - <<'PY'
+          import struct
+          from pathlib import Path
+          for name in ("render_wide.png", "render_close.png"):
+              file = Path("cad/slab/tmp") / name
+              data = file.read_bytes()
+              assert data[:8] == bytes((137,80,78,71,13,10,26,10)), name
+              width, height = struct.unpack(">II", data[16:24])
+              assert (width, height) == (320, 200), (name,width,height)
+              assert len(data) > 1000, (name,len(data))
+              print(f"{name}: {width}x{height} {len(data)} bytes")
+          PY
+      - name: Attach geometry and render evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macdesk-slab-cad-smoke
+          path: |
+            cad/slab/tmp/parts/*.stl
+            cad/slab/tmp/render_*.png
+          if-no-files-found: warn

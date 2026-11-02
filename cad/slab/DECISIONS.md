@@ -1,32 +1,63 @@
-# Slab buddy: mounting and electrical geometry (2026-11-02)
+# MacDesk Buddy: 60 mm slab mount (engineering status, 2026-11-02)
 
-The 60 × 38.4 mm detachable side display and single fixed USB-C cable are still the intended design. The magnetic mount is a **conceptual, unverified prototype**, not a production-safe USB connector. See PR #12 for the original design decisions and reason for replacing the 48 mm pod.
+**Status: unpowered conceptual CAD only. NOT READY FOR FABRICATION OR POWER.**
+This branch corrects the insulation, retention and registration *shapes* from PRs #12/#13. It does not establish physical strength, USB compliance, electrical isolation under wet/dirty conditions, lid fit, hinge endurance, or an assembled screen PCB. It must never be treated as a finished connector.
 
-## Static CAD arrangement (mm)
+## Nominal envelope, coordinates and honesty about fit
 
-- MacBook 14-inch enclosure: Apple-published width 312.6 and depth 221.2. **Not measured:** lid height 214, lid thickness 4.5, hinge axis (`y=-2.25, z=11`), right-side USB-C port at 45 mm from rear, and 135° lid sweep. The simplified lid/deck boxes are only placement aids; do not use them as a manufacturing fit reference.
-- Display: 60 wide × 38.4 tall, 0.6 gap from lid. Aluminum shell's front is `y=-4.5` and back `y=0.4`; 0.3 glass is seated *inside* the shell with its outer surface flush at `y=-4.5`. Nominal detachable thickness **4.9**. Front glass seat is conceptual; panel and driver PCB still unselected.
-- Permanent mount: 30-high, 1.2-thick magnetic stainless plate bonded on a 24-wide lid strip with 0.4 tape, cantilevered beneath the detachable screen. Four 5 × 1 magnets in the screen back; magnetic strength, steel grade, retention under shock and interaction with MacBook magnets **not verified**.
-- **Isolated connector:** one full-thickness rectangular window in steel contains a dielectric polymer insert. A 0.35-thick rear lip retains it against screen-side removal. An additional 0.15 gap to the steel surrounds its core; the four individually separated metal pad-and-via envelopes have >=1.0 polymer margin on the core and >=0.64 polymer web between pad wells. Counterpart pogo contact envelopes sit in separate shell bores and touch the pad faces only at the nominal assembly plane. Steel never intersects contacts in CAD. A real pogo part, dielectric material, positioning features, adhesive, lead routing and mating spring force are **not yet specified**. The via ends on the carrier rear would connect to an insulated flex circuit; the flex circuit is **not modeled**.
-- **Cable exit:** nominal 3-mm cable goes through a 4.5-mm-wide **bottom-open through-notch** in the plate, with a separately modeled insulating elastomer sleeve (4.0 outer diameter, 3.16 bore, 1.5 projection below the plate). Cable centerline `y=3.0` keeps the nominal route behind the lid and out of steel; no tape/lid/steel collision in nominal geometry is the design requirement. The 12-mm nominal bend radius is a *static* routing assumption, not a cable manufacturer's fatigue or dynamic bend rating. Sleeve adhesion/retention, strain relief and four-core termination remain to be designed.
-- Stack from the screen front to the dielectric rear retention lip is **6.45 mm**, under the nominal 6.5-mm envelope; this does **not** include localized cable protrusion, tolerances or internal electronics. This is not proof of a buildable 4.9-mm device.
-- Electrical: four mechanical contacts carry nominal **USB 2.0 VBUS/GND/D+/D-**, not USB 3 or Thunderbolt. The USB-C plug still needs a correct CC configuration, power-budget compliance, D+/D- impedance control, shield/ground strategy, ESD protection, rated contacts, verified insulation resistance and appropriate disconnect sequencing. **No power should be applied based on CAD alone.** These are contact *envelopes*, not a completed schematic.
+All distances are mm. X points right, Y toward the back of the lid, Z up. Simplified lid front = Y -4.5, lid rear = Y 0; these lid dimensions are *assumptions*. Published overall MacBook enclosure W=312.6, depth=221.2, closed H=15.5 are not an accessory interface drawing.
 
-## Open: hinge cable movement (high-priority blocker)
+| Item | Static front-to-back envelope |
+| --- | ---: |
+| Detachable aluminum + flush glass body (60 × 38.4) | **4.90** |
+| Front to back of tape + stainless plate | **6.10** |
+| Front to far rear of contact-carrier capture flange | **6.45** |
+| Front to cable outside surface (local, not continuous) | **9.00** |
+| Front to protective grommet outside surface (local maximum) | **9.50** |
 
-`cable_report()` prints **geometric free-span excess over endpoint chord**, NOT verified usable slack. `params.slack_needed()` is an **arc-length proxy** based on an unverified hinge and rotation angle, NOT a measured demand. Both are insufficient to ensure the cable remains untensioned, avoids pinch points or survives repeated opening/closing.
+These are ideal geometry extents, **not maximum as-built thicknesses**. No manufacturing tolerance stack, real glass adhesive, bare display panel, controller PCB, connector PCB, solder, cable strain relief or wiring volume has been packaged. The screen shell is still a *solid mass envelope with glass/mount cutouts*, not a manufacturable hollow enclosure. The proposed 4.9-mm body may be impossible with the eventual panel, electronics, thermal clearances and fasteners; select/measure those parts before revising the target. The 0.6-mm lid-edge gap is only nominal.
 
-Illustrative sensitivity with the nominal model: at 90° and 150° nominal hinge sweep, the proxy demand changes substantially; moving assumed hinge Y also changes the estimate (see `test_slack_estimate_is_sensitive_to_unmeasured_hinge`). The original PR estimated ~7.9 mm chord excess vs ~22 mm at a guessed 135°; changing the cable plane alters the proxy again, but **does not close the deficit or establish a safe range**. A specific flexible cable and a controlled service loop/strain relief should be selected **after** measuring actual MacBook hinge location, USB-C receptacle position, maximum lid angle and swept envelope. Validate the prototype at closed, intermediate and maximum angles before supplying power. Do not use elastic cable stretch as a design requirement.
+## Mechanically registered detachable interface
 
-## CAD validation / limitations
+- Four magnets remain at X = screen center ±18 and Z = center ±10, with nominal 5.0 × 1.0-mm magnets. Their 5.2-mm diameter pockets now include a nominal 0.10-mm adhesive ring and floor, leaving the magnetic face 0.10 mm behind the shell. **Adhesive formulation, surface preparation, pull-off/shear force, corrosion and temperature cycling are unverified.** A magnet may pull out before the screen detaches unless tested.
+- **Two asymmetric integral aluminum locating dowels**, 1.60 mm diameter, project 1.0 mm from the back of the screen. Primary 1.90-mm round through-hole and secondary 1.90-mm-wide elongated through-slot are cut in the steel plate. Their 36-mm-class spacing constrains rotation; asymmetric Z offset prevents a nominal 180° mate. At the ideal hole sizes the primary radial allowance is 0.15 mm, *not an achievable finished-product tolerance promise*. Lead-in/chamfers, hole-edge strength, insertion wear and real stack tolerances need a physical build. Pogo pins begin contacting only after the longer dowels have entered the holes.
+- The insulating carrier is now **captured by opposite front and rear shoulders** across the 1.2-mm steel thickness, with a 0.15-mm clearance to the through-window core. This is a **steel-insert overmold** concept; a single-piece, double-flanged carrier cannot be pressed through a closed hole afterward. Alternatively, redesign it as a two-piece screw/clip assembly *before fabrication*. The front flange has explicit relief in the screen shell. Polymer creep, adhesion, tooling and repeated pogo loading have not been evaluated.
+- The 3-mm fixed cable passes down a bottom notch behind the bonded lid strip inside a 4.0-mm-OD insulating sleeve. Unlike the previous loose sleeve, the modeled grommet uses **two closed steel mounting holes**, 1.50-mm elastomeric snap stems and 2.20-mm mushroom heads (through 1.90-mm bores). The tape is relieved around the heads. The snap heads trap the sleeve against escape from the open-bottom notch. **A real elastomer grade and snap-deflection/fatigue design have not been chosen**. This is an outline of a captive molding, not a pull-tested clamp or strain relief. A separate cable-grip/strain-relief feature is mandatory.
+- The stainless grade, its magnetic response, plate bending stress, plate-to-lid adhesive, and interaction with the MacBook's own magnets/sensors are **not verified**.
 
-From the repository root:
+## USB contact geometry and explicit electronics blocker
+
+The steel has a full-depth isolated opening. The 1.8-mm-wide, 2.54-mm-pitch mounting pads are now recessed **0.20 mm** in separate dielectric wells. The carrier outline includes each 0.05-mm well clearance **before** adding the remaining 1.0-mm outer polymer wall. Nominal 0.64-mm internal web between wells; nominal 0.15-mm carrier-to-steel window gap. Four pad/via metal envelopes remain independently isolated from the stainless in the static model. Physical polymer dielectric strength and leakage under contamination/ESD are unverified.
+
+Physical pad order is **GND / D- / D+ / VBUS**, deliberately separating power and ground by signal contacts. Recesses and alignment reduce accidental contact but **do not make exposed VBUS safe**. With the permanent USB-C plug connected and the screen removed, its VBUS pad must be **normally de-energized**. A future cable-side or plug-contained PCB must provide:
+
+1. Correct USB-C sink/plug CC/Rd arrangement, power negotiation/budget and cable/plug wiring (do not presume USB-C is just four wires).
+2. A **normally disabled, current-limited/latch-off high-side power switch** between Mac VBUS and the exposed mounting VBUS, plus protected power-off/fault handling. TI TPS2553-1 is an *example for feasibility* (adjustable 75mA–1.7A typical current limit, latch-off). It is **not specified into this CAD** and its chosen limit must obey the host/device power budget.
+3. **Reliable fully mated detection and break-before-exposure power removal** independent of ordinary four USB data/power contacts, e.g. a verified mechanically actuated interlock or additional staged sense contact. The four-contact design **does not yet implement this**. Do not connect VBUS directly or use D+/D- activity as a safety interlock.
+4. USB 2.0 D+/D- continuity and differential integrity across the detachable contacts, EMI/shield/chassis strategy, TVS/ESD positioning, ground sequencing and short/partial-mate tests. No USB 3.x/Thunderbolt passthrough is claimed.
+5. A real insulated termination of the four carrier rear vias to the fixed cable, and SMT pogo PCB connections inside the display. Strain relief and cable bend endurance must be qualified.
+
+**Reference pogo candidate, not an approved part:** [Harwin P70-5000045R](https://www.harwin.com/products/P70-5000045R), [Harwin comparison chart](https://cdn.harwin.com/pdfs/Harwin_Pogo_Pin_Comparison_Chart.pdf). Gold-plated SMT pogo; free height 2.40; acceptable manufacturer working height 1.85–2.00 (nominal 1.90); ball head Ø0.60, body Ø1.50; manufacturer normal working force 0.68 ± 0.19 N; max rated current 1 A/contact; specified minimum 10,000 cycles. The contact reference assumes PCB seating face Y = -1.30 and pad mating plane Y = +0.60: **1.90 mm nominal compressed height** and 0.50-mm travel from free. Four contacts imply roughly 2.72 N nominal total spring force *from the datasheet only*, not a measured magnetic retention requirement or tolerance guarantee. The barrel/tip are simplified solids, not manufacturer STEP. 2.1-mm shell bores contain separate 2.0-mm insulating bushings with 1.56-mm bores; the eventual PCB needs the actual recommended footprint, solder process and support. No controller PCB/panel assembly is modeled.
+
+**Electrical references:** [TI TPS2553-1](https://www.ti.com/product/TPS2553-1); [ROHM CC/Rd technical guide](https://fscdn.rohm.com/en/products/databook/applinote/ic/interface/usb_pd/bd91n01nux-evk-001-sa_ug-e.pdf). These are candidate design references, not a tested circuit.
+
+## Cable and MacBook movement: still a hard stop
+
+The static centerline is approximately **184.6 mm** with nominal 12-mm radii, but the precise report must be generated by the CAD tool. Prior reference numbers are about 8.0-mm free-span chord excess against ~24.0-mm guessed arc-length demand (~16.1-mm nominal proxy deficit). Both figures depend on assumed hinge/port geometry. **Chord excess is not usable service-loop slack; arc length is not a dynamic hinge simulation**. Neither 12-mm radius nor a nominal zero-intersection with the frozen lid proves fatigue life or cable safety.
+
+Measure on the physical 14-inch M4 MacBook: display-half thickness/profile and heights, hinge pivot/clearance in all relevant axes, true USB-C port XYZ and plug profile, lid max opening angle, cable pinch envelope at closed/intermediate/open angles, and the final cable OD/minimum *dynamic* bend radius from its manufacturer. Trial a restrained service loop and strain relief through the entire lid sweep using a nonconductive mock-up. **Do not stretch the cable to solve the deficit**. A rear plate/plug or routing change may be mandatory. The current model does not validate a full lid movement.
+
+## Reproducible verification (static CAD only)
+
+From the repo root:
 
 ```sh
+python -m compileall -q cad sim experiments tests
 python -m unittest discover -s tests -v
 python -m pip install build123d==0.13.0
-python -m unittest discover -s tests -p 'test_mount_geometry.py' -v
+python -m unittest discover -s tests -v
 (cd cad/slab/src && python mount.py && python export_parts.py)
+MACDESK_RENDER_SMOKE=1 blender -b -t 2 --python cad/slab/tools/render.py
 ```
 
-The independent pure-Python clearance tests run without a CAD installation; the solid-level tests run with `build123d` (also in the CAD CI job). The exporter deletes **only generated STLs** from `cad/slab/tmp/parts/` before regenerating them, preventing stale assembly parts from contaminating renders. `tools/render.py` produces a static nominal layout, not a hinge-motion simulation: the cable cannot deform if lid and deck are rotated as rigid solids. Treat renders as illustrations only, not clearance evidence. An actual toleranced assembly, visual/fit check, multimeter continuity/insulation tests and repeated hinge cycling are still required.
+GitHub Actions CAD job **must** install build123d, run the solid checks (not skip), export new STLs while deleting old STLs, actually render both PNGs headlessly, and check their signatures/dimensions. Generated CAD STLs and Blender images are uploaded as workflow artifacts. Static CAD regression checks are *not* real tolerance analysis, manufacturing proof, ESD verification, physical clearance metrology or a powered-device approval.

@@ -50,64 +50,90 @@ def cable_report(path):
 
 
 def build():
+    """Static reference geometry, not a certified electrical or mechanical assembly."""
     zc, xc = P.screen_z_center(), P.screen_x_center()
     x0, x1 = P.plate_x_range()
     z0, z1 = P.plate_z_range()
     lid_edge = P.LID_W / 2
     plate_back = P.ADH_T + P.PLATE_T
 
-    # Tape is only bonded to the lid strip; no tape on the detachable half.
     adh = box(x0, lid_edge, 0, P.ADH_T, z0, z1, "mount_adhesive", "#e8e4d8")
     plate = box(x0, x1, P.ADH_T, plate_back, z0, z1, "mount_plate", "#8d9096")
 
-    # A *through-window* in conductive stainless isolates all four contacts.
-    # The dielectric carrier has a rear lip that cannot pull forward through the opening.
+    # This is an OVERMOLDED carrier, not a push-in cartridge. Opposing shoulders
+    # capture the steel from both faces under pogo compression and removal.
     ix0, ix1, iz0, iz1 = P.carrier_outline()
-    fit = P.CARRIER_FIT_CLEARANCE
+    fit, lip = P.CARRIER_FIT_CLEARANCE, P.CARRIER_FLANGE_OVERHANG
     plate -= box(ix0-fit, ix1+fit, P.ADH_T-0.1, plate_back+0.1,
                  iz0-fit, iz1+fit, "carrier_window", "#000000")
-    core = box(ix0, ix1, P.ADH_T, plate_back, iz0, iz1, "carrier_core", "#f5eee1")
-    lip = P.CARRIER_FLANGE_OVERHANG
-    rear_lip = box(ix0-lip, ix1+lip, plate_back, plate_back+P.CARRIER_FLANGE_T,
-                   iz0-lip, iz1+lip, "carrier_rear_lip", "#f5eee1")
-    carrier = core + rear_lip
+    carrier = box(ix0, ix1, P.ADH_T, plate_back, iz0, iz1,
+                  "carrier_core", "#f5eee1")
+    carrier += box(ix0-lip, ix1+lip, plate_back, plate_back+P.CARRIER_FLANGE_T,
+                   iz0-lip, iz1+lip, "rear_capture_flange", "#f5eee1")
+    carrier += box(ix0-lip, ix1+lip, P.ADH_T-P.CARRIER_FRONT_FLANGE_T, P.ADH_T,
+                   iz0-lip, iz1+lip, "front_capture_flange", "#f5eee1")
+
+    # A round primary locator and a slotted secondary locator give positive
+    # x/z/yaw registration; their asymmetric spacing rules out 180-degree mating.
+    for i, (ax, az) in enumerate(P.alignment_positions()):
+        if i == 0:
+            hole = cyl_y(ax, az, P.ALIGN_HOLE_D, P.ADH_T-0.1, plate_back+0.1)
+        else:
+            half = P.ALIGN_SLOT_EXTRA_X/2
+            hole = cyl_y(ax-half, az, P.ALIGN_HOLE_D, P.ADH_T-0.1, plate_back+0.1)
+            hole += cyl_y(ax+half, az, P.ALIGN_HOLE_D, P.ADH_T-0.1, plate_back+0.1)
+            hole += box(ax-half, ax+half, P.ADH_T-0.1, plate_back+0.1,
+                        az-P.ALIGN_HOLE_D/2, az+P.ALIGN_HOLE_D/2, "slot", "#000000")
+        plate -= hole
 
     mount_contacts = []
-    screen_contacts = []
     for name, px in zip(P.POGO_NAMES, P.contact_x_positions()):
-        r = P.POGO_PAD / 2
-        pad = box(px-r, px+r, P.ADH_T, P.ADH_T+P.PAD_DEPTH,
-                  zc-r, zc+r, f"mount_contact_{name}", "#d4af37")
-        # Metal via joins the pad to the carrier rear face, where insulated wiring/FPC can attach.
-        via = cyl_y(px, zc, P.PAD_VIA_D, P.ADH_T+P.PAD_DEPTH/2,
+        r, face = P.POGO_PAD/2, P.pad_face_y()
+        pad = box(px-r, px+r, face, face+P.PAD_DEPTH,
+                  zc-r, zc+r, "pad", "#d4af37")
+        via = cyl_y(px, zc, P.PAD_VIA_D, face+P.PAD_DEPTH/2,
                     plate_back+P.CARRIER_FLANGE_T)
         contact = pad + via
         carrier -= box(px-r-P.PAD_WELL_CLEARANCE, px+r+P.PAD_WELL_CLEARANCE,
-                       P.ADH_T-0.05, P.ADH_T+P.PAD_DEPTH+0.02,
+                       P.ADH_T-P.CARRIER_FRONT_FLANGE_T-0.1,
+                       face+P.PAD_DEPTH+0.02,
                        zc-r-P.PAD_WELL_CLEARANCE, zc+r+P.PAD_WELL_CLEARANCE,
                        "contact_well", "#000000")
-        carrier -= cyl_y(px, zc, P.PAD_VIA_D + 2*P.PAD_WELL_CLEARANCE,
-                         P.ADH_T+P.PAD_DEPTH/2, plate_back+P.CARRIER_FLANGE_T+0.1)
+        carrier -= cyl_y(px, zc, P.PAD_VIA_D+2*P.PAD_WELL_CLEARANCE,
+                         face+P.PAD_DEPTH/2, plate_back+P.CARRIER_FLANGE_T+0.1)
         contact.label, contact.color = f"mount_contact_{name}", "#d4af37"
         mount_contacts.append(contact)
-
     carrier.label, carrier.color = "insulating_contact_carrier", "#f5eee1"
 
-    # A bottom-open cable notch and dielectric sleeve eliminate the cable/steel overlap.
+    # Open-bottom cable sleeve is captive in TWO closed steel holes via molded
+    # mushroom barbs. Barb compliance, peel/pull-out and cable grip are not tested.
     nx0, nx1, nz0, nz1 = P.cable_notch_bounds()
     plate -= box(nx0, nx1, P.ADH_T-0.1, plate_back+0.1, nz0, nz1,
                  "cable_exit_notch", "#000000")
+    for ax, az in P.grommet_anchor_positions():
+        plate -= cyl_y(ax, az, P.GROMMET_HOLE_D, P.ADH_T-0.1, plate_back+0.1)
+        adh -= cyl_y(ax, az, P.GROMMET_HEAD_D+0.2, -0.05, P.ADH_T+0.05)
     plate.label, plate.color = "mount_plate", "#8d9096"
+    adh.label, adh.color = "mount_adhesive", "#e8e4d8"
+
     sleeve_z0, sleeve_z1 = z0-P.CABLE_GROMMET_EXTENSION, P.cable_entry_z()
-    sleeve_h = sleeve_z1 - sleeve_z0
-    sleeve_pos = bd.Pos(P.cable_x()[0], P.CABLE_Y, (sleeve_z0+sleeve_z1)/2)
+    sleeve_h = sleeve_z1-sleeve_z0
+    xe = P.cable_x()[0]
+    sleeve_pos = bd.Pos(xe, P.CABLE_Y, (sleeve_z0+sleeve_z1)/2)
     sleeve = sleeve_pos * bd.Cylinder(P.CABLE_D/2+P.CABLE_GROMMET_WALL, sleeve_h)
     sleeve -= sleeve_pos * bd.Cylinder(P.CABLE_D/2+P.CABLE_GROMMET_BORE_CLEARANCE,
                                        sleeve_h+0.2)
-    sleeve.label, sleeve.color = "cable_insulating_grommet", "#2d2d31"
+    for ax, az in P.grommet_anchor_positions():
+        side = -1 if ax < xe else 1
+        sleeve += cyl_y(ax, az, P.GROMMET_ANCHOR_D, 0.28, 3.2)
+        sleeve += cyl_y(ax, az, P.GROMMET_HEAD_D, 0.12, 0.36)
+        xl, xr = sorted((xe+side*1.90, ax))
+        sleeve += box(xl, xr, 2.65, 3.35, az-0.55, az+0.55,
+                      "grommet_anchor_arm", "#2d2d31")
+    sleeve.label, sleeve.color = "captive_cable_grommet", "#2d2d31"
 
-    # Screen shell and flush-mounted front glass: actual envelope equals SCREEN_T.
-    bx0, bx1 = lid_edge + P.GAP, lid_edge + P.GAP + P.W
+    # The shell is still a solid ENVELOPE; panel and PCB cavity are not designed.
+    bx0, bx1 = lid_edge+P.GAP, lid_edge+P.GAP+P.W
     bz0, bz1 = zc-P.H/2, zc+P.H/2
     shell = bd.fillet(box(bx0, bx1, -P.LID_T, P.ADH_T, bz0, bz1,
                           "screen_shell", "#c9ccd1").edges().filter_by(bd.Axis.Y), 1.0)
@@ -119,22 +145,46 @@ def build():
                  "glass_recess", "#000000")
     glass = box(glass_x0, glass_x1, -P.LID_T, -P.LID_T+P.GLASS_T,
                 glass_z0, glass_z1, "screen_glass", "#050507")
-    magnets = []
+
+    # The screen must clear the front retaining shoulder of the overmold.
+    rel = P.CARRIER_SHELL_RELIEF
+    shell -= box(ix0-lip-rel, ix1+lip+rel,
+                 P.ADH_T-P.CARRIER_FRONT_FLANGE_T-0.05, P.ADH_T+0.05,
+                 iz0-lip-rel, iz1+lip+rel, "carrier_relief", "#000000")
+    for ax, az in P.alignment_positions():
+        shell += cyl_y(ax, az, P.ALIGN_D, P.ADH_T-0.20,
+                       P.ADH_T+P.ALIGN_PROJECTION)
+
+    magnets, bonds = [], []
     for sx in (-1, 1):
         for sz in (-1, 1):
-            mx, mz = xc + sx*P.MAGNET_DX, zc + sz*P.MAGNET_DZ
-            shell -= cyl_y(mx, mz, P.MAGNET_D+0.2, P.ADH_T-P.MAGNET_POCKET, P.ADH_T)
-            m = cyl_y(mx, mz, P.MAGNET_D, P.ADH_T-P.MAGNET_T, P.ADH_T)
-            m.label, m.color = "magnet", "#444444"
-            magnets.append(m)
+            mx, mz = xc+sx*P.MAGNET_DX, zc+sz*P.MAGNET_DZ
+            floor_y = P.ADH_T-P.MAGNET_POCKET
+            pocket_d = P.MAGNET_D+2*P.MAGNET_ADHESIVE_T
+            shell -= cyl_y(mx, mz, pocket_d, floor_y, P.ADH_T+0.05)
+            magnet_min = floor_y+P.MAGNET_ADHESIVE_T
+            magnet_max = magnet_min+P.MAGNET_T
+            magnet = cyl_y(mx, mz, P.MAGNET_D, magnet_min, magnet_max)
+            magnet.label, magnet.color = "magnet", "#444444"
+            magnets.append(magnet)
+            bond = cyl_y(mx, mz, pocket_d, floor_y, magnet_min)
+            bond += (cyl_y(mx, mz, pocket_d, magnet_min, magnet_max) -
+                     cyl_y(mx, mz, P.MAGNET_D, magnet_min, magnet_max))
+            bond.label, bond.color = "magnet_bond", "#88888a"
+            bonds.append(bond)
 
-    # Mating pogo envelopes are separate from the aluminum shell and face the insulated pads.
-    # Their real contact spring travel/force and PCB connection are yet to be specified.
+    screen_contacts, insulators = [], []
+    pcb_y = P.pogo_pcb_y()
     for name, px in zip(P.POGO_NAMES, P.contact_x_positions()):
-        shell -= cyl_y(px, zc, P.SCREEN_CONTACT_BORE_D,
-                       P.ADH_T-P.SCREEN_CONTACT_DEPTH, P.ADH_T+0.05)
-        pin = cyl_y(px, zc, P.SCREEN_CONTACT_D,
-                    P.ADH_T-P.SCREEN_CONTACT_DEPTH+0.1, P.ADH_T)
+        # PCB-to-pad tip height = Harwin's 1.90mm nominal compressed height.
+        shell -= cyl_y(px, zc, P.POGO_SHELL_BORE, pcb_y-0.10, P.ADH_T+0.05)
+        bush = cyl_y(px, zc, P.POGO_SLEEVE_OD, pcb_y-0.05, P.ADH_T-P.CARRIER_FRONT_FLANGE_T-0.05)
+        bush -= cyl_y(px, zc, P.POGO_SLEEVE_ID, pcb_y-0.15, P.ADH_T-P.CARRIER_FRONT_FLANGE_T+0.05)
+        bush.label, bush.color = f"contact_insulator_{name}", "#f5eee1"
+        insulators.append(bush)
+        barrel_end = pcb_y+P.POGO_BARREL_H
+        pin = cyl_y(px, zc, P.POGO_BARREL_D, pcb_y, barrel_end)
+        pin += cyl_y(px, zc, P.POGO_TIP_D, barrel_end, P.pad_face_y())
         pin.label, pin.color = f"screen_contact_{name}", "#d4af37"
         screen_contacts.append(pin)
     shell.label, shell.color = "screen_shell", "#c9ccd1"
@@ -149,12 +199,14 @@ def build():
                port_y-P.PLUG_W/2, port_y+P.PLUG_W/2,
                P.PORT_Z-P.PLUG_H/2, P.PORT_Z+P.PLUG_H/2,
                "plug", "#9aa0a6")
-    return ([shell, glass, *magnets, *screen_contacts, adh, plate, carrier,
-             *mount_contacts, sleeve, cable, plug], cable_report(path))
+    report = cable_report(path)
+    report.update(P.dimensions())
+    return ([shell, glass, *magnets, *bonds, *screen_contacts, *insulators,
+             adh, plate, carrier, *mount_contacts, sleeve, cable, plug], report)
 
 
 if __name__ == "__main__":
     _, report = build()
     print(report)
-    if report["free_span_slack_mm"] < report["slack_needed_mm"]:
-        print("OPEN: moving-lid cable clearance/strain relief unverified; measure and prototype.")
+    print("BLOCKED: no verified electronics, USB CC/power protection, termination, "
+          "magnet pull-out, moving cable or actual MacBook fit.")

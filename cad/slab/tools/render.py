@@ -21,7 +21,8 @@ arm = pbr("arm", (0.55, 0.57, 0.6, 1), 1, 0.4)
 
 objs = [o for o in sc.objects if o.type == "MESH"]
 print("OBJS", [o.name for o in objs])
-# Static nominal CAD view only. Rotating the lid would require deforming the cable.\nR = Matrix.Identity(4)
+# Static nominal CAD view only. Rotating the lid would require deforming the cable.
+R = Matrix.Identity(4)
 for o in objs:
     n = o.name.lower()
     o.data.materials.clear()
@@ -50,8 +51,12 @@ for loc, e in (((250, -400, 500), 120000), ((-300, -200, 300), 40000)):
     L.data.energy = e; L.data.size = 300
     L.rotation_euler = (Vector((0, 0, 100)) - Vector(loc)).to_track_quat('-Z', 'Y').to_euler()
 
-sc.render.engine = 'CYCLES'; sc.cycles.samples = 64; sc.cycles.use_denoising = True
-sc.render.resolution_x, sc.render.resolution_y = 1800, 1100
+smoke = os.environ.get("MACDESK_RENDER_SMOKE") == "1"
+sc.render.engine = 'CYCLES'
+sc.cycles.samples = 2 if smoke else 64
+sc.cycles.use_denoising = not smoke
+sc.render.resolution_x, sc.render.resolution_y = ((320, 200) if smoke else (1800, 1100))
+sc.render.resolution_percentage = 100
 sc.view_settings.view_transform = 'Standard'
 def shot(name, loc, target, lens):
     bpy.ops.object.camera_add(location=loc); c = bpy.context.active_object

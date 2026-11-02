@@ -24,17 +24,30 @@ PLATE_H = 30.0
 PLATE_REAR_MARGIN = 4.0
 MAGNET_D, MAGNET_T, MAGNET_POCKET = 5.0, 1.0, 1.2
 MAGNET_DX, MAGNET_DZ = 18.0, 10.0
-POGO_NAMES = ("VBUS", "GND", "D_PLUS", "D_MINUS")
+MAGNET_ADHESIVE_T = 0.10      # reference bondline; force and adhesion unverified
+MAGNET_BACK_RECESS = 0.10    # magnet is recessed from plate
+POGO_NAMES = ("GND", "D_MINUS", "D_PLUS", "VBUS")  # separate supply poles
 POGO_PITCH, POGO_PAD = 2.54, 1.8
 PAD_EDGE_INSULATION = 1.0     # minimum polymer between each pad perimeter and the insert edge
 PAD_WELL_CLEARANCE = 0.05     # assembly allowance around the metal pad/lead
 PAD_DEPTH, PAD_VIA_D = 0.25, 0.7
+PAD_RECESS = 0.20           # front face recessed inside the dielectric well
+# Candidate SMT contact: Harwin P70-5000045R; selected for reference geometry,
+# NOT approved for the device until current, PCB, spring force and wear are verified.
+POGO_PART = "Harwin P70-5000045R"
+POGO_FREE_H, POGO_WORK_H = 2.40, 1.90
+POGO_WORK_MIN, POGO_WORK_MAX = 1.85, 2.00
+POGO_BARREL_H, POGO_BARREL_D, POGO_TIP_D = 1.78, 1.50, 0.60
+POGO_SLEEVE_OD, POGO_SLEEVE_ID, POGO_SHELL_BORE = 2.00, 1.56, 2.10
 CARRIER_FIT_CLEARANCE = 0.15  # on each side of the insert inside the steel through-window
 CARRIER_FLANGE_OVERHANG = 0.8 # rear lip overlap past the cutout, not total clearance
 CARRIER_FLANGE_T = 0.35       # rear retaining lip, included in stack thickness
-SCREEN_CONTACT_D = 1.0       # simplified pogo-pin envelope, NOT an off-the-shelf pin spec
-SCREEN_CONTACT_BORE_D = 1.2
-SCREEN_CONTACT_DEPTH = 1.3
+CARRIER_FRONT_FLANGE_T = 0.25  # captures compression into steel; must OVERMOLD
+CARRIER_SHELL_RELIEF = 0.15   # relief around front shoulder in screen shell
+ALIGN_PINS = ((-18.0, 0.0), (18.0, 4.0)) # non-symmetric x/z offsets
+ALIGN_D, ALIGN_HOLE_D = 1.60, 1.90
+ALIGN_PROJECTION = 1.00
+ALIGN_SLOT_EXTRA_X = 0.70    # float second hole along x without losing z control
 
 # 3 mm cable and protected bottom exit
 CABLE_D = 3.0
@@ -49,6 +62,8 @@ CABLE_GROMMET_WALL = 0.5      # insulating sleeve inside plate notch
 CABLE_GROMMET_BORE_CLEARANCE = 0.08
 CABLE_NOTCH_CLEARANCE = 0.25  # between sleeve outside and steel edges
 CABLE_GROMMET_EXTENSION = 1.5 # sleeve extends below steel plate for edge protection
+GROMMET_ANCHOR_D, GROMMET_HOLE_D, GROMMET_HEAD_D = 1.50, 1.90, 2.20
+GROMMET_ANCHOR_DX, GROMMET_ANCHOR_BELOW_ENTRY = 4.0, 1.2
 Z_OUT = PORT_Z + PLUG_H / 2 + CABLE_ARC_R
 HINGE_AXIS_Y = -LID_T / 2    # ASSUMED
 HINGE_SWING_DEG = 135.0       # ASSUMED max lid sweep
@@ -79,9 +94,37 @@ def contact_x_positions() -> tuple[float, ...]:
 def carrier_outline() -> tuple[float, float, float, float]:
     """Bounding rectangle of dielectric core (x0, x1, z0, z1)."""
     xc, zc = screen_x_center(), screen_z_center()
-    half_x = 1.5 * POGO_PITCH + POGO_PAD / 2 + PAD_EDGE_INSULATION
-    half_z = POGO_PAD / 2 + PAD_EDGE_INSULATION
+    half_x = 1.5 * POGO_PITCH + POGO_PAD / 2 + PAD_WELL_CLEARANCE + PAD_EDGE_INSULATION
+    half_z = POGO_PAD / 2 + PAD_WELL_CLEARANCE + PAD_EDGE_INSULATION
     return xc - half_x, xc + half_x, zc - half_z, zc + half_z
+
+
+def pad_face_y() -> float:
+    return ADH_T + PAD_RECESS
+
+
+def pogo_pcb_y() -> float:
+    """The as-yet unmodeled PCB top face needed for nominal spring compression."""
+    return pad_face_y() - POGO_WORK_H
+
+
+def alignment_positions() -> tuple[tuple[float, float], ...]:
+    return tuple((screen_x_center()+dx, screen_z_center()+dz) for dx, dz in ALIGN_PINS)
+
+
+def grommet_anchor_positions() -> tuple[tuple[float, float], ...]:
+    x, _, _ = cable_x()
+    z = cable_entry_z() - GROMMET_ANCHOR_BELOW_ENTRY
+    return ((x-GROMMET_ANCHOR_DX, z), (x+GROMMET_ANCHOR_DX, z))
+
+
+def dimensions() -> dict[str, float]:
+    """Nominal stack projections, excluding any unselected circuit and tolerances."""
+    return {"display_w_mm": W, "display_h_mm": H, "screen_body_mm": SCREEN_T,
+            "tape_and_steel_mm": ADH_T+PLATE_T,
+            "front_to_carrier_rear_mm": SCREEN_T+PLATE_T+CARRIER_FLANGE_T,
+            "front_to_cable_rear_mm": LID_T+CABLE_Y+CABLE_D/2,
+            "front_to_grommet_rear_mm": LID_T+CABLE_Y+CABLE_D/2+CABLE_GROMMET_WALL}
 
 
 def cable_entry_z() -> float:

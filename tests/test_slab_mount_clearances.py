@@ -21,6 +21,35 @@ class MountClearances(unittest.TestCase):
         self.assertGreaterEqual(P.screen_z_center()-P.POGO_PAD/2-z0, P.PAD_EDGE_INSULATION)
         self.assertGreaterEqual(z1-(P.screen_z_center()+P.POGO_PAD/2), P.PAD_EDGE_INSULATION)
 
+    def test_well_clearance_is_removed_from_outer_margin(self):
+        x0, x1, z0, z1 = P.carrier_outline()
+        r = P.POGO_PAD/2 + P.PAD_WELL_CLEARANCE
+        xs = P.contact_x_positions()
+        self.assertGreaterEqual(xs[0]-r-x0, 1.0)
+        self.assertGreaterEqual(x1-xs[-1]-r, 1.0)
+        self.assertGreaterEqual(P.screen_z_center()-r-z0, 1.0)
+        self.assertGreaterEqual(z1-P.screen_z_center()-r, 1.0)
+        self.assertGreaterEqual(P.POGO_PITCH-2*r, 0.6)
+
+    def test_locators_and_spring_working_height(self):
+        a, b = P.alignment_positions()
+        self.assertGreater(math.dist(a, b), 30)
+        self.assertNotEqual(a[1]-P.screen_z_center(),
+                            -(b[1]-P.screen_z_center()))
+        drift = (P.ALIGN_HOLE_D-P.ALIGN_D)/2
+        drift += ((P.ALIGN_HOLE_D-P.ALIGN_D)/math.dist(a,b)) * max(
+            math.dist(a, (x, P.screen_z_center())) for x in P.contact_x_positions())
+        self.assertLess(drift+P.POGO_TIP_D/2, P.POGO_PAD/2)
+        self.assertGreaterEqual(P.pad_face_y()-P.pogo_pcb_y(), P.POGO_WORK_MIN)
+        self.assertLessEqual(P.pad_face_y()-P.pogo_pcb_y(), P.POGO_WORK_MAX)
+
+    def test_captive_geometry_and_local_stack(self):
+        self.assertGreater(P.GROMMET_HEAD_D, P.GROMMET_HOLE_D)
+        self.assertLess(P.GROMMET_ANCHOR_D, P.GROMMET_HOLE_D)
+        self.assertGreater(P.CARRIER_FLANGE_OVERHANG, P.CARRIER_FIT_CLEARANCE)
+        self.assertGreater(P.dimensions()["front_to_grommet_rear_mm"],
+                           P.dimensions()["front_to_carrier_rear_mm"])
+
     def test_insert_and_magnets_clear_one_another(self):
         x0, x1, z0, z1 = P.carrier_outline()
         plate0, plate1 = P.plate_x_range()
