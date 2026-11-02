@@ -85,9 +85,10 @@ shot("render_close.png", (260, -330, 235), tuple(pod_c), 85)
 # view shows pogo barrels, insulation, locating dowels, and magnet pockets.
 sp.hide_render = True
 fl.hide_render = True  # the floor otherwise obscures the lower docking features
-# Additional samples and denoising make close mechanical features reviewable.
-sc.cycles.samples = 16 if smoke else 64
-sc.cycles.use_denoising = True
+# Ubuntu's headless Blender build lacks OpenImageDenoiser; use more
+# samples instead of enabling unsupported denoising in smoke mode.
+sc.cycles.samples = 32 if smoke else 64
+sc.cycles.use_denoising = not smoke
 sc.render.resolution_x, sc.render.resolution_y = ((800, 500) if smoke else (2000, 1250))
 for o in objs:
     n = o.name.lower()
