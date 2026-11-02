@@ -174,7 +174,8 @@ class MountSolidTests(unittest.TestCase):
         self.assert_clear(shell, glass, 0.019, "glass seat at glass recess back")
         self.assertAlmostEqual(glass.bounding_box().min.Y, -P.LID_T)
         self.assertAlmostEqual(shell.bounding_box().min.Y, -P.LID_T)
-        self.assertAlmostEqual(shell.bounding_box().max.Y-P.LID_T*(-1), P.SCREEN_T)
+        self.assertAlmostEqual(P.ADH_T - glass.bounding_box().min.Y, P.SCREEN_T)
+        self.assertAlmostEqual(shell.bounding_box().max.Y, P.ADH_T+P.ALIGN_PROJECTION)
         self.assertAlmostEqual(self.report["screen_body_mm"], 4.9)
         self.assertAlmostEqual(self.report["front_to_carrier_rear_mm"],
                                self.by_label["insulating_contact_carrier"].bounding_box().max.Y
