@@ -1,4 +1,4 @@
-"""Color/pixel-density showcase for the 800x600 RGB565 screen.
+"""Color/pixel-density showcase for the 240x280 RGB565 screen.
 
 Cycles 4 static patterns every 3s: hue sweep, 2D hue x brightness ramp,
 saturation/value ramp, 1px checkerboard. Only re-renders on pattern change.
@@ -37,12 +37,12 @@ def _hue_ramp(s):
 
 def _sat_value(s):
     # left 2/3: grayscale 0->255 by column; right: pure red fading down
-    band = scr.WIDTH - 120
+    band = scr.WIDTH * 2 // 3
     for x in range(band):
         v = round(255 * x / (band - 1))
         s.fill_rect(x, 0, 1, scr.HEIGHT, (v, v, v))
     for y in range(scr.HEIGHT):
-        s.fill_rect(band, y, 120, 1, (255 - y * 255 // (scr.HEIGHT - 1), 0, 0))
+        s.fill_rect(band, y, scr.WIDTH - band, 1, (255 - y * 255 // (scr.HEIGHT - 1), 0, 0))
 
 
 def _checker(s):

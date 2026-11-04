@@ -16,7 +16,7 @@ class ProtocolTest(unittest.TestCase):
                     m("bar", id=2, label="Claude", value=73),
                     m("text", slot=0, s="héllo ♪"),
                     m("brightness", value=0), m("sleep"), m("wake"), m("ping"),
-                    m("hello", fw="0.1", w=800, h=600), m("ok"),
+                    m("hello", fw="0.1", w=240, h=280), m("ok"),
                     m("err", code="unknown_type")):
             line = encode(msg)
             self.assertTrue(line.endswith(b"\n"))

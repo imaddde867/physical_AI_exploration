@@ -82,7 +82,7 @@ def decode(line: bytes) -> dict:
 
 
 class Watchdog:
-    """Device-side rule, mirrored here for tests/sim: feed() on every message."""
+    """Liveness only: feed() after valid messages; explicit sleep is separate."""
 
     def __init__(self, timeout=WATCHDOG_S, clock=time.monotonic):
         self.timeout, self.clock = timeout, clock
