@@ -2,11 +2,13 @@
 
 Prepared 2026-11-04 after the project reset. Start by reading [the product brief](../product-brief.md) and [current CAD decisions](../../cad/slab/DECISIONS.md).
 
+Status: ordered 2026-11-04, BerryBase order 1097674: Waveshare RP2040-Touch-LCD-1.69 (€29.80 delivered, integrated RP2040, capacitive touch), powered over the existing 50 cm Apple USB-C cable. This supersedes the Pico WH + Pico-LCD-1.8 basket in the [budget report](../../reports/Budget%20companion%20learning%20hardware.md), which was never ordered. The earlier [display shortlist report](../../reports/Companion%20display%20hardware%20shortlist.md) remains source history.
+
 ## Goal and decisions
 
 Find a practical display/controller combination for the first working **animated companion**. The user approved the current black-glass, silver-frame sidecar appearance beside the MacBook lid's right edge. The concept is about 59 × 49.65 mm; preserve its proportions while allowing dimensions to change for real hardware. Usage meters, focus timer, lyrics, and chat can follow gradually.
 
-The display should detach magnetically; the rear plate and fixed USB cable stay on the MacBook. Wired power/data and no battery are the current direction. Final panel, controller, power circuit, contacts, and electronics stack are open. Do not assume a custom PCB is required until comparing simpler working options.
+Begin with ordinary USB power/data and an optional simple desk holder. Thin packaging, magnetic attachment and electrical contacts are deferred until a working prototype; retain the detachable black-glass/silver-frame concept as the long-term appearance. No separate battery purchase is required. Final hardware and electronics stack remain open; integrated display boards already include their MCU.
 
 ## Evidence and branches
 
@@ -18,7 +20,7 @@ The display should detach magnetically; the rear plate and fixed USB cable stay 
 
 ## Research task
 
-Build a small, sourced comparison of credible display + controller options. Include a ready-to-drive prototype option and a thinner bare-panel route only where the driving/power requirements are documented. Compare:
+The prototype board is ordered; run first-light checks on delivery. Preserve the following broader criteria for later enclosure research. Build a small, sourced comparison of credible display + controller options. Include a ready-to-drive prototype option and a thinner bare-panel route only where the driving/power requirements are documented. Compare:
 
 - Visible area, glass/board dimensions, thickness of the entire assembled stack, FPC/connector orientation, and cable access.
 - Real driver/demo evidence, animation capability, supported interface, controller RAM, and development effort.
