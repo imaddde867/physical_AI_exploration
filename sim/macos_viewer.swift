@@ -78,12 +78,15 @@ final class Viewer: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func readFrames() {
         let frameBytes = width * height * 3
+        var renderedFrames = 0
         while true {
             var data = Data()
             while data.count < frameBytes {
                 let chunk = FileHandle.standardInput.readData(ofLength: frameBytes - data.count)
                 if chunk.isEmpty {
                     if !data.isEmpty { fputs("Incomplete simulator frame.\n", stderr) }
+                    print("viewer: rendered \(renderedFrames) frame(s)")
+                    fflush(stdout)
                     DispatchQueue.main.async { NSApp.terminate(nil) }
                     return
                 }
@@ -101,6 +104,7 @@ final class Viewer: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self.panel.needsDisplay = true
                 self.panel.displayIfNeeded()
             }
+            renderedFrames += 1
         }
     }
 }
