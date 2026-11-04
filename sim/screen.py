@@ -1,4 +1,4 @@
-"""Pixel-exact stand-in for the 456x280 V2 AMOLED landscape view (stdlib only).
+"""800x600 concept display simulator (stdlib only); the final panel is not selected.
 
 Colors quantize to RGB565 and reconstruct with round(), so sim pixels match
 what a 16-bit panel driver receives.
@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 
-WIDTH, HEIGHT = 456, 280
+WIDTH, HEIGHT = 800, 600
 
 _hex_cache: dict[tuple[int, int, int], str] = {}
 

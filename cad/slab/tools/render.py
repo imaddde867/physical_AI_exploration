@@ -1,9 +1,9 @@
 import bpy, math, sys, os
-from mathutils import Vector, Matrix
+from mathutils import Vector
 here = os.path.dirname(os.path.abspath(__file__))
 bpy.ops.wm.read_factory_settings(use_empty=True)
 import glob
-for f in sorted(glob.glob(os.path.join(here, "../tmp/parts", "*.stl"))):
+for f in sorted(glob.glob(os.path.join(here, "../tmp/render-parts", "*.stl"))):
     try: bpy.ops.wm.stl_import(filepath=f)
     except AttributeError: bpy.ops.import_mesh.stl(filepath=f)
     bpy.context.selected_objects[0].name = os.path.basename(f)[:-4]
@@ -18,17 +18,18 @@ def pbr(name, col, metal, rough):
 alu = pbr("alu", (0.78, 0.79, 0.81, 1), 1, 0.30)
 dark = pbr("glass", (0.008, 0.008, 0.01, 1), 0, 0.04)
 arm = pbr("arm", (0.55, 0.57, 0.6, 1), 1, 0.4)
+cable = pbr("cable", (0.015, 0.015, 0.018, 1), 0, 0.5)
+gold = pbr("gold", (0.83, 0.66, 0.2, 1), 0.75, 0.25)
 
 objs = [o for o in sc.objects if o.type == "MESH"]
+assert len(objs) == 16, "Rebuild export_parts.py; expected 16 current assembly meshes"
 print("OBJS", [o.name for o in objs])
-hinge = Vector((0, 0, 4)); R = Matrix.Translation(hinge) @ Matrix.Rotation(math.radians(-15), 4, 'X') @ Matrix.Translation(-hinge)
 for o in objs:
     n = o.name.lower()
     o.data.materials.clear()
-    o.data.materials.append(dark if "glass" in n else arm if ("arm" in n or "clip" in n) else alu)
+    o.data.materials.append(dark if "glass" in n else cable if ("cable" in n or "magnet" in n)
+                          else gold if "pad" in n else arm if "plate" in n else alu)
     for p in o.data.polygons: p.use_smooth = False
-    if "deck" not in n:
-        o.matrix_world = R @ o.matrix_world
 
 glass = next(o for o in objs if "glass" in o.name.lower())
 
@@ -38,7 +39,7 @@ sp.rotation_euler = (math.radians(90), 0, 0); sp.scale = (302.4, 196.4, 1)
 sm = bpy.data.materials.new("screen"); sm.use_nodes = True; sn = sm.node_tree; sn.nodes.clear()
 e = sn.nodes.new("ShaderNodeEmission"); e.inputs["Color"].default_value = (0.05, 0.09, 0.2, 1); e.inputs["Strength"].default_value = 0.8
 o2 = sn.nodes.new("ShaderNodeOutputMaterial"); sn.links.new(e.outputs[0], o2.inputs[0])
-sp.data.materials.append(sm); bpy.context.view_layer.update(); sp.matrix_world = R @ sp.matrix_world
+sp.data.materials.append(sm); bpy.context.view_layer.update()
 # floor + world
 bpy.ops.mesh.primitive_plane_add(size=3000, location=(0, -100, -0.1))
 fl = bpy.context.active_object; fl.data.materials.append(pbr("floor", (0.55, 0.45, 0.35, 1), 0, 0.6))
@@ -61,3 +62,4 @@ def shot(name, loc, target, lens):
 pod_c = sum((glass.matrix_world @ Vector(c) for c in glass.bound_box), Vector()) / 8
 shot("render_wide.png", (330, -650, 250), (40, 0, 115), 40)
 shot("render_close.png", (260, -330, 235), tuple(pod_c), 85)
+shot("render_rear.png", (360, 520, 300), (45, 0, 115), 48)

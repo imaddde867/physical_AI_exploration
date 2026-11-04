@@ -1,4 +1,4 @@
-"""Color/pixel-density showcase for the 456x280 RGB565 screen.
+"""Color/pixel-density showcase for the 800x600 RGB565 screen.
 
 Cycles 4 static patterns every 3s: hue sweep, 2D hue x brightness ramp,
 saturation/value ramp, 1px checkerboard. Only re-renders on pattern change.
