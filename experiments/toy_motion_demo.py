@@ -1,6 +1,6 @@
 """Motion demo (heavy per frame; read the window's fps label for your Mac's real rate): scrolling RGB565 gradient, bouncing ball, spinning arc gauge.
 
-Redraws gradient by column each frame (456 fill_rects, C-speed row slices).
+Redraws gradient by column each frame (WIDTH fill_rects, C-speed row slices).
 """
 import math
 

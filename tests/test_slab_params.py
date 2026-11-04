@@ -26,6 +26,18 @@ class SlabParamsTests(unittest.TestCase):
         self.assertLess(1.5 * P.POGO_PITCH + P.POGO_PAD / 2, P.MAGNET_DX - P.MAGNET_D / 2)
         self.assertGreater(P.MAGNET_POCKET, P.MAGNET_T)
 
+    def test_panel_fits_in_part(self):
+        for o, v, part in zip(P.PANEL_OUTLINE, P.PANEL_SCREEN, (P.W, P.H)):
+            self.assertGreater(o - v, 0)                # positive border around the visible area
+            self.assertAlmostEqual(part, o + 2 * P.FRAME_WALL)
+        self.assertAlmostEqual(P.W, 59.0)
+        self.assertAlmostEqual(P.H, 49.65)
+
+    def test_magnets_and_pads_inside_part(self):
+        self.assertLess(P.MAGNET_DX + P.MAGNET_D / 2, P.W / 2)
+        self.assertLess(P.MAGNET_DZ + P.MAGNET_D / 2, P.H / 2)
+        self.assertLessEqual(P.PLATE_H, P.H)
+
     def test_cable_route(self):
         xe, xs, xo = P.cable_x()
         x0, _ = P.plate_x_range()

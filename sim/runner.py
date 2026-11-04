@@ -1,4 +1,4 @@
-"""Run a mini-app live in a tkinter window shaped like the V2 AMOLED view.
+"""Run a mini-app live in a tkinter window using the current 800x600 concept defaults.
 
 tkinter imports lazily so headless test suites can import this module.
 """
@@ -30,7 +30,7 @@ def load_app(path: str) -> object:
     return module
 
 
-PANEL_WIDTH_MM = 60.0  # slab buddy design width, see cad/slab/DECISIONS.md
+PANEL_WIDTH_MM = 54.6  # previous Good Display candidate's visible width; hardware selection is open
 MAC_PPI = 127.0  # 14" MacBook Pro default scaled mode: 1512 pt across ~302 mm. Tk reports a fake 72, so this is a knob.
 
 
@@ -53,10 +53,10 @@ def frames_per_second(timestamps: list[float], window_ms: float = FPS_WINDOW_MS)
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run a mini-app on a pixel-exact simulated V2 screen")
+    parser = argparse.ArgumentParser(description="Run a mini-app on a pixel-exact simulated 800x600 screen")
     parser.add_argument("app", help="path to the mini-app module (defining update(screen, t_ms))")
     parser.add_argument("--fps", type=int, default=30, help="frame cap, default 30")
-    parser.add_argument("--width-mm", type=float, default=PANEL_WIDTH_MM, help="physical panel width, default 60")
+    parser.add_argument("--width-mm", type=float, default=PANEL_WIDTH_MM, help="physical panel width, default 54.6")
     parser.add_argument("--ppi", type=float, default=MAC_PPI,
                         help="your screen's points per inch, default 127 (14in MacBook Pro); tune until a ruler matches")
     parser.add_argument("--scale", type=float, default=0, help="override real size with a plain zoom factor (1 = pixel-exact)")

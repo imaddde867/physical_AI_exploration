@@ -2,14 +2,19 @@
 Axes: x right, y back (+y is behind the lid), z up. Lid display plane y = -LID_T, lid back y = 0.
 Values marked ASSUMED are unverified and need a tape-measure on the real laptop/part."""
 
-# MacBook Pro 14: width/depth/total closed height (15.5) are Apple's published figures.
+# MacBook Pro 14 (M4, Nov 2024): width/depth/total closed height (15.5) are Apple's published figures; lid height/thickness/ports are not published.
 LID_W, LID_H = 312.6, 214.0      # lid height ASSUMED
 LID_T = 4.5                      # ASSUMED
 DECK_D, DECK_T_TOTAL = 221.2, 15.5
 BASE_T = DECK_T_TOTAL - LID_T    # base slab height; the lid hinges at its top (z = BASE_T)
 
 # Screen part (detachable)
-W, H = 60.0, 38.4
+# Previous Good Display candidate dimensions preserve the approved preview; hardware selection is open.
+PANEL_OUTLINE = (56.6, 47.25)    # glass outline
+PANEL_SCREEN = (54.6, 40.95)     # visible area
+FRAME_WALL = 1.2                 # ASSUMED aluminium frame wall; needs a design decision
+W = PANEL_OUTLINE[0] + 2 * FRAME_WALL
+H = PANEL_OUTLINE[1] + 2 * FRAME_WALL
 GAP = 0.6                        # to the lid's right edge
 ADH_T, PLATE_T = 0.4, 1.2        # VHB-type tape, 430 stainless plate (magnetic)
 SCREEN_T = LID_T + ADH_T         # glass flush with the lid front, back sits on the plate's front face = 4.9
@@ -27,7 +32,7 @@ POGO_PITCH, POGO_PAD = 2.54, 1.8  # 4 pads: VBUS, GND, D+, D- (USB 2.0 + 5 V; pl
 # Cable (fixed to the mount, USB-C plug into the Mac's right-side Thunderbolt port)
 CABLE_D = 3.0
 MIN_BEND_R = 4 * CABLE_D         # static; dynamic (lid swing) needs a flexible cable and a slack loop
-PORT_FROM_REAR = 45.0            # ASSUMED: right-side TB port, distance from the base's rear edge
+PORT_FROM_REAR = 45.0            # ASSUMED (no public offset; the right TB4 port is 2nd from rear after HDMI): right-side TB port, distance from the base's rear edge
 PORT_Z = BASE_T / 2
 PLUG_L, PLUG_W, PLUG_H = 10.0, 8.5, 4.5  # right-angle overmold; sticks out of the side 10 mm
 CABLE_ARC_R = MIN_BEND_R         # every bend in the route uses this radius

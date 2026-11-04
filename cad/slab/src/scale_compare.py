@@ -1,4 +1,5 @@
-"""1:1 scale comparison: 14" MacBook Pro (open, front) vs slim 'slab' buddy at several widths.
+"""Historical scale comparison, not the current design (see placement.py and ../DECISIONS.md).
+14" MacBook Pro (open, front) vs slim 'slab' buddy at several widths.
 MacBook dims are public spec (312.6 x 221.2 mm base); lid height/bezels are approximations.
 Buddy: aluminium shell + edge-to-edge black glass, ~1.3 mm visible border. Units mm, front = -Y."""
 import build123d as bd

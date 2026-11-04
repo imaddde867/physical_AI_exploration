@@ -10,10 +10,10 @@ def html_hex(color):
 class SimScreenTests(unittest.TestCase):
     def test_dimensions_and_blank(self):
         s = Screen()
-        self.assertEqual(WIDTH, 456); self.assertEqual(HEIGHT, 280)
+        self.assertEqual(WIDTH, 800); self.assertEqual(HEIGHT, 600)
         rows = s.rows()
-        self.assertEqual(len(rows), 280)
-        self.assertEqual(len(rows[0]), 456)
+        self.assertEqual(len(rows), 600)
+        self.assertEqual(len(rows[0]), 800)
         self.assertEqual(rows[0][0], "#000000")
 
     def test_quantized_color_matches_html_formula(self):
@@ -23,10 +23,10 @@ class SimScreenTests(unittest.TestCase):
 
     def test_set_pixel_clips(self):
         s = Screen()
-        s.set_pixel(456, 279, (255, 255, 255))  # off right edge
-        s.set_pixel(0, 280, (255, 255, 255))    # off bottom
+        s.set_pixel(800, 599, (255, 255, 255))  # off right edge
+        s.set_pixel(0, 600, (255, 255, 255))    # off bottom
         s.set_pixel(-3, -3, (255, 255, 255))
-        self.assertEqual(s.rows()[279][455], "#000000")
+        self.assertEqual(s.rows()[599][799], "#000000")
 
     def test_fill_rect_and_zero_size_noop(self):
         s = Screen()

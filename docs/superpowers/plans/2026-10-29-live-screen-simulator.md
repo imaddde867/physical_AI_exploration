@@ -1,5 +1,7 @@
 # Live Screen Simulator Implementation Plan
 
+> Historical implementation plan for the retired 1.64" panel; do not execute it as a current task. Paths, face assets, dimensions, and runtime assumptions below have been superseded. Start with the [current README](../../../README.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Run a mini-app (one Python file, `update(screen, t_ms)`) live in a tkinter window that shows the exact 456×280 landscape view with RGB565 quantized colors, so screen ideas can be explored without ESP hardware.
