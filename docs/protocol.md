@@ -1,6 +1,6 @@
 # MacDesk Buddy serial protocol (DRAFT v1)
 
-Status, 2026-11-04: proposed interface, not a running host/device system. Only the Python codec and watchdog helper exist; transport, firmware, keepalive scheduling, and reconnect behavior below are not implemented. Controller selection is open; see the [product brief](product-brief.md).
+Status, 2026-11-04: proposed interface, not a running host/device system. Only the Python codec and watchdog helper exist; transport, firmware, keepalive scheduling, and reconnect behavior below are not implemented. The ordered bench prototype uses an integrated RP2040; see the [product brief](product-brief.md).
 
 Proposed Mac service <-> display controller over USB CDC serial. One JSON object per line (UTF-8, `\n` terminated).
 Every message has `v` (protocol version, currently `1`) and `t` (type). Reference: `daemon/protocol.py`.
@@ -12,8 +12,8 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 | `face` | `x`,`y` float -1..1 (gaze); `blink` bool; `mood` neutral/happy/sad/sleepy/surprised/angry | all optional; omitted fields keep their last value. Idle animation runs on the device |
 | `bar` | `id` 0..7, `value` int 0..100, `label` str <=16 (optional) | usage bars (Claude/Codex) |
 | `text` | `slot` 0..3, `s` str <=200 chars | lyrics, chat; empty string clears the slot |
-| `brightness` | `value` 0..100 | |
-| `sleep` / `wake` | none | `sleep` blanks the panel; `wake` restores it |
+| `brightness` | `value` 0..100 | sets desired brightness, retained while blanked |
+| `sleep` / `wake` | none | `sleep` latches the panel off until `wake`; `wake` restores desired brightness |
 | `ping` | none | keepalive |
 
 ## Device -> host
@@ -32,7 +32,9 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 
 ## Failure behaviour
 
-- Link drop / daemon dead: the device blanks if no message (any type, `ping` included) arrives for `WATCHDOG_S = 5` s. The daemon sends at least one message every 2 s. Any new message wakes it.
+- Explicit sleep: `sleep` latches the panel off until `wake`. Valid `ping` messages update liveness without clearing this latch. Valid face/state commands may update hidden state while asleep. `wake` clears the latch and restores the stored desired brightness; it does not replace that brightness value.
+- Link drop / daemon dead: the device separately blanks after no valid message for `WATCHDOG_S = 5` s. The daemon sends at least one valid message every 2 s. The next valid message clears timeout blanking, but an explicit sleep latch keeps the panel off. Invalid messages do not count as keepalive.
+- The Python `Watchdog` only tracks liveness; it does not implement the sleep latch, display blanking, or brightness state. Its caller must feed it only after validation.
 - Mac sleep: the daemon sends `sleep` before sleeping; on wake it sends `wake`.
 - On (re)connect the device sends `hello`; the daemon then resends full state (face, bars, text, brightness).
 

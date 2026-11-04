@@ -1,4 +1,4 @@
-"""Run a mini-app live in a tkinter window using the current 800x600 concept defaults.
+"""Run a mini-app live at the 240x280 prototype display's size.
 
 tkinter imports lazily so headless test suites can import this module.
 """
@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import math
 import sys
 import time
 from collections import deque
@@ -30,8 +31,8 @@ def load_app(path: str) -> object:
     return module
 
 
-PANEL_WIDTH_MM = 54.6  # previous Good Display candidate's visible width; hardware selection is open
-MAC_PPI = 127.0  # 14" MacBook Pro default scaled mode: 1512 pt across ~302 mm. Tk reports a fake 72, so this is a knob.
+PANEL_WIDTH_MM = 27.972  # nominal active width of Waveshare's 1.69-inch panel; verify on delivery
+MAC_PPI = 127.0  # fallback for non-macOS Tk; the native macOS viewer reads the active display
 
 
 def real_scale(width_mm: float, ppi: float, width_px: int = WIDTH) -> float:
@@ -53,24 +54,34 @@ def frames_per_second(timestamps: list[float], window_ms: float = FPS_WINDOW_MS)
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run a mini-app on a pixel-exact simulated 800x600 screen")
+    parser = argparse.ArgumentParser(description="Run a mini-app on a simulated 240x280 screen")
     parser.add_argument("app", help="path to the mini-app module (defining update(screen, t_ms))")
     parser.add_argument("--fps", type=int, default=30, help="frame cap, default 30")
-    parser.add_argument("--width-mm", type=float, default=PANEL_WIDTH_MM, help="physical panel width, default 54.6")
-    parser.add_argument("--ppi", type=float, default=MAC_PPI,
-                        help="your screen's points per inch, default 127 (14in MacBook Pro); tune until a ruler matches")
-    parser.add_argument("--scale", type=float, default=0, help="override real size with a plain zoom factor (1 = pixel-exact)")
+    parser.add_argument("--width-mm", type=float, default=PANEL_WIDTH_MM, help="physical panel width, default 27.972")
+    parser.add_argument("--ppi", type=float,
+                        help="override logical points per inch for ruler calibration; macOS detects it automatically")
+    parser.add_argument("--scale", type=float, default=0, help="override real size (1 = one logical point per source pixel)")
     parser.add_argument("--frames", type=int, default=0, help="stop after N frames; 0 = until window close")
     args = parser.parse_args(argv)
-    scale = args.scale if args.scale > 0 else real_scale(args.width_mm, args.ppi)
-    zoom, sub = zoom_steps(scale)
-    size = (round(WIDTH * zoom / sub), round(HEIGHT * zoom / sub))
+    if (args.fps <= 0 or args.frames < 0 or not math.isfinite(args.width_mm) or args.width_mm <= 0
+            or not math.isfinite(args.scale) or args.scale < 0
+            or (args.ppi is not None and (not math.isfinite(args.ppi) or args.ppi <= 0))):
+        parser.error("fps and dimensions must be positive; scale and frames must be non-negative")
 
     try:
         app = load_app(args.app)
     except (ValueError, OSError) as exc:  # expected load failure: bad path or missing update
         print(exc, file=sys.stderr)
         return 2
+
+    if sys.platform == "darwin":
+        from sim.macos import run
+        return run(app, args)
+
+    args.ppi = args.ppi or MAC_PPI
+    scale = args.scale if args.scale > 0 else real_scale(args.width_mm, args.ppi)
+    zoom, sub = zoom_steps(scale)
+    size = (round(WIDTH * zoom / sub), round(HEIGHT * zoom / sub))
 
     import tkinter as tk
 

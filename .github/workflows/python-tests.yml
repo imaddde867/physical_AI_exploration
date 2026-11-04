@@ -19,3 +19,12 @@ jobs:
           python-version: '3.12'
       - name: Unit tests
         run: python -m unittest discover -s tests -v
+
+  native-viewer:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Native viewer sizing checks
+        run: swift sim/macos_viewer.swift --self-test

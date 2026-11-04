@@ -1,13 +1,14 @@
-"""800x600 concept display simulator (stdlib only); the final panel is not selected.
+"""240x280 RP2040-Touch-LCD-1.69 desktop simulator (stdlib only).
 
 Colors quantize to RGB565 and reconstruct with round(), so sim pixels match
 what a 16-bit panel driver receives.
+The hex-string buffer is desktop-only; device firmware needs packed RGB565.
 """
 from __future__ import annotations
 
 import math
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 240, 280
 
 _hex_cache: dict[tuple[int, int, int], str] = {}
 

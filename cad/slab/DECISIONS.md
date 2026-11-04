@@ -21,7 +21,8 @@ The simplified laptop uses a 312.6 × 221.2 mm base footprint. Lid thickness/hei
 
 ## Hardware status and open checks
 
-- Good Display GDOJ0269C01 / ESP32-P4 is a previous proposal, **not selected hardware**. Its dimensions remain in the model and 800×600 simulator defaults to preserve the approved preview.
+- Waveshare RP2040-Touch-LCD-1.69 (240×280, integrated RP2040) is ordered for bench bring-up with the existing USB cable; electronics fit and final enclosure hardware remain unvalidated.
+- Good Display GDOJ0269C01 / ESP32-P4 is a previous proposal, **not selected hardware**. Its dimensions remain in the CAD model to preserve the approved preview; simulator defaults now follow the ordered prototype.
 - The recorded cable estimate gives about 7.9 mm free-span slack against about 22 mm estimated need for the assumed lid swing. Both are model estimates; test the route with string before redesigning it.
 - Validate the full electronics stack, screen border, mounting retention, spring contacts, cable fastening, strain relief, heat, and lid clearance before final CAD.
 - Confirm printer model, material, and print profile from the user before choosing manufacturing tolerances. Their details are not recorded here.

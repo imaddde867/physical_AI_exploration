@@ -1,6 +1,6 @@
 # Live screen simulator — design
 
-Historical specification for the retired 1.64" panel. References to removed assets/firmware and 456×280 dimensions below are not current instructions. The simulator now defaults to 800×600, supports approximate physical sizing, and uses a placeholder face. See the [current README](../../../README.md) and [product brief](../../product-brief.md).
+Historical specification for the retired 1.64" panel. References to removed assets/firmware and 456×280 dimensions below are not current instructions. The simulator now defaults to 240×280 portrait for the ordered RP2040-Touch-LCD-1.69, supports approximate physical sizing, and uses a placeholder face. See the [current README](../../../README.md) and [product brief](../../product-brief.md).
 
 **Date:** 2026-10-29 · **Status:** implemented
 **Approached as:** small change (short design)
