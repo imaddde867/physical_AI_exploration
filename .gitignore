@@ -10,3 +10,6 @@ __pycache__/
 *.3mf
 *.gcode
 .gitnexus
+
+# Generated Pico SDK firmware build artifacts
+firmware/first_light/build/
