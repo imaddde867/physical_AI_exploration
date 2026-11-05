@@ -20,7 +20,7 @@ Begin with ordinary USB power/data and an optional simple desk holder. Thin pack
 
 ## Bring-up and later enclosure research
 
-Run Waveshare's demo on delivery, then a blink, then one Mac serial command over the existing USB cable. Follow the [device renderer plan](../product-brief.md#device-renderer-plan): one packed RGB565 framebuffer, with runtime memory measured on the board. Firmware and transport still need implementation.
+Follow the [integrated-board first-light guide](rp2040-first-light.md): run the unmodified Waveshare demo on delivery, then flash the minimal RGB565 diagnostic and verify one Mac USB-serial command over the existing USB cable. Follow the [device renderer plan](../product-brief.md#device-renderer-plan): one packed RGB565 framebuffer, with runtime memory measured on the board. Firmware and transport still need implementation.
 
 The broad display shortlist is paused. Revisit alternatives only if prototype evidence requires them or later enclosure work needs a thinner route. Compare:
 
