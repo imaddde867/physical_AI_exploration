@@ -23,3 +23,19 @@ Power and sleep (needs the USB-C meter and any 5 V USB-C load):
 | 12 | When the lid is closed, does a slab beside the right edge touch the desk? | hold a card of the slab's size against the edge and close the lid | |
 
 Cable slack test: lay a string along the planned cable route on the lid back (see `cad/slab/DECISIONS.md`), swing the lid through your normal range and mark how much the route length changes.
+
+## Apple's published drawing (2026-11-05)
+
+Source: Apple's dimensions drawing for the 14.2-inch MacBook Pro (screenshot, not a caliper measurement). Treat as a prior; the table above still needs calipers.
+
+| Item | Published | CAD today | Note |
+|---|---|---|---|
+| Width | 312.6 mm | 312.6 | matches |
+| Depth (base and closed lid) | 221.2 mm | 221.2 | matches |
+| Closed height | 15.5 mm | 15.5 | matches |
+| Lid height | not stated; the closed-lid outline equals the base depth, so roughly 215-221 mm | 214 (ASSUMED) | derived from the drawing, ±5 mm |
+| Right-side port order | rear to front: HDMI, USB-C (Thunderbolt), SD slot | "2nd from rear after HDMI" | matches |
+| Right USB-C centre from rear edge | about 47 mm, read off the drawing by eye (±3 mm) | 45 (ASSUMED) | within error |
+| Lid thickness, hinge axis, opening angle | not published | 4.5 / mid-thickness / 135 deg | still need calipers |
+
+Nothing in `cad/slab/src/params.py` was changed from this; the drawing supports the current assumptions to within its own error.
