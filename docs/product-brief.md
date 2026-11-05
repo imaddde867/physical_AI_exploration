@@ -27,7 +27,7 @@ Claude/Codex usage meters, a focus timer, lyrics, and chat are later candidates,
 |---|---|---|
 | CAD | Display exterior, magnets, rear plate, contact pads, cable, plug, simplified laptop | Electronics cavity, closures, real contact assembly, manufacturing tolerances, and cable fastening |
 | Simulator | 240×280 portrait RGB565 drawing for the ordered prototype, native macOS physical sizing, animation examples | Real refresh rate, brightness, and final face |
-| Host/device software | Draft messages, validation, and watchdog helper | Running Mac service, serial transport, firmware, and hardware integration |
+| Host/device software | Draft messages, validation, watchdog helper, and [local blink prototype](../firmware/rp2040/README.md) | Running Mac service, serial transport, and hardware validation |
 | Hardware | Ordered: Waveshare RP2040-Touch-LCD-1.69 (BerryBase order 1097674) | Delivery, first light, frame rate, sleep/wake behaviour; final power circuit and connectors |
 | Printing | Concept meshes can be exported | Printable enclosure, printer/profile/material details recorded in this repo, tolerances, and fit tests |
 

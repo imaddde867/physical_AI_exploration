@@ -10,3 +10,4 @@ __pycache__/
 *.3mf
 *.gcode
 .gitnexus
+firmware/rp2040/waveshare_lcd.py
