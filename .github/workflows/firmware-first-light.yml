@@ -1,0 +1,35 @@
+name: Firmware first light
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-rp2040:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Install ARM toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi cmake ninja-build
+      - name: Fetch pinned Pico SDK
+        run: git clone --depth 1 --recurse-submodules --branch 2.3.1 https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
+      - name: Build RP2040 UF2
+        env:
+          PICO_SDK_PATH: ${{ runner.temp }}/pico-sdk
+        run: |
+          cmake -S firmware/first_light -B firmware/first_light/build -G Ninja -DPICO_BOARD=pico
+          cmake --build firmware/first_light/build --parallel 2
+          test -s firmware/first_light/build/buddy_first_light.uf2
+          arm-none-eabi-size firmware/first_light/build/buddy_first_light.elf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: buddy-first-light-rp2040
+          path: firmware/first_light/build/buddy_first_light.uf2
+          if-no-files-found: error
