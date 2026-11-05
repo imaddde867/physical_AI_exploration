@@ -25,7 +25,7 @@ The simplified laptop uses a 312.6 × 221.2 mm base footprint. Lid thickness (4.
 - Good Display GDOJ0269C01 / ESP32-P4 is a previous proposal, **not selected hardware**. Its dimensions remain in the CAD model to preserve the approved preview; simulator defaults now follow the ordered prototype.
 - The recorded cable estimate gives about 7.9 mm free-span slack against about 26 mm estimated need for the assumed lid swing. Both are model estimates; test the route with string before redesigning it.
 - Validate the full electronics stack, screen border, mounting retention, spring contacts, cable fastening, strain relief, heat, and lid clearance before final CAD.
-- Confirm printer model, material, and print profile from the user before choosing manufacturing tolerances. Their details are not recorded here.
+- Printer is recorded in [docs/hardware/printer.md](../../docs/hardware/printer.md). Confirm filament material and print profile, and print a fit coupon, before choosing manufacturing tolerances.
 - Preserve the approved silhouette while adapting dimensions to actual hardware. Do not buy final parts or treat exported concept STLs as print-ready enclosure parts.
 
 ## Rebuild and preview
