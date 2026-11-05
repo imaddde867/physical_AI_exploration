@@ -11,7 +11,8 @@ Next session: [ordered prototype bring-up handoff](docs/hardware/shortlist-hando
 | Physical design | [CAD decisions and commands](cad/slab/DECISIONS.md) | Approved appearance; concept geometry |
 | Face experiments | `sim/` and `experiments/hello_buddy.py` | Runnable simulator; placeholder face |
 | Hardware | [Bring-up log](docs/hardware/bringup-log.md), [Mac measurements](docs/hardware/measure-mac.md) | Waveshare RP2040-Touch-LCD-1.69 ordered; no recorded first light |
-| Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec and watchdog tests; no running daemon or firmware |
+| Device prototype | [Local blink setup](firmware/rp2040/README.md) | Prepared MicroPython blink; hardware validation awaits delivery |
+| Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec and watchdog tests; no running daemon or serial transport |
 
 Older simulator plans in `docs/superpowers/`, the [November 1 slab record](docs/archive/2026-11-01-slab-decisions.md), and `cad/slab/src/scale_compare.py` are historical references. The removed 1.64" pod work remains in git history.
 

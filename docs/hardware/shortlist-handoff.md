@@ -16,7 +16,7 @@ Begin with ordinary USB power/data and an optional simple desk holder. Thin pack
 - Current CAD: `cad/slab/src/placement.py`, `mount.py`, and `params.py`; preview commands in [CAD decisions](../../cad/slab/DECISIONS.md). The shell is a largely solid exterior concept, not a hollow printable electronics enclosure.
 - Simulator: 240×280 portrait RGB565, 27.972 mm visible-width default from the vendor panel drawing; verify physical scale on arrival. The two eyes are a placeholder.
 - `daemon/protocol.py` is a tested draft codec/watchdog, not a running service or firmware.
-- Separate [PR #13](https://github.com/imaddde867/physical_AI_exploration/pull/13) proposed a different conceptual dock with contact insulation, locating features, and cable-exit changes. It is not part of this reset baseline; review its scope/status before reusing or duplicating that work. Do not silently combine its geometry with the approved preview.
+- Separate [PR #13](https://github.com/imaddde867/physical_AI_exploration/pull/13) proposed a different conceptual dock with contact insulation, locating features, and cable-exit changes. It was closed unmerged (2026-11-04, merge conflicts) and is not part of this reset baseline; reuse its ideas deliberately rather than duplicating them. Do not silently combine its geometry with the approved preview.
 
 ## Bring-up and later enclosure research
 
