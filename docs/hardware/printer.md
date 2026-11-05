@@ -10,7 +10,7 @@ Recorded 2026-11-05 from photos taken at the machine.
 | Nozzle | 0.4 mm (two spare 0.4 hotends in the toolbox) | hotend labels |
 | Filament system | AMS 2 Pro on top, 4 spools, dry packs inside | photo |
 
-The concept assembly (372.2 × 221.2 × 225 mm) exceeds the build volume, but the printable parts (slab shell about 59 × 49.65 mm, plate, holder) fit easily.
+The concept assembly (372.2 × 221.2 × 232.7 mm) exceeds the build volume, so it must be printed as separate parts. The expected part sizes (slab shell about 59 × 49.65 mm, plate, desk holder) are well within the bed, but none is a print-ready part yet: the mount uses a steel plate, the shell is still a solid exterior concept, and the desk holder is not modeled.
 
 ## Still unknown
 

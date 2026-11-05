@@ -26,7 +26,7 @@ Cable slack test: lay a string along the planned cable route on the lid back (se
 
 ## Values taken from Apple's dimensions drawing (2026-11-05)
 
-Source: Apple's drawing for the 14.2-inch MacBook Pro (screenshot, treated as 1:1). Pixel positions were measured against the 312.6 mm width (about 2.74 px/mm); the drawing's USB-C slot measures 8.7 mm, as expected. Resolution is about ±0.4 mm. Rows 1-4 above are resolved this way, so no caliper pass is needed for them.
+Source: Apple's drawing for the 14.2-inch MacBook Pro (screenshot, treated as 1:1). Pixel positions were measured against the 312.6 mm width (about 2.74 px/mm); the drawing's USB-C slot measures 8.7 mm, as expected. Resolution is about ±0.4 mm. The screenshot and a source link were not saved, so the scale and reference edges cannot be rechecked. Treat rows 1-4 as provisional drawing values and keep the caliper checks open until the drawing is saved to the repo with its URL and marked measurement points.
 
 | Row | Item | Value used | Was |
 |---|---|---|---|
