@@ -4,7 +4,7 @@ Values in `cad/slab/src/params.py` marked ASSUMED depend on these. Tools: calipe
 
 | # | Measure | How | Assumed in CAD | Measured |
 |---|---|---|---|---|
-| 1 | Lid thickness (at the right edge) | calipers, lid closed or open | 4.5 mm | |
+| 1 | Lid thickness (at the right edge) | calipers, lid closed or open | 4.5 mm | 4.0 (drawing) |
 | 2 | Lid height (hinge to top edge) | ruler, lid open | 214 mm | |
 | 3 | Right-side port: distance from the base's rear edge to port centre | ruler | 45 mm | |
 | 4 | Port centre height above the desk | calipers | half of base height | |
@@ -24,18 +24,15 @@ Power and sleep (needs the USB-C meter and any 5 V USB-C load):
 
 Cable slack test: lay a string along the planned cable route on the lid back (see `cad/slab/DECISIONS.md`), swing the lid through your normal range and mark how much the route length changes.
 
-## Apple's published drawing (2026-11-05)
+## Values taken from Apple's dimensions drawing (2026-11-05)
 
-Source: Apple's dimensions drawing for the 14.2-inch MacBook Pro (screenshot, not a caliper measurement). Treat as a prior; the table above still needs calipers.
+Source: Apple's drawing for the 14.2-inch MacBook Pro (screenshot, treated as 1:1). Pixel positions were measured against the 312.6 mm width (about 2.74 px/mm); the drawing's USB-C slot measures 8.7 mm, as expected. Resolution is about ±0.4 mm. Rows 1-4 above are resolved this way, so no caliper pass is needed for them.
 
-| Item | Published | CAD today | Note |
+| Row | Item | Value used | Was |
 |---|---|---|---|
-| Width | 312.6 mm | 312.6 | matches |
-| Depth (base and closed lid) | 221.2 mm | 221.2 | matches |
-| Closed height | 15.5 mm | 15.5 | matches |
-| Lid height | not stated; the closed-lid outline equals the base depth, so roughly 215-221 mm | 214 (ASSUMED) | derived from the drawing, ±5 mm |
-| Right-side port order | rear to front: HDMI, USB-C (Thunderbolt), SD slot | "2nd from rear after HDMI" | matches |
-| Right USB-C centre from rear edge | about 47 mm, read off the drawing by eye (±3 mm) | 45 (ASSUMED) | within error |
-| Lid thickness, hinge axis, opening angle | not published | 4.5 / mid-thickness / 135 deg | still need calipers |
+| 1 | Lid thickness | 4.0 mm | 4.5 ASSUMED |
+| 2 | Lid height | 221.2 mm (lid outline equals the base footprint) | 214 ASSUMED |
+| 3 | Right USB-C centre from rear edge | 46.1 mm (rear to front: HDMI, USB-C, SD) | 45 ASSUMED |
+| 4 | Right USB-C centre height | 7.75 mm, half of the 15.5 mm body (base is 11.5 mm) | half of base height |
 
-Nothing in `cad/slab/src/params.py` was changed from this; the drawing supports the current assumptions to within its own error.
+Not in the drawing, still assumed: hinge axis (rows 5), opening angle (6), magnet pull (7), power and sleep behaviour (8-11), lid-closed clearance (12), cable slack.

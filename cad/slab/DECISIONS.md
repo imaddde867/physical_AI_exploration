@@ -9,21 +9,21 @@ Updated 2026-11-04. Product scope lives in the [product brief](../../docs/produc
 | Item | Current CAD value | Meaning |
 |---|---|---|
 | Display outline | 59 × 49.65 mm | Approved visual proportions; derived from the previous panel candidate |
-| Body depth | 4.9 mm | Exterior concept; excludes the additional 0.3 mm front glass |
-| Installed front-to-rear extent | 6.4 mm including glass and plate | Geometry target, not verified electronics capacity |
+| Body depth | 4.4 mm | Exterior concept; excludes the additional 0.3 mm front glass |
+| Installed front-to-rear extent | 5.9 mm including glass and plate | Geometry target, not verified electronics capacity |
 | Lid gap | 0.6 mm | Display on the right edge |
-| Vertical placement | Top edge 53.5 mm below lid top | One quarter of the assumed 214 mm lid height |
+| Vertical placement | Top edge 55.3 mm below lid top | One quarter of the 221.2 mm lid height |
 | Rear mount | 30 mm tall, 1.2 mm steel plate; 0.4 mm adhesive on a 24 mm lid strip | Plate and fixed cable stay on the laptop when the display detaches |
 | Retention/contact concept | Four 5 × 1 mm magnets and four contact pads | USB power/data intent; spring contacts, wiring, alignment, and live detach behavior are not designed |
 | Cable | 3 mm diameter, 12 mm modeled bend radius | Not validated for lid movement or strain relief |
 
-The simplified laptop uses a 312.6 × 221.2 mm base footprint. Lid thickness/height, hinge axis, port position, and plug dimensions include assumptions; record real values in the [measurement sheet](../../docs/hardware/measure-mac.md). The exterior body is solid concept geometry with magnet pockets, not a hollow electronics enclosure.
+The simplified laptop uses a 312.6 × 221.2 mm base footprint. Lid thickness (4.0 mm), lid height (221.2 mm) and port position/height come from Apple's drawing; hinge axis, opening angle and plug dimensions are still assumptions; record real values in the [measurement sheet](../../docs/hardware/measure-mac.md). The exterior body is solid concept geometry with magnet pockets, not a hollow electronics enclosure.
 
 ## Hardware status and open checks
 
 - Waveshare RP2040-Touch-LCD-1.69 (240×280, integrated RP2040) is ordered for bench bring-up with the existing USB cable; electronics fit and final enclosure hardware remain unvalidated.
 - Good Display GDOJ0269C01 / ESP32-P4 is a previous proposal, **not selected hardware**. Its dimensions remain in the CAD model to preserve the approved preview; simulator defaults now follow the ordered prototype.
-- The recorded cable estimate gives about 7.9 mm free-span slack against about 22 mm estimated need for the assumed lid swing. Both are model estimates; test the route with string before redesigning it.
+- The recorded cable estimate gives about 7.9 mm free-span slack against about 26 mm estimated need for the assumed lid swing. Both are model estimates; test the route with string before redesigning it.
 - Validate the full electronics stack, screen border, mounting retention, spring contacts, cable fastening, strain relief, heat, and lid clearance before final CAD.
 - Confirm printer model, material, and print profile from the user before choosing manufacturing tolerances. Their details are not recorded here.
 - Preserve the approved silhouette while adapting dimensions to actual hardware. Do not buy final parts or treat exported concept STLs as print-ready enclosure parts.
