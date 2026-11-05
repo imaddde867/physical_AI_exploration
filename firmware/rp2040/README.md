@@ -52,7 +52,9 @@ vendor example, not a measured stable rate on this board.
 ## On arrival
 
 1. Connect the existing USB-C data cable. Check the factory demo if present.
-2. Follow the board wiki's MicroPython setup using its firmware/demo package.
+2. Follow the board wiki's MicroPython setup. The example archive above already contains
+   `Python/RPI_PICO-20240222-v1.22.2.uf2` (MicroPython 1.22.2, sha256
+   `e92c2a25...bba9`): hold BOOT while plugging in, then copy it to the `RPI2-RP2` drive.
    Run the original vendor example from Thonny to establish a working baseline.
    Record the installed MicroPython version; no version has been board-tested here.
 3. In Thonny, copy `waveshare_lcd.py` and our `main.py` to the board's root.
