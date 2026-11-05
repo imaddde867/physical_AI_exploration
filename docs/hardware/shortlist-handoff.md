@@ -34,10 +34,10 @@ Prove the ordered display works before freezing final enclosure CAD or productio
 
 ## Remaining physical checks
 
-Collect [real Mac measurements](measure-mac.md), printer model/material/profile (user says the printer is known, but details are not recorded), and a moving-lid cable-route test. Current cable slack is insufficient under the model's assumptions. Magnetic retention, spring contacts, hot-plug behavior, insulation, strain relief, electronics fit, heat, and enclosure assembly remain unverified.
+Collect [real Mac measurements](measure-mac.md), [printer details](printer.md) (model known; filament material and print profile still open), and a moving-lid cable-route test. Current cable slack is insufficient under the model's assumptions. Magnetic retention, spring contacts, hot-plug behavior, insulation, strain relief, electronics fit, heat, and enclosure assembly remain unverified.
 
 ## Reset and validation
 
 The reset established the product brief, reconciled active and historical docs, and repaired named CAD exports and front/rear renders. It preserved existing simulator/protocol work and design history. The later order establishes the bench prototype, not final enclosure hardware. Generated video transcripts and summaries were removed at the user's request before publication; original videos are not part of the repository.
 
-Pre-PR checks: dependency-free tests pass, local documentation links resolve, and the CAD rebuild/export/render succeeds. Assembly bounds (372.2 × 221.2 × 225 mm), volume, and 16 named parts match the approved preview. These checks establish a reproducible concept only. The reset PR's GitHub checks and merge state must be checked separately.
+Pre-PR checks: dependency-free tests pass, local documentation links resolve, and the CAD rebuild/export/render succeeds. Assembly bounds (372.2 × 221.2 × 232.7 mm), volume, and 16 named parts match the approved preview. These checks establish a reproducible concept only. The reset PR's GitHub checks and merge state must be checked separately.
