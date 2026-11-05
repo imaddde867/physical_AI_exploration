@@ -1,0 +1,233 @@
+{
+  "name": "Crying head 2",
+  "author": "CommunicationNode",
+  "source_url": "https://sketchfab.com/3d-models/crying-head-2-2867ed3cd41243caaf9dd24eeccf6ca5",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "archive_sha256": "a8e431d805fb548eb82295de05531fe06145e4c22501a4b92d75ac6b5c694f88",
+  "source_fps": 24,
+  "vertices": 3322,
+  "bones": 95,
+  "appendage_chains": [
+    {
+      "root": "Virus1.L",
+      "weighted_bones": [
+        "Virus1.L",
+        "Virus1.001.L",
+        "Virus1.002.L",
+        "Virus1.003.L"
+      ],
+      "source_helper_bones": [
+        "Virus1.003.L_end",
+        "Virus1.003.L_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.004.L",
+      "weighted_bones": [
+        "Virus1.004.L",
+        "Virus1.005.L",
+        "Virus1.006.L",
+        "Virus1.007.L",
+        "Virus1.008.L"
+      ],
+      "source_helper_bones": [
+        "Virus1.008.L_end",
+        "Virus1.008.L_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.009.L",
+      "weighted_bones": [
+        "Virus1.009.L",
+        "Virus1.010.L",
+        "Virus1.011.L",
+        "Virus1.012.L"
+      ],
+      "source_helper_bones": [
+        "Virus1.012.L_end",
+        "Virus1.012.L_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.013.L",
+      "weighted_bones": [
+        "Virus1.013.L",
+        "Virus1.014.L",
+        "Virus1.015.L",
+        "Virus1.016.L"
+      ],
+      "source_helper_bones": [
+        "Virus1.016.L_end",
+        "Virus1.016.L_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.017.L",
+      "weighted_bones": [
+        "Virus1.017.L",
+        "Virus1.018.L",
+        "Virus1.019.L",
+        "Virus1.020.L"
+      ],
+      "source_helper_bones": []
+    },
+    {
+      "root": "Virus1.021.L",
+      "weighted_bones": [
+        "Virus1.021.L",
+        "Virus1.022.L",
+        "Virus1.023.L"
+      ],
+      "source_helper_bones": []
+    },
+    {
+      "root": "Virus1.R",
+      "weighted_bones": [
+        "Virus1.R",
+        "Virus1.001.R",
+        "Virus1.002.R",
+        "Virus1.003.R"
+      ],
+      "source_helper_bones": [
+        "Virus1.003.R_end",
+        "Virus1.003.R_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.004.R",
+      "weighted_bones": [
+        "Virus1.004.R",
+        "Virus1.005.R",
+        "Virus1.006.R",
+        "Virus1.007.R",
+        "Virus1.008.R"
+      ],
+      "source_helper_bones": [
+        "Virus1.008.R_end",
+        "Virus1.008.R_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.009.R",
+      "weighted_bones": [
+        "Virus1.009.R",
+        "Virus1.010.R",
+        "Virus1.011.R",
+        "Virus1.012.R"
+      ],
+      "source_helper_bones": [
+        "Virus1.012.R_end",
+        "Virus1.012.R_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.013.R",
+      "weighted_bones": [
+        "Virus1.013.R",
+        "Virus1.014.R",
+        "Virus1.015.R",
+        "Virus1.016.R"
+      ],
+      "source_helper_bones": [
+        "Virus1.016.R_end",
+        "Virus1.016.R_end_end"
+      ]
+    },
+    {
+      "root": "Virus1.017.R",
+      "weighted_bones": [
+        "Virus1.017.R",
+        "Virus1.018.R",
+        "Virus1.019.R",
+        "Virus1.020.R"
+      ],
+      "source_helper_bones": []
+    },
+    {
+      "root": "Virus1.021.R",
+      "weighted_bones": [
+        "Virus1.021.R",
+        "Virus1.022.R",
+        "Virus1.023.R"
+      ],
+      "source_helper_bones": []
+    }
+  ],
+  "face_controls": [
+    "Basic",
+    "Jaw",
+    "Jaw.001"
+  ],
+  "eye_controls": false,
+  "shape_keys": false,
+  "source_constraints": 0,
+  "clips": {
+    "Idle": {
+      "action": "SOURCE | Idle",
+      "frames": [
+        1.0,
+        77.0
+      ]
+    },
+    "move": {
+      "action": "SOURCE | move",
+      "frames": [
+        1.0,
+        20.0
+      ]
+    }
+  },
+  "cameras": [
+    "CAM | Window close-up",
+    "CAM | Full character",
+    "CAM | Three quarter"
+  ],
+  "changes": [
+    "Texture paths repaired and maps packed",
+    "DirectX normal green channel converted in material nodes",
+    "Source concrete plinth hidden",
+    "Bone collections and colors; no bone renaming",
+    "Whole-actor parent and optional look action",
+    "Portrait cameras and black studio lighting",
+    "Upright studio orientation and actor rest rotation; approved third view moved 5% closer",
+    "Separate closed-jaw resting action derived from source Idle; originals unchanged"
+  ],
+  "preserved": [
+    "mesh topology",
+    "skin weights",
+    "bone hierarchy",
+    "source animation keyframes"
+  ],
+  "main_shot": {
+    "camera": "CAM | Window close-up",
+    "comparison": "framing C2",
+    "source_view_angle_degrees": 75,
+    "distance_percent": 95,
+    "studio_orientation": "upright actor, eye-level camera",
+    "layout_comparison": "C3",
+    "camera_roll_correction_degrees": 16,
+    "additional_distance_percent": 90,
+    "centering": "closed face bounds"
+  },
+  "default_rest": {
+    "action": "DERIVED | Watch rest",
+    "frames": [
+      1,
+      77
+    ],
+    "mouth_comparison": "C3",
+    "jaw_location": [
+      0,
+      0,
+      0
+    ],
+    "jaw_quaternion": [
+      1,
+      0,
+      0,
+      0
+    ],
+    "preserved_motion": "All SOURCE Idle channels except Jaw location/rotation"
+  }
+}

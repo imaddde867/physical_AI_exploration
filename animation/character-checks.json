@@ -1,0 +1,35 @@
+{
+  "source_geometry_weights_bones_and_keys_preserved": true,
+  "used_material_textures_packed": true,
+  "clips": {
+    "Idle": {
+      "frames": 77,
+      "max_midclip_displacement": 0.44395882249877106,
+      "endpoint_max_distance": 0.0
+    },
+    "move": {
+      "frames": 20,
+      "max_midclip_displacement": 3.8156487329043314,
+      "endpoint_max_distance": 0.0
+    },
+    "Watch rest": {
+      "frames": 77,
+      "max_midclip_displacement": 0.44395882249877106,
+      "endpoint_max_distance": 0.0
+    }
+  },
+  "appendage_controls": {
+    "Virus1.L": 0.11676621509096874,
+    "Virus1.004.L": 0.18597341405260265,
+    "Virus1.009.L": 0.17124190284823343,
+    "Virus1.013.L": 0.15070492086087026,
+    "Virus1.017.L": 0.06864976003079885,
+    "Virus1.021.L": 0.05908042978449249,
+    "Virus1.R": 0.11677838277984573,
+    "Virus1.004.R": 0.1859792978425712,
+    "Virus1.009.R": 0.17125170503132126,
+    "Virus1.013.R": 0.15071643488769057,
+    "Virus1.017.R": 0.06864829358394255,
+    "Virus1.021.R": 0.05907418212692108
+  }
+}

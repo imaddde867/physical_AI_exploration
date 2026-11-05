@@ -11,3 +11,6 @@ __pycache__/
 *.gcode
 .gitnexus
 firmware/rp2040/waveshare_lcd.py
+animation/tmp/
+animation/vendor/
+*.blend1

@@ -1,0 +1,570 @@
+[
+  {
+    "grid": "framing",
+    "index": 0,
+    "label": "A1",
+    "angle_degrees": 60,
+    "distance_percent": 100
+  },
+  {
+    "grid": "framing",
+    "index": 1,
+    "label": "A2",
+    "angle_degrees": 60,
+    "distance_percent": 95
+  },
+  {
+    "grid": "framing",
+    "index": 2,
+    "label": "A3",
+    "angle_degrees": 60,
+    "distance_percent": 90
+  },
+  {
+    "grid": "framing",
+    "index": 3,
+    "label": "A4",
+    "angle_degrees": 60,
+    "distance_percent": 85
+  },
+  {
+    "grid": "framing",
+    "index": 4,
+    "label": "B1",
+    "angle_degrees": 70,
+    "distance_percent": 100
+  },
+  {
+    "grid": "framing",
+    "index": 5,
+    "label": "B2",
+    "angle_degrees": 70,
+    "distance_percent": 95
+  },
+  {
+    "grid": "framing",
+    "index": 6,
+    "label": "B3",
+    "angle_degrees": 70,
+    "distance_percent": 90
+  },
+  {
+    "grid": "framing",
+    "index": 7,
+    "label": "B4",
+    "angle_degrees": 70,
+    "distance_percent": 85
+  },
+  {
+    "grid": "framing",
+    "index": 8,
+    "label": "C1",
+    "angle_degrees": 75,
+    "distance_percent": 100
+  },
+  {
+    "grid": "framing",
+    "index": 9,
+    "label": "C2",
+    "angle_degrees": 75,
+    "distance_percent": 95
+  },
+  {
+    "grid": "framing",
+    "index": 10,
+    "label": "C3",
+    "angle_degrees": 75,
+    "distance_percent": 90
+  },
+  {
+    "grid": "framing",
+    "index": 11,
+    "label": "C4",
+    "angle_degrees": 75,
+    "distance_percent": 85
+  },
+  {
+    "grid": "framing",
+    "index": 12,
+    "label": "D1",
+    "angle_degrees": 80,
+    "distance_percent": 100
+  },
+  {
+    "grid": "framing",
+    "index": 13,
+    "label": "D2",
+    "angle_degrees": 80,
+    "distance_percent": 95
+  },
+  {
+    "grid": "framing",
+    "index": 14,
+    "label": "D3",
+    "angle_degrees": 80,
+    "distance_percent": 90
+  },
+  {
+    "grid": "framing",
+    "index": 15,
+    "label": "D4",
+    "angle_degrees": 80,
+    "distance_percent": 85
+  },
+  {
+    "grid": "presence",
+    "index": 0,
+    "label": "A1",
+    "lighting": "Soft",
+    "frame": 1
+  },
+  {
+    "grid": "presence",
+    "index": 1,
+    "label": "A2",
+    "lighting": "Soft",
+    "frame": 20
+  },
+  {
+    "grid": "presence",
+    "index": 2,
+    "label": "A3",
+    "lighting": "Soft",
+    "frame": 39
+  },
+  {
+    "grid": "presence",
+    "index": 3,
+    "label": "A4",
+    "lighting": "Soft",
+    "frame": 58
+  },
+  {
+    "grid": "presence",
+    "index": 4,
+    "label": "B1",
+    "lighting": "Side",
+    "frame": 1
+  },
+  {
+    "grid": "presence",
+    "index": 5,
+    "label": "B2",
+    "lighting": "Side",
+    "frame": 20
+  },
+  {
+    "grid": "presence",
+    "index": 6,
+    "label": "B3",
+    "lighting": "Side",
+    "frame": 39
+  },
+  {
+    "grid": "presence",
+    "index": 7,
+    "label": "B4",
+    "lighting": "Side",
+    "frame": 58
+  },
+  {
+    "grid": "presence",
+    "index": 8,
+    "label": "C1",
+    "lighting": "Dark",
+    "frame": 1
+  },
+  {
+    "grid": "presence",
+    "index": 9,
+    "label": "C2",
+    "lighting": "Dark",
+    "frame": 20
+  },
+  {
+    "grid": "presence",
+    "index": 10,
+    "label": "C3",
+    "lighting": "Dark",
+    "frame": 39
+  },
+  {
+    "grid": "presence",
+    "index": 11,
+    "label": "C4",
+    "lighting": "Dark",
+    "frame": 58
+  },
+  {
+    "grid": "mouth",
+    "index": 0,
+    "label": "A1",
+    "pitch": 44,
+    "row": "Source offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 1,
+    "label": "A2",
+    "pitch": 20,
+    "row": "Source offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 2,
+    "label": "A3",
+    "pitch": 0,
+    "row": "Source offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 3,
+    "label": "A4",
+    "pitch": -20,
+    "row": "Source offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 4,
+    "label": "B1",
+    "pitch": 44,
+    "row": "Zero offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 5,
+    "label": "B2",
+    "pitch": 20,
+    "row": "Zero offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 6,
+    "label": "B3",
+    "pitch": 0,
+    "row": "Zero offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 7,
+    "label": "B4",
+    "pitch": -20,
+    "row": "Zero offset"
+  },
+  {
+    "grid": "mouth",
+    "index": 8,
+    "label": "C1",
+    "pitch": 44,
+    "row": "Neutral axes"
+  },
+  {
+    "grid": "mouth",
+    "index": 9,
+    "label": "C2",
+    "pitch": 20,
+    "row": "Neutral axes"
+  },
+  {
+    "grid": "mouth",
+    "index": 10,
+    "label": "C3",
+    "pitch": 0,
+    "row": "Neutral axes"
+  },
+  {
+    "grid": "mouth",
+    "index": 11,
+    "label": "C4",
+    "pitch": -20,
+    "row": "Neutral axes"
+  },
+  {
+    "grid": "layout",
+    "index": 0,
+    "label": "A1",
+    "roll_degrees": 0,
+    "distance_percent": 100,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 1,
+    "label": "A2",
+    "roll_degrees": 0,
+    "distance_percent": 95,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 2,
+    "label": "A3",
+    "roll_degrees": 0,
+    "distance_percent": 90,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 3,
+    "label": "A4",
+    "roll_degrees": 0,
+    "distance_percent": 85,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 4,
+    "label": "B1",
+    "roll_degrees": 8,
+    "distance_percent": 100,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 5,
+    "label": "B2",
+    "roll_degrees": 8,
+    "distance_percent": 95,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 6,
+    "label": "B3",
+    "roll_degrees": 8,
+    "distance_percent": 90,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 7,
+    "label": "B4",
+    "roll_degrees": 8,
+    "distance_percent": 85,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 8,
+    "label": "C1",
+    "roll_degrees": 16,
+    "distance_percent": 100,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 9,
+    "label": "C2",
+    "roll_degrees": 16,
+    "distance_percent": 95,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 10,
+    "label": "C3",
+    "roll_degrees": 16,
+    "distance_percent": 90,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 11,
+    "label": "C4",
+    "roll_degrees": 16,
+    "distance_percent": 85,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 12,
+    "label": "D1",
+    "roll_degrees": 24,
+    "distance_percent": 100,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 13,
+    "label": "D2",
+    "roll_degrees": 24,
+    "distance_percent": 95,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 14,
+    "label": "D3",
+    "roll_degrees": 24,
+    "distance_percent": 90,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  },
+  {
+    "grid": "layout",
+    "index": 15,
+    "label": "D4",
+    "roll_degrees": 24,
+    "distance_percent": 85,
+    "target": [
+      -0.3106304407119751,
+      0.8083145618438721,
+      1.440804123878479
+    ],
+    "distance": 3.5435350108523576,
+    "direction": [
+      0.0,
+      -1.0,
+      8.940696716308594e-08
+    ]
+  }
+]
