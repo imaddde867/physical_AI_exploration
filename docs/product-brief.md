@@ -43,7 +43,7 @@ Render the face locally from small commands; do not stream desktop frames. Start
 
 1. Wait for delivery. Meanwhile read the Waveshare wiki for the RP2040-Touch-LCD-1.69 (driver setup, pinout, MicroPython/C demos).
 2. Run Waveshare's demo, then a blink, then one Mac serial command over the 50 cm USB-C cable. Do not freeze final CAD from board width and height alone.
-3. Prove the display works on the bench. In parallel, collect the [real Mac measurements](hardware/measure-mac.md), printer model/profile/material, and a physical cable-route test. The user says the printer is known; its details were not found in the reviewed repository.
+3. Prove the display works on the bench. In parallel, collect the [real Mac measurements](hardware/measure-mac.md), [printer filament/profile](hardware/printer.md) (model recorded), and a physical cable-route test.
 4. Adapt the enclosure and mount around actual hardware, then print a fit prototype. Check lid movement, magnet retention, contacts, assembly access, and strain relief before final print files.
 
 The current cable route has a documented slack shortfall; do not treat the rendered bend as validated. The current body is an exterior concept, not a hollow, ready-to-print electronics enclosure. See [CAD decisions](../cad/slab/DECISIONS.md).

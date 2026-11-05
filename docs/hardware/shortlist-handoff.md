@@ -34,7 +34,7 @@ Prove the ordered display works before freezing final enclosure CAD or productio
 
 ## Remaining physical checks
 
-Collect [real Mac measurements](measure-mac.md), printer model/material/profile (user says the printer is known, but details are not recorded), and a moving-lid cable-route test. Current cable slack is insufficient under the model's assumptions. Magnetic retention, spring contacts, hot-plug behavior, insulation, strain relief, electronics fit, heat, and enclosure assembly remain unverified.
+Collect [real Mac measurements](measure-mac.md), [printer details](printer.md) (model known; filament material and print profile still open), and a moving-lid cable-route test. Current cable slack is insufficient under the model's assumptions. Magnetic retention, spring contacts, hot-plug behavior, insulation, strain relief, electronics fit, heat, and enclosure assembly remain unverified.
 
 ## Reset and validation
 
