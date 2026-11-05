@@ -1,6 +1,7 @@
 #ifndef BUDDY_FIRST_LIGHT_CORE_H
 #define BUDDY_FIRST_LIGHT_CORE_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -17,10 +18,14 @@ typedef enum {
     BUDDY_WAKE,
 } buddy_command_t;
 
-static inline buddy_command_t buddy_parse(const char *line) {
-    if (strcmp(line, "{\"v\":1,\"t\":\"ping\"}") == 0) return BUDDY_PING;
-    if (strcmp(line, "{\"v\":1,\"t\":\"sleep\"}") == 0) return BUDDY_SLEEP;
-    if (strcmp(line, "{\"v\":1,\"t\":\"wake\"}") == 0) return BUDDY_WAKE;
+static inline buddy_command_t buddy_parse(const char *line, size_t length) {
+    static const char ping[] = "{\"v\":1,\"t\":\"ping\"}";
+    static const char sleep[] = "{\"v\":1,\"t\":\"sleep\"}";
+    static const char wake[] = "{\"v\":1,\"t\":\"wake\"}";
+    /* Match every received byte; strcmp would ignore data after an embedded NUL. */
+    if (length == sizeof(ping) - 1u && memcmp(line, ping, length) == 0) return BUDDY_PING;
+    if (length == sizeof(sleep) - 1u && memcmp(line, sleep, length) == 0) return BUDDY_SLEEP;
+    if (length == sizeof(wake) - 1u && memcmp(line, wake, length) == 0) return BUDDY_WAKE;
     return BUDDY_UNSUPPORTED;
 }
 
