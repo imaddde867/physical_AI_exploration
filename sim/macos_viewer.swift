@@ -35,7 +35,8 @@ final class Viewer: NSObject, NSApplicationDelegate, NSWindowDelegate {
         } ?? NSScreen.main!
         window = NSWindow(contentRect: .zero, styleMask: [.titled, .closable, .miniaturizable],
                           backing: .buffered, defer: false, screen: screen)
-        window.title = "MacDesk Buddy · 240×280"
+        let appName = CommandLine.arguments.count > 6 ? CommandLine.arguments[6] : "MacDesk Buddy"
+        window.title = "\(appName) · 240×280"
         window.delegate = self
         window.contentView!.addSubview(panel)
         window.contentView!.addSubview(status)
@@ -103,6 +104,7 @@ final class Viewer: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 self.panel.image = image
                 self.panel.needsDisplay = true
                 self.panel.displayIfNeeded()
+                self.status.stringValue = String(format: "LIVE %d · %.1f mm", renderedFrames + 1, self.widthMM)
             }
             renderedFrames += 1
         }

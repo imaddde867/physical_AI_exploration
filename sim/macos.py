@@ -17,7 +17,8 @@ def run(app, args) -> int:
         print("The Retina viewer needs Apple's Swift tools (xcode-select --install).", file=sys.stderr)
         return 2
     command = ["swift", str(Path(__file__).with_name("macos_viewer.swift")),
-               str(WIDTH), str(HEIGHT), str(args.width_mm), str(args.ppi or 0), str(args.scale)]
+               str(WIDTH), str(HEIGHT), str(args.width_mm), str(args.ppi or 0), str(args.scale),
+               Path(args.app).stem]
     screen = Screen()
     with subprocess.Popen(command, stdin=subprocess.PIPE) as viewer:
         try:

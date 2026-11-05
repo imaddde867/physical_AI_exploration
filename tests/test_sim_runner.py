@@ -70,7 +70,8 @@ class SimRunnerTests(unittest.TestCase):
         from types import SimpleNamespace
         from unittest.mock import Mock, patch
         from sim.macos import run
-        args = SimpleNamespace(width_mm=27.972, ppi=None, scale=0, fps=30, frames=1)
+        args = SimpleNamespace(app="experiments/hello_buddy.py", width_mm=27.972,
+                               ppi=None, scale=0, fps=30, frames=1)
         for error in (ValueError("bad app"), BrokenPipeError("app I/O failed")):
             app = Mock()
             app.update.side_effect = error
@@ -81,6 +82,7 @@ class SimRunnerTests(unittest.TestCase):
                 stderr = io.StringIO()
                 with contextlib.redirect_stderr(stderr):
                     self.assertEqual(run(app, args), 3)
+                self.assertEqual(process.call_args.args[0][-1], "hello_buddy")
                 self.assertIn("mini-app raised", stderr.getvalue())
                 viewer.terminate.assert_called_once()
 
