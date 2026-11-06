@@ -95,7 +95,7 @@ def main():
     q = camera.rotation_euler.to_quaternion()
     right, up, toward = (q @ Vector(axis) for axis in ((1, 0, 0), (0, 1, 0), (0, 0, 1)))
     # Use the selected, recentered camera from the direct-attention study.
-    study = json.loads((HERE / 'tmp/idle-polish/grid.json').read_text())
+    study = json.loads((HERE / 'idle-view-study.json').read_text())
     choice = next(item for item in study if item['label'] == 'A2')
     camera.location = choice['location']
     camera.rotation_euler = choice['rotation']
@@ -161,6 +161,7 @@ def main():
     scene['state_idle_period_frames'] = 192
     scene.render.filepath = '//tmp/frames/'
     bpy.ops.wm.save_as_mainfile(filepath=str(output), compress=True)
+    (HERE/'tmp').mkdir(exist_ok=True)
     (HERE/'tmp/state-catalog.json').write_text(json.dumps(catalog, indent=2)+'\n')
     print('Saved eight native Action assets:', output)
 

@@ -20,7 +20,7 @@ Begin with ordinary USB power/data and an optional simple desk holder. Thin pack
 
 ## Bring-up and later enclosure research
 
-Run Waveshare's demo on delivery, then a blink, then one Mac serial command over the existing USB cable. Follow the [device renderer plan](../product-brief.md#device-renderer-plan): one packed RGB565 framebuffer, with runtime memory measured on the board. Firmware and transport still need implementation.
+Run Waveshare's demo on delivery, then a blink, then one Mac serial command over the existing USB cable. Follow the [device renderer plan](../product-brief.md#device-renderer-plan): one packed RGB565 framebuffer, with runtime memory measured on the board. The [local blink prototype and setup instructions](../../firmware/rp2040/README.md) are prepared. A host line-transport helper exists in `daemon/link.py`; device commands and end-to-end USB integration still need implementation.
 
 The broad display shortlist is paused. Revisit alternatives only if prototype evidence requires them or later enclosure work needs a thinner route. Compare:
 

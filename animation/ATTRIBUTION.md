@@ -19,3 +19,6 @@ and original Idle/move keyframes are preserved.
 Keep this credit, source link, license link, and change description with shared
 character assets. The source listing requires attribution and ShareAlike for
 modified versions. See the linked license for its terms.
+
+Further changes: native world-space contact controls, non-stretch IK for planted
+claws, controlled scratch release/regrip and reach-limited backward head motion.

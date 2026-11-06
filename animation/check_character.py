@@ -30,7 +30,10 @@ def main():
     assert scene.render.fps == 24
     assert (scene.render.resolution_x, scene.render.resolution_y) == (240, 280)
     assert scene.camera.name == "CAM | Window close-up"
-    assert rig.animation_data.action.name in {"DERIVED | Watch rest", "STATE | watch", "POLISH | watch"}
+    assert rig.animation_data.action.name in {"DERIVED | Watch rest", "STATE | watch", "POLISH | watch", "ANCHORED | watch"}
+    if 'contacts_enabled' in rig:
+        rig['contacts_enabled'] = False  # Check the preserved source FK independently of the contact layer.
+        bpy.context.view_layer.update()
     assert mesh.data.shape_keys is None
     for material in mesh.data.materials:
         for node in material.node_tree.nodes:

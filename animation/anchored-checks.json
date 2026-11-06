@@ -1,0 +1,42 @@
+{
+  "watch": {
+    "max_motion": 0.03330932275103523,
+    "max_bone_length_error": 6.953034504819655e-07,
+    "idle_boundary_error": 0.0
+  },
+  "look_left": {
+    "max_motion": 0.33532244078751605,
+    "max_bone_length_error": 7.89119340149913e-07,
+    "idle_boundary_error": 1.3437509915346499e-06
+  },
+  "look_right": {
+    "max_motion": 0.32755293357550685,
+    "max_bone_length_error": 8.123631164425049e-07,
+    "idle_boundary_error": 1.311640804092013e-06
+  },
+  "look_around": {
+    "max_motion": 0.3080051367576354,
+    "max_bone_length_error": 8.244252313605038e-07,
+    "idle_boundary_error": 1.228781230931777e-06
+  },
+  "lean_back": {
+    "max_motion": 0.20039299293483595,
+    "max_bone_length_error": 9.93053109188402e-07,
+    "idle_boundary_error": 8.925783116741143e-07
+  },
+  "lean_in": {
+    "max_motion": 0.14587071317244682,
+    "max_bone_length_error": 8.717892802101446e-07,
+    "idle_boundary_error": 1.311640804092013e-06
+  },
+  "shift": {
+    "max_motion": 0.08793613494033076,
+    "max_bone_length_error": 8.388828358629752e-07,
+    "idle_boundary_error": 0.0
+  },
+  "scratch": {
+    "max_motion": 1.851184065891943,
+    "max_bone_length_error": 7.89119340149913e-07,
+    "idle_boundary_error": 0.0
+  }
+}

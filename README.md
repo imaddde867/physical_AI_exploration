@@ -4,15 +4,17 @@ A slim display companion beside a 14" MacBook Pro lid, with silver framing and b
 
 Start with the [current product brief](docs/product-brief.md): approved direction, first-version scope, open decisions, and next steps. The physical appearance was approved on 2026-11-04; electronics fit and print readiness remain unresolved. The ordered bench prototype is the Waveshare RP2040-Touch-LCD-1.69; final enclosure hardware is not frozen.
 
-Next session: [ordered prototype bring-up handoff](docs/hardware/shortlist-handoff.md).
+Current character: [planted 3D character and animation handoff](animation/README.md).
+Hardware next step: [ordered prototype bring-up](docs/hardware/shortlist-handoff.md).
 
 | Area | Current entry point | Status |
 |---|---|---|
 | Physical design | [CAD decisions and commands](cad/slab/DECISIONS.md) | Approved appearance; concept geometry |
-| Face experiments | `sim/` and `experiments/hello_buddy.py` | Runnable simulator; placeholder face |
+| Character | [Blender library](animation/README.md) | Eight validated states, planted claw contacts, 30 FPS exports |
+| Earlier face experiments | `sim/` and `experiments/occupant_idle.py` | Approved 2D checkpoint retained |
 | Hardware | [Bring-up log](docs/hardware/bringup-log.md), [Mac measurements](docs/hardware/measure-mac.md) | Waveshare RP2040-Touch-LCD-1.69 ordered; no recorded first light |
 | Device prototype | [Local blink setup](firmware/rp2040/README.md) | Prepared MicroPython blink; hardware validation awaits delivery |
-| Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec and watchdog tests; no running daemon or serial transport |
+| Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec, watchdog, and host line-transport helper tested; no running service or device command handler |
 
 Older simulator plans in `docs/superpowers/`, the [November 1 slab record](docs/archive/2026-11-01-slab-decisions.md), and `cad/slab/src/scale_compare.py` are historical references. The removed 1.64" pod work remains in git history.
 

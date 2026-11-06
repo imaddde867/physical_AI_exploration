@@ -213,7 +213,7 @@
     "idle_view_study": "A2: recentered, yaw -8 degrees, pitch 0"
   },
   "default_rest": {
-    "action": "STATE | watch",
+    "action": "ANCHORED | watch",
     "frames": [
       1,
       193
@@ -235,8 +235,12 @@
     "motion_amplitude": {
       "head": 0.18,
       "other_bones": 0.12
-    }
+    },
+    "contact_mode": "eight fixed supports; four short appendages free"
   },
   "approved_checkpoint": "f44e690",
-  "states": "states.json"
+  "states": "anchored-states.json",
+  "current_scene": "crying-head-2-anchored.blend",
+  "approved_polish_checkpoint": "f1ec032",
+  "contact_map": "contacts.json"
 }

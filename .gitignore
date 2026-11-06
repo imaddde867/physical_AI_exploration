@@ -14,3 +14,7 @@ firmware/rp2040/waveshare_lcd.py
 animation/tmp/
 animation/vendor/
 *.blend1
+
+.local-archive/
+
+.claude/

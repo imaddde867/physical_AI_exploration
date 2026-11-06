@@ -1,0 +1,42 @@
+{
+  "watch": {
+    "max_world_tip_drift": 3.3207865422210978e-06,
+    "max_projected_tip_drift_pixels": 0.000396436761100473,
+    "max_joint_gap": 1.3576421713701607e-06
+  },
+  "look_left": {
+    "max_world_tip_drift": 3.523360579354411e-06,
+    "max_projected_tip_drift_pixels": 0.00042374165655210293,
+    "max_joint_gap": 2.3960770657350755e-06
+  },
+  "look_right": {
+    "max_world_tip_drift": 3.3207865422210978e-06,
+    "max_projected_tip_drift_pixels": 0.000369171750084799,
+    "max_joint_gap": 1.4939853977554182e-06
+  },
+  "look_around": {
+    "max_world_tip_drift": 3.68441568864002e-06,
+    "max_projected_tip_drift_pixels": 0.00044737802683455136,
+    "max_joint_gap": 1.4441831511483642e-06
+  },
+  "lean_back": {
+    "max_world_tip_drift": 4.099417504859205e-06,
+    "max_projected_tip_drift_pixels": 0.00047717231654227817,
+    "max_joint_gap": 2.3503359274857096e-05
+  },
+  "lean_in": {
+    "max_world_tip_drift": 3.305774837461006e-06,
+    "max_projected_tip_drift_pixels": 0.00037787652504270454,
+    "max_joint_gap": 1.4067201282031473e-06
+  },
+  "shift": {
+    "max_world_tip_drift": 3.6763311891853276e-06,
+    "max_projected_tip_drift_pixels": 0.0004041476225837748,
+    "max_joint_gap": 1.4196826683820963e-06
+  },
+  "scratch": {
+    "max_world_tip_drift": 3.420003159213592e-06,
+    "max_projected_tip_drift_pixels": 0.0003610447730290593,
+    "max_joint_gap": 1.3576421713701607e-06
+  }
+}
