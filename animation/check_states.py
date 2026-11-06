@@ -58,7 +58,8 @@ def main():
     # Calm head travel should be smaller than the clearly intentional gestures.
     assert report['lean_back']['max_motion'] > 3 * report['watch']['max_motion']
     assert report['look_left']['max_motion'] > 3 * report['watch']['max_motion']
-    (HERE/'state-checks.json').write_text(json.dumps(report, indent=2)+'\n')
+    filename = 'polish-checks.json' if catalog['watch']['action'].startswith('POLISH |') else 'state-checks.json'
+    (HERE/filename).write_text(json.dumps(report, indent=2)+'\n')
     print('PASS: eight moving states, shared idle boundaries, closed jaw, unstretched bones')
 
 

@@ -120,11 +120,11 @@ From the repository root:
 /Applications/Blender.app/Contents/MacOS/Blender \
   -b animation/crying-head-2-master.blend --python-exit-code 1 \
   --python animation/render_character.py -- \
-  --clip look --camera window --output animation/tmp/new-look
+  --clip look --camera window --fps 30 --output animation/tmp/new-look
 ```
 
 Options: `--clip watch|look_left|look_right|look_around|lean_back|lean_in|shift|scratch`
-(default `watch`), `--camera window|full|quarter`, `--fps 12|24`,
+(default `watch`), `--camera window|full|quarter`, `--fps 12|15|20|24|25|30|60` (default 30),
 `--size 1..8` (multiples of 240 × 280). The output folder must be new to prevent
 mixing sequences. Rendering does not save changes back to the master. Playback FPS
 is recorded in `render.json`. Legacy `rest`, `idle`, `move`, and `look` names
@@ -132,7 +132,7 @@ remain supported; `idle` and `move` refer to the original source demo. Encode
 using the recorded FPS:
 
 ```sh
-ffmpeg -framerate 12 -pattern_type glob \
+ffmpeg -framerate 30 -pattern_type glob \
   -i 'animation/tmp/new-look/frame-*.png' \
   -c:v libx264 -pix_fmt yuv420p animation/tmp/new-look.mp4
 ```
@@ -145,6 +145,30 @@ The calmer idle now refines the frontal direction with camera study A2. Behavior
 previews are in `tmp/state-previews/`.
 
 ## Verification and limits
+
+### Higher-FPS motion-polish candidate
+
+The approved master is pushed at `f56683c`. **`crying-head-2-polish.blend` is a
+separate review candidate**, retaining the original `STATE` actions alongside
+new `POLISH` actions. It adds asymmetric holds/returns, restrained anticipation
+and settling, subtle breathing variation and 110 ms of claw follow-through.
+The resting expression, camera, geometry and skin weights remain unchanged.
+
+`polish_states.py` authors this take from the saved actions; it does not rebuild
+the character. `polish-states.json` and `polish-checks.json` describe and verify it.
+The same renderer works with either blend file.
+
+Exports evaluate real Blender subframes at their requested cadence, rather than
+duplicating frames or changing animation speed. The eight-second states produce
+192 frames at 24 FPS or 240 at 30 FPS, excluding the repeated endpoint. Higher export
+FPS is not evidence of supported device playback. See the
+[display frame-rate decision](../docs/hardware/display-frame-rate.md).
+
+New PNG frame names are consecutive output indices, not source-frame numbers.
+`render.json` records source and playback duration, cadence and resolution.
+Cycles render data is cached between frames to avoid reloading this small scene.
+The higher-FPS comparisons are in `tmp/polish-preview/`; polished clips are in
+`tmp/polish-final/`.
 
 ```sh
 /Applications/Blender.app/Contents/MacOS/Blender \

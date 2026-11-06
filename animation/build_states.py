@@ -37,6 +37,34 @@ def pose_values(rig):
             for b in rig.pose.bones}
 
 
+def bake_action(rig, name, description, samples, frames):
+    action = bpy.data.actions.new(name)
+    slot = action.slots.new(rig.id_type, rig.name)
+    strip = action.layers.new('Baked native pose').strips.new(type='KEYFRAME')
+    bag = strip.channelbag(slot, ensure=True)
+    for name, values in samples.items():
+        # Match quaternion hemispheres to prevent interpolation flips.
+        for previous, current in zip(values, values[1:]):
+            if previous[1].dot(current[1]) < 0: current[1].negate()
+        for kind, index, width in (('location', 0, 3), ('rotation_quaternion', 1, 4), ('scale', 2, 3)):
+            for axis in range(width):
+                ys = [value[index][axis] for value in values]
+                constant = max(ys)-min(ys) < 1e-7
+                points = [(frames[0], ys[0]), (frames[-1], ys[-1])] if constant else list(zip(frames, ys))
+                curve = bag.fcurves.new(data_path=f'pose.bones["{name}"].{kind}', index=axis)
+                curve.keyframe_points.add(len(points))
+                curve.keyframe_points.foreach_set('co', [n for point in points for n in point])
+                for key in curve.keyframe_points:
+                    key.interpolation = 'BEZIER'
+                    key.handle_left_type = key.handle_right_type = 'AUTO_CLAMPED'
+                curve.update()
+    action.use_fake_user = True
+    action.asset_mark()
+    action.asset_data.author = 'MacDesk Buddy; source character CommunicationNode'
+    action.asset_data.description = description + '. Starts and ends on the shared calm-idle pose. CC BY-SA 4.0 source.'
+    return action
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -119,30 +147,7 @@ def main():
             bpy.context.view_layer.update()
             for name, value in pose_values(rig).items():
                 samples[name].append(value)
-        action = bpy.data.actions.new('STATE | ' + state)
-        slot = action.slots.new(rig.id_type, rig.name)
-        strip = action.layers.new('Baked native pose').strips.new(type='KEYFRAME')
-        bag = strip.channelbag(slot, ensure=True)
-        for name, values in samples.items():
-            # Match quaternion hemispheres to prevent interpolation flips.
-            for previous, current in zip(values, values[1:]):
-                if previous[1].dot(current[1]) < 0: current[1].negate()
-            for kind, index, width in (('location', 0, 3), ('rotation_quaternion', 1, 4), ('scale', 2, 3)):
-                for axis in range(width):
-                    ys = [value[index][axis] for value in values]
-                    constant = max(ys)-min(ys) < 1e-7
-                    points = [(FRAMES[0], ys[0]), (FRAMES[-1], ys[-1])] if constant else list(zip(FRAMES, ys))
-                    curve = bag.fcurves.new(data_path=f'pose.bones["{name}"].{kind}', index=axis)
-                    curve.keyframe_points.add(len(points))
-                    curve.keyframe_points.foreach_set('co', [n for point in points for n in point])
-                    for key in curve.keyframe_points:
-                        key.interpolation = 'BEZIER'
-                        key.handle_left_type = key.handle_right_type = 'AUTO_CLAMPED'
-                    curve.update()
-        action.use_fake_user = True
-        action.asset_mark()
-        action.asset_data.author = 'MacDesk Buddy; source character CommunicationNode'
-        action.asset_data.description = description + '. Starts and ends on the shared calm-idle pose. CC BY-SA 4.0 source.'
+        action = bake_action(rig, 'STATE | ' + state, description, samples, FRAMES)
         catalog[state] = {'action': action.name, 'frames': [1, 193], 'fps': 24,
                           'seconds': 8, 'loop': state == 'watch', 'description': description}
     idle = bpy.data.actions['STATE | watch']

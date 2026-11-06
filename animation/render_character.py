@@ -1,10 +1,14 @@
 """Render the saved character; run with Blender --background --python this_file -- ..."""
 import argparse
 import json
+import math
 from pathlib import Path
 import sys
 
 import bpy
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from frame_timing import frame_times
 
 
 def select_clip(clip):
@@ -48,7 +52,7 @@ def main():
                         "lean_back", "lean_in", "shift", "scratch", "rest", "idle", "move", "look"),
                         default="watch")
     parser.add_argument("--camera", choices=("window", "full", "quarter"), default="window")
-    parser.add_argument("--fps", type=int, choices=(12, 24), default=12)
+    parser.add_argument("--fps", type=int, choices=(12, 15, 20, 24, 25, 30, 60), default=30)
     parser.add_argument("--size", type=int, default=1, help="Integer multiple of 240 x 280")
     parser.add_argument("--output", type=Path, required=True, help="New output folder")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
@@ -61,32 +65,33 @@ def main():
     rig = bpy.data.objects["Crying head 2 | source rig"]
     assert len(rig.data.bones) == 95
     select_clip(args.clip)
-    # Both original clips and the derived turn have matching endpoint poses.
-    # Drop that repeated endpoint when the source interval divides into output frames.
-    if (scene.frame_end - scene.frame_start) % (24 // args.fps) == 0:
-        scene.frame_end -= 1
+    times = frame_times(scene.frame_start, scene.frame_end, 24, args.fps)
     scene.camera = bpy.data.objects[{
         "window": "CAM | Window close-up",
         "full": "CAM | Full character",
         "quarter": "CAM | Three quarter",
     }[args.camera]]
-    # Keep source time at 24 FPS; sampling every second frame produces 12 FPS playback.
+    # Evaluate real Blender subframes; 30 FPS must not become slower 24 FPS motion.
     scene.render.fps = 24
     scene.render.fps_base = 1
-    scene.frame_step = 24 // args.fps
     scene.render.resolution_x = 240 * args.size
     scene.render.resolution_y = 280 * args.size
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
-    scene.render.filepath = str(output / "frame-")
-    scene.frame_set(scene.frame_start)
-    bpy.ops.render.render(animation=True)
+    scene.render.use_persistent_data = True
+    for index, source_time in enumerate(times, 1):
+        frame = math.floor(source_time)
+        scene.frame_set(frame, subframe=source_time-frame)
+        scene.render.filepath = str(output / f"frame-{index:04d}.png")
+        bpy.ops.render.render(write_still=True)
     frames = sorted(output.glob("frame-*.png"))
-    expected = len(range(scene.frame_start, scene.frame_end + 1, scene.frame_step))
+    expected = len(times)
     assert len(frames) == expected and all(p.stat().st_size for p in frames)
     (output / "render.json").write_text(json.dumps({
         "clip": args.clip, "camera": args.camera, "playback_fps": args.fps,
-        "source_fps": 24, "frame_step": scene.frame_step, "frames": len(frames),
+        "source_fps": 24, "frame_step": 24 / args.fps, "frames": len(frames),
+        "source_duration_seconds": (scene.frame_end-scene.frame_start)/24,
+        "playback_duration_seconds": len(frames)/args.fps,
         "resolution": [scene.render.resolution_x, scene.render.resolution_y],
         "blend": bpy.data.filepath,
     }, indent=2) + "\n")
