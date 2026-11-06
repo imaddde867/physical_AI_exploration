@@ -1,6 +1,7 @@
 # Crying head 2 — reusable character foundation
 
 Prepared 2026-11-06. Open **`crying-head-2-master.blend`** for everyday work.
+Approved pre-behavior checkpoint: **`f44e690`**.
 The main shot is a face looking toward the viewer through the 240 × 280 screen,
 with original claws around the edges. No wall or generated anatomy is used.
 The previous Occupant checkpoints remain separate.
@@ -49,15 +50,51 @@ Duplicate a source action before editing it. No new anatomy has been added.
 | `DERIVED | Watch rest` | 1–77 | Closed-mouth watching; other original idle movement retained |
 | `DERIVED | Look around` | 1–229 | Whole-character turns over three repeated resting cycles |
 
-**Watch rest is the default**, using mouth-test C3: a neutral closed jaw.
+**The preserved Watch rest**, using mouth-test C3: a neutral closed jaw.
 The exposed teeth remain part of the source design. The original open-mouth Idle
 is preserved as a separate action. Only Jaw location/rotation were replaced in
 the resting take; the other original animation channels remain unchanged.
 
 Actions and the character collection are retained as Blender assets. The native
 asset library is registered as `MacDesk Character`. The look action turns the whole actor;
-it is not independent eye or neck tracking. New gestures and reactive transitions
-still require animation and visual review.
+it is not independent eye or neck tracking. The new behavior library below provides separate native rig Actions.
+
+## Calm idle and behavior library
+
+**`STATE | watch` is now the default idle.** Camera study A2 recenters the face
+and turns the view 8° toward a more direct frontal angle. The closed-mouth head
+movement is 18% of the original amplitude; other motion is 12%, stretched across
+eight seconds. A small breathing drift keeps it alive.
+
+| State | Behavior |
+| --- | --- |
+| `watch` | Calm centered watching |
+| `look_left` | Look toward the viewer's left and return |
+| `look_right` | Look toward the viewer's right and return |
+| `look_around` | Look left, then right, and return |
+| `lean_back` | Move away from the window and return |
+| `lean_in` | Lean slightly closer and return |
+| `shift` | Small side-to-side settling motion |
+| `scratch` | Raise an original claw, scratch the scalp, lower it |
+
+Every state is a native `STATE | ...` rig Action, frames 1–193 at 24 FPS: eight
+seconds excluding the repeated endpoint. First/last poses and neighboring samples
+match the same underlying idle phase. Gesture offsets ease in and out. Exported
+previews omit the duplicated endpoint. Metadata lives in `states.json` and the
+Blender text `STATE LIBRARY`; checks are in `state-checks.json`.
+
+For smooth pre-rendered playback, enter/leave gestures at the shared idle-phase
+boundary. This is not an arbitrary-phase interrupt system: a future device player
+must synchronize the idle phase or supply another blend. Larger gestures remain
+separate one-shot assets rather than part of the calm default.
+
+Scratch uses four original `Virus1.013.L` bones with a length-preserving solver,
+baked as FK rotations. Contact uses the actual mesh tip extending past the bone.
+The study checked scalp clearance and unchanged other controls; complete mesh
+self-collision detection is not implemented.
+
+Use the saved scene for normal edits. `build_states.py` is the initial authoring
+recipe from the approved checkpoint, not a per-edit rebuilding requirement.
 
 ## Shots and everyday workflow
 
@@ -86,10 +123,13 @@ From the repository root:
   --clip look --camera window --output animation/tmp/new-look
 ```
 
-Options: `--clip rest|idle|move|look` (default `rest`), `--camera window|full|quarter`, `--fps 12|24`,
+Options: `--clip watch|look_left|look_right|look_around|lean_back|lean_in|shift|scratch`
+(default `watch`), `--camera window|full|quarter`, `--fps 12|24`,
 `--size 1..8` (multiples of 240 × 280). The output folder must be new to prevent
 mixing sequences. Rendering does not save changes back to the master. Playback FPS
-is recorded in `render.json`. Encode using that FPS:
+is recorded in `render.json`. Legacy `rest`, `idle`, `move`, and `look` names
+remain supported; `idle` and `move` refer to the original source demo. Encode
+using the recorded FPS:
 
 ```sh
 ffmpeg -framerate 12 -pattern_type glob \
@@ -100,8 +140,9 @@ ffmpeg -framerate 12 -pattern_type glob \
 Generated previews and comparison grids belong in ignored `tmp/`.
 `shot-comparisons.json` records 56 angle/distance/lighting, jaw and layout tests.
 Large labeled grids are in `tmp/comparisons/`, `tmp/mouth-comparisons/` and
-`tmp/layout-comparisons/`. Mouth C3 is approved; layout C3 is the current working
-composition, rather than a separately approved final visual design.
+`tmp/layout-comparisons/`. Mouth C3 and layout C3 were approved and saved at checkpoint `f44e690`.
+The calmer idle now refines the frontal direction with camera study A2. Behavior
+previews are in `tmp/state-previews/`.
 
 ## Verification and limits
 
@@ -116,6 +157,10 @@ the source import; checks packed material textures; evaluates both source clips
 and the wide camera; and exercises all 12 appendage roots independently. Both
 source clip endpoints match exactly. This does not prove future poses are free of
 self-intersections.
+
+`check_states.py` additionally checks all eight states for shared start/end poses
+and neighboring samples, a closed jaw, live motion and unchanged bone lengths.
+Run it with the same Blender command as above, replacing the script name.
 
 The RP2040 will play exported pixels, not run the 3D rig. Compression, RGB565,
 flash budget, reactive transitions and device playback are not part of this

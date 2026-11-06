@@ -10,6 +10,9 @@ Changes: repaired texture paths; packed supplied maps; connected the DirectX
 normal with green-channel conversion; hid the source concrete plinth; organized
 bone collections; added studio cameras/lights, an actor-placement parent and an
 optional whole-character look action and separate closed-jaw resting take.
+Further changes: calmer eight-second idle, frontal camera refinement, and
+separate looking, leaning, settling and scratch animation takes. Original source
+actions remain unchanged.
 Mesh topology, weights, bone hierarchy,
 and original Idle/move keyframes are preserved.
 

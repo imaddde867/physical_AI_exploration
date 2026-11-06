@@ -191,7 +191,8 @@
     "Whole-actor parent and optional look action",
     "Portrait cameras and black studio lighting",
     "Upright studio orientation and actor rest rotation; approved third view moved 5% closer",
-    "Separate closed-jaw resting action derived from source Idle; originals unchanged"
+    "Separate closed-jaw resting action derived from source Idle; originals unchanged",
+    "Calm eight-second idle plus seven native gestures with shared idle-phase boundaries and fixed bone lengths"
   ],
   "preserved": [
     "mesh topology",
@@ -208,13 +209,14 @@
     "layout_comparison": "C3",
     "camera_roll_correction_degrees": 16,
     "additional_distance_percent": 90,
-    "centering": "closed face bounds"
+    "centering": "closed face bounds",
+    "idle_view_study": "A2: recentered, yaw -8 degrees, pitch 0"
   },
   "default_rest": {
-    "action": "DERIVED | Watch rest",
+    "action": "STATE | watch",
     "frames": [
       1,
-      77
+      193
     ],
     "mouth_comparison": "C3",
     "jaw_location": [
@@ -228,6 +230,13 @@
       0,
       0
     ],
-    "preserved_motion": "All SOURCE Idle channels except Jaw location/rotation"
-  }
+    "preserved_motion": "Original motion sampled at reduced amplitude; original actions retained separately",
+    "previous_action": "DERIVED | Watch rest",
+    "motion_amplitude": {
+      "head": 0.18,
+      "other_bones": 0.12
+    }
+  },
+  "approved_checkpoint": "f44e690",
+  "states": "states.json"
 }

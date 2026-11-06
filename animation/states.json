@@ -1,0 +1,170 @@
+{
+  "watch": {
+    "action": "STATE | watch",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": true,
+    "description": "Calm centered watching with slight living movement",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  },
+  "look_left": {
+    "action": "STATE | look_left",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": false,
+    "description": "Look toward the viewer left, then return to watching",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  },
+  "look_right": {
+    "action": "STATE | look_right",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": false,
+    "description": "Look toward the viewer right, then return to watching",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  },
+  "look_around": {
+    "action": "STATE | look_around",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": false,
+    "description": "Look left, then right, then return to watching",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  },
+  "lean_back": {
+    "action": "STATE | lean_back",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": false,
+    "description": "Move away from the window, then return",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  },
+  "lean_in": {
+    "action": "STATE | lean_in",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": false,
+    "description": "Lean slightly toward the viewer, then return",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  },
+  "shift": {
+    "action": "STATE | shift",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": false,
+    "description": "Small side-to-side settling movement",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  },
+  "scratch": {
+    "action": "STATE | scratch",
+    "frames": [
+      1,
+      193
+    ],
+    "fps": 24,
+    "seconds": 8,
+    "loop": false,
+    "description": "Raise an original claw to the side of the head, scratch, and return",
+    "entry_idle_phase": 0,
+    "exit_idle_phase": 0,
+    "shared_entry_frames": [
+      1,
+      3
+    ],
+    "shared_exit_frames": [
+      191,
+      193
+    ]
+  }
+}

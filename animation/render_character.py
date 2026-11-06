@@ -7,9 +7,46 @@ import sys
 import bpy
 
 
+def select_clip(clip):
+    """Select a native saved Action; retain the original foundation's clip names."""
+    scene = bpy.context.scene
+    rig = bpy.data.objects["Crying head 2 | source rig"]
+    actor = rig.parent
+    for track in rig.animation_data.nla_tracks:
+        track.mute = True
+    actor.animation_data.action = None
+    actor.rotation_euler = actor["rest_rotation"]
+    library = bpy.data.texts.get("STATE LIBRARY")
+    states = json.loads(library.as_string()) if library else {}
+    name = "look_around" if clip == "look" and states else clip
+    if name in states:
+        action = bpy.data.actions[states[name]["action"]]
+    else:
+        action = bpy.data.actions[{
+            "rest": "DERIVED | Watch rest", "look": "DERIVED | Watch rest",
+            "idle": "SOURCE | Idle", "move": "SOURCE | move",
+        }[clip]]
+    rig.animation_data.action = action
+    rig.animation_data.action_slot = action.slots[0]
+    scene.frame_start, scene.frame_end = map(int, action.frame_range)
+    if clip == "look" and not states:
+        rig.animation_data.action = None
+        track = rig.animation_data.nla_tracks.new()
+        track.name = "Preview | repeated watching rest"
+        strip = track.strips.new("DERIVED | Watch rest", 1, action)
+        strip.action_slot = action.slots[0]
+        strip.repeat = 3
+        actor.animation_data.action = bpy.data.actions["DERIVED | Look around"]
+        actor.animation_data.action_slot = actor.animation_data.action.slots[0]
+        scene.frame_end = int(actor.animation_data.action.frame_range[1])
+    scene.frame_set(scene.frame_start)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--clip", choices=("rest", "idle", "move", "look"), default="rest")
+    parser.add_argument("--clip", choices=("watch", "look_left", "look_right", "look_around",
+                        "lean_back", "lean_in", "shift", "scratch", "rest", "idle", "move", "look"),
+                        default="watch")
     parser.add_argument("--camera", choices=("window", "full", "quarter"), default="window")
     parser.add_argument("--fps", type=int, choices=(12, 24), default=12)
     parser.add_argument("--size", type=int, default=1, help="Integer multiple of 240 x 280")
@@ -22,31 +59,8 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     scene = bpy.context.scene
     rig = bpy.data.objects["Crying head 2 | source rig"]
-    actor = rig.parent
-    idle = bpy.data.actions["DERIVED | Watch rest"]
-    action = bpy.data.actions[{
-        "rest": "DERIVED | Watch rest", "look": "DERIVED | Watch rest",
-        "idle": "SOURCE | Idle", "move": "SOURCE | move",
-    }[args.clip]]
-    assert len(rig.data.bones) == 95 and action.slots
-    for track in rig.animation_data.nla_tracks:
-        track.mute = True
-    actor.animation_data.action = None
-    actor.rotation_euler = actor["rest_rotation"]
-    rig.animation_data.action = action
-    rig.animation_data.action_slot = action.slots[0]
-    scene.frame_start, scene.frame_end = map(int, action.frame_range)
-    if args.clip == "look":
-        # Repeat the closed-jaw take beneath turns; source keys stay untouched.
-        rig.animation_data.action = None
-        track = rig.animation_data.nla_tracks.new()
-        track.name = "Preview | repeated watching rest"
-        strip = track.strips.new("DERIVED | Watch rest", 1, idle)
-        strip.action_slot = idle.slots[0]
-        strip.repeat = 3
-        actor.animation_data.action = bpy.data.actions["DERIVED | Look around"]
-        actor.animation_data.action_slot = actor.animation_data.action.slots[0]
-        scene.frame_end = int(actor.animation_data.action.frame_range[1])
+    assert len(rig.data.bones) == 95
+    select_clip(args.clip)
     # Both original clips and the derived turn have matching endpoint poses.
     # Drop that repeated endpoint when the source interval divides into output frames.
     if (scene.frame_end - scene.frame_start) % (24 // args.fps) == 0:
