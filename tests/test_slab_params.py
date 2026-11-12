@@ -46,6 +46,15 @@ class SlabParamsTests(unittest.TestCase):
         self.assertLess(xo, P.LID_W / 2 + P.PLUG_L)     # meets the plug body
         self.assertGreater(P.slack_needed(), 0)
 
+    def test_waveshare_board_fits_its_case(self):
+        gw, gh = P.WS_GLASS
+        self.assertLess(P.WS_PCB[0], gw)
+        self.assertLess(P.WS_PCB[1], gh)
+        # the front lip must leave the whole visible area uncovered
+        self.assertLess(P.WS_ACTIVE[0], gw - 2 * P.CASE_LIP)
+        self.assertLess(P.WS_ACTIVE[1], gh - 2 * P.CASE_LIP)
+        self.assertGreater(P.WS_USB_CUT[1], 3.26)  # USB-C receptacle height
+
 
 if __name__ == "__main__":
     unittest.main()

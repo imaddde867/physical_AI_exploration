@@ -77,3 +77,20 @@ def cable_x() -> tuple[float, float, float]:
     x_end = LID_W / 2 + PLUG_L - 2.5
     xs = x_end - CABLE_ARC_R
     return xs - CABLE_ARC_R, xs, x_end
+
+
+# --- Waveshare RP2040-Touch-LCD-1.69 (ordered prototype) -------------------------------------
+# Source: Waveshare dimension drawing (docs/hardware/waveshare-rp2040-touch-lcd-1.69-dimensions.jpg,
+# https://www.waveshare.com/wiki/RP2040-Touch-LCD-1.69). The drawing is landscape; values are
+# rotated to portrait (width x height) to match the 240 x 280 firmware. No thickness, corner
+# radius, or connector position is stated: those are ASSUMED and are what the fit coupon checks.
+WS_GLASS = (33.13, 41.13)        # glass outline, drawing
+WS_ACTIVE = (27.972, 32.634)     # visible area, drawing
+WS_PCB = (29.83, 37.12)          # PCB outline, drawing
+WS_STACK_T = 7.0                 # ASSUMED glass + PCB + USB-C receptacle (3.26 mm) front to back
+WS_GLASS_R = 5.0                 # ASSUMED glass corner radius
+WS_USB_SIDE = +1                 # ASSUMED: USB-C on the +x wall (depends on rotation direction)
+WS_USB_CUT = (10.0, 6.0)         # opening along y, along z: receptacle 8.94 x 3.26 plus margin for the unstated position
+WS_CLEAR = 0.25                  # ASSUMED FDM clearance per side; set from the fit coupon
+CASE_WALL, CASE_LIP_T, CASE_LIP = 1.6, 0.8, 1.0  # side wall, front lip thickness, lip overlap on the glass border
+COVER_T, COVER_TONGUE = 1.2, 1.5

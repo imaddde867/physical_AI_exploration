@@ -43,3 +43,18 @@ Run from the repository root with the installed text-to-CAD skill's pinned runti
 Everything under `tmp/` is generated and gitignored. `tmp/current_preview.py` and `tmp/render_current.py` from the first review are superseded scratch helpers; use the source commands above. Existing temporary files are retained, not inputs to the current workflow.
 
 The earlier [November 1 decisions/research record](../../docs/archive/2026-11-01-slab-decisions.md) is preserved for context. The [bring-up log](../../docs/hardware/bringup-log.md) contains later corrections and the panel-selection pause; dated prices and availability require fresh research.
+
+## Waveshare board case (2026-11-12)
+
+No measuring tools are available, so dimensions come from Waveshare's drawing ([saved copy](../../docs/hardware/waveshare-rp2040-touch-lcd-1.69-dimensions.jpg), [wiki](https://www.waveshare.com/wiki/RP2040-Touch-LCD-1.69)) and Apple's published figures.
+
+| Item | Value | Source |
+|---|---|---|
+| Glass outline | 33.13 × 41.13 mm (portrait) | Waveshare drawing |
+| Visible area | 27.972 × 32.634 mm | Waveshare drawing / spec table |
+| PCB outline | 29.83 × 37.12 mm | Waveshare drawing |
+| Stack thickness, glass corner radius, USB-C position and side, FDM clearance | 7.0 mm, 5 mm, +x wall, 0.25 mm | ASSUMED, not on the drawing |
+
+`src/waveshare_case.py` builds a shell (front lip over the glass border, USB-C opening, open back) and a friction-fit back cover, plus `waveshare_fit_coupon`: three open trays at 6 / 7 / 8 mm depth. STLs are written to `exports/` (gitignored; rerun to regenerate). Run it with `cadgen +0.8.3 run cad/slab/src/waveshare_case.py`; it self-checks and re-exports.
+
+Next, with no tools needed: print the coupon, press the real board into each tray, and keep the depth where it sits flush with the USB-C opening lined up. Also note which way the board's USB-C faces for the desired screen rotation. Then set `WS_STACK_T`, `WS_USB_SIDE` and `WS_CLEAR` in `params.py`, rebuild, and print the case. The magnet/plate mount and cable route still use the old 59 × 49.65 mm panel geometry and are not yet adapted to this case.
