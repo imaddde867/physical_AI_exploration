@@ -2,7 +2,7 @@
 
 Prepared 2026-11-04 after the project reset. Start by reading [the product brief](../product-brief.md) and [current CAD decisions](../../cad/slab/DECISIONS.md).
 
-Status: ordered 2026-11-04, BerryBase order 1097674: [Waveshare RP2040-Touch-LCD-1.69](https://www.waveshare.com/product/rp2040-touch-lcd-1.69.htm) (€29.80 delivered, 240×280 portrait, integrated RP2040 with 264 KB SRAM and 16 MB flash, capacitive touch), powered over the existing 50 cm Apple USB-C cable. This supersedes the Pico WH + Pico-LCD-1.8 basket in the [budget report](../../reports/Budget%20companion%20learning%20hardware.md), which was never ordered. The earlier [display shortlist report](../../reports/Companion%20display%20hardware%20shortlist.md) remains source history.
+Status: ordered 2026-11-04, delivered and flashed 2026-11-12, BerryBase order 1097674: [Waveshare RP2040-Touch-LCD-1.69](https://www.waveshare.com/product/rp2040-touch-lcd-1.69.htm) (€29.80 delivered, 240×280 portrait, integrated RP2040 with 264 KB SRAM and 16 MB flash, capacitive touch), powered over the existing 50 cm Apple USB-C cable. This supersedes the Pico WH + Pico-LCD-1.8 basket in the [budget report](../../reports/Budget%20companion%20learning%20hardware.md), which was never ordered. The earlier [display shortlist report](../../reports/Companion%20display%20hardware%20shortlist.md) remains source history.
 
 ## Goal and decisions
 
@@ -20,7 +20,7 @@ Begin with ordinary USB power/data and an optional simple desk holder. Thin pack
 
 ## Bring-up and later enclosure research
 
-Run Waveshare's demo on delivery, then a blink, then one Mac serial command over the existing USB cable. Follow the [device renderer plan](../product-brief.md#device-renderer-plan): one packed RGB565 framebuffer, with runtime memory measured on the board. The [local blink prototype and setup instructions](../../firmware/rp2040/README.md) are prepared. A host line-transport helper exists in `daemon/link.py`; device commands and end-to-end USB integration still need implementation.
+Run Waveshare's demo on the delivered board, then a blink, then one Mac serial command over the existing USB cable. Follow the [device renderer plan](../product-brief.md#device-renderer-plan): one packed RGB565 framebuffer, with runtime memory measured on the board. The [local blink prototype and setup instructions](../../firmware/rp2040/README.md) are prepared. A host line-transport helper exists in `daemon/link.py`; device commands and end-to-end USB integration still need implementation.
 
 The broad display shortlist is paused. Revisit alternatives only if prototype evidence requires them or later enclosure work needs a thinner route. Compare:
 

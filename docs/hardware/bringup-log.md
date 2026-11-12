@@ -1,6 +1,12 @@
 # Panel bench bring-up log
 
-Status, 2026-11-04: panel choice and bench plan remain on hold; no hardware first light is recorded. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
+Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
+
+## 2026-11-12 Waveshare board: first load (current hardware)
+
+MicroPython 1.22.2 installed; the vendor driver and `firmware/rp2040/main.py` were loaded. Session results (free heap, orientation, colour, flicker, tearing, SPI rate) are not recorded yet. This is the ordered bench prototype, separate from the paused Good Display proposal below.
+
+## 2026-11-01 Good Display proposal
 
 Paused [bench plan](../superpowers/plans/2026-11-01-panel-bench-bringup.md). Later entries supersede earlier proposals in this log; prices and stock below are dated observations, not current quotes.
 

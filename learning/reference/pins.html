@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pin map</title><link rel="stylesheet" href="../assets/style.css"></head><body>
+<h1>Pin map</h1><p class="mut">From the vendor driver <code>waveshare_lcd.py</code>; not checked against the board.</p>
+<table><tr><th>Signal</th><th>GPIO</th><th>Use</th></tr>
+<tr><td>DC</td><td>8</td><td>Display command/data select</td></tr>
+<tr><td>CS</td><td>9</td><td>Display chip select</td></tr>
+<tr><td>SCK</td><td>10</td><td>SPI1 clock</td></tr>
+<tr><td>MOSI</td><td>11</td><td>SPI1 data out</td></tr>
+<tr><td>MISO</td><td>12</td><td>Defined, unused (display is write-only here)</td></tr>
+<tr><td>RST</td><td>13</td><td>Display reset</td></tr>
+<tr><td>BL</td><td>25</td><td>Backlight, PWM</td></tr>
+<tr><td>I2C SDA</td><td>6</td><td>I2C1 data (touch; IMU not read)</td></tr>
+<tr><td>I2C SCL</td><td>7</td><td>I2C1 clock</td></tr>
+<tr><td>Touch IRQ</td><td>21</td><td>Falling edge = touch event</td></tr>
+<tr><td>Touch RST</td><td>22</td><td>Touch controller reset</td></tr></table>
+<h2>Numbers</h2>
+<table><tr><td>Frame</td><td>240 × 280 × 2 = 134,400 bytes = 1,075,200 bits</td></tr>
+<tr><td>SPI rate</td><td>clk_peri / (CPSDVSR × (1+SCR)); max clk_peri / 2</td></tr>
+<tr><td>Touch</td><td>I2C 0x15, ID register 0xA7 reads 0xB5, X/Y from register 0x03 (4 bytes)</td></tr>
+<tr><td>Display init</td><td>Reset, init registers, 11h, wait 120 ms, 29h</td></tr></table></body></html>

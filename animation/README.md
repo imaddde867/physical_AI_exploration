@@ -12,8 +12,10 @@ original rig, texture maps and earlier takes are preserved.
 | `f56683c` | Calm idle and eight-state library; pushed before polish |
 | `f1ec032` | Approved 30 FPS polish and frame-rate tools, before planted contacts |
 
-`crying-head-2-master.blend` and `crying-head-2-polish.blend` retain those earlier
-working scenes. `crying-head-2-source.blend` retains the clean source import.
+`crying-head-2-anchored.blend` is the only scene tracked in the repo. The three
+earlier scenes are kept in the checkpoint commits above and in the gitignored
+local archive `.local-archive/2026-11-12/animation/`. Restore one with
+`git show 17157bb:animation/<name>.blend > animation/<name>.blend`.
 The final planted scene contains all eight new `ANCHORED | ...` Actions.
 
 ## Current behavior library
@@ -91,7 +93,7 @@ Actions remain available. Disable contacts to inspect their unmodified free pose
 
 ## Validation and remaining work
 
-- 45 non-GUI Python tests passed; the AppKit smoke test was not rerun.
+- The full Python suite passes on macOS, including the AppKit smoke test.
 - `check_character.py`: packed maps, source geometry/weights/bones/keyframes preserved.
 - `check_states.py`: all eight states, shared idle boundaries, closed jaw and fixed bone lengths.
 - `check_contacts.py`: all eight states at 30 FPS, actual planted tip drift below 0.001 screen pixel, connected joints, scratch release/regrip.

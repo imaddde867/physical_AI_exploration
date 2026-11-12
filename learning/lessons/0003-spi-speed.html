@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3. SPI speed and frame rate</title><link rel="stylesheet" href="../assets/style.css"></head><body>
+<nav class="l"><a href="0002-pixel-path.html">2</a> · <a href="../reference/glossary.html">Glossary</a> · next: <a href="0004-micropython.html">4. MicroPython</a></nav>
+<h1>3. SPI speed and frame rate</h1>
+<p>A full frame is 240 × 280 × 16 = <b>1,075,200 bits</b>. Frame time is bits ÷ SPI clock. So the SPI clock sets the ceiling on frame rate; the question is what clock you actually get.</p>
+
+<h2>What the RP2040 can produce</h2>
+<p>The SPI block divides its input clock <code>clk_peri</code>: <code>rate = clk_peri / (CPSDVSR × (1 + SCR))</code>, with CPSDVSR even from 2 to 254 and SCR from 0 to 255. The fastest master rate is <code>clk_peri / 2</code>. The datasheet's own example: 125 MHz in, 62.5 MHz out.</p>
+<p class="mut">RP2040 datasheet, SPI section (SSPCLKOUT, "Bit rate generation").</p>
+
+<h2>What MicroPython sets by default</h2>
+<p>The MicroPython RP2 quick reference says <code>machine.freq(mcu, peripheral=48_000_000)</code>: the peripheral clock defaults to <b>48 MHz</b>, and it can only be 48 MHz or equal to the CPU clock (125 MHz at boot). If SPI runs from 48 MHz, the ceiling is <b>24 MHz</b>, not the 100 MHz the vendor code asks for. A request above the limit is not an error in itself; MicroPython's SPI docs say the actual rate can differ from the request, so print the SPI object.</p>
+<div class="card todo">This is a reading of the documents, not a measurement. Our <code>docs/hardware/display-frame-rate.md</code> assumes 62.5 MHz and a 58 fps ceiling. That needs <code>machine.freq(125_000_000, 125_000_000)</code> first, and our notes say the ST7789 minimum write cycle (16 ns) is exactly 62.5 MHz, with no margin. <code>benchmark_display.py</code> settles it.</div>
+
+<figure><svg class="d" viewBox="0 0 600 190" role="img" aria-label="Maximum full-frame rate by SPI clock"><path class="gr" d="M275 10V175"/><text class="m" x="275" y="188" text-anchor="middle">30 fps</text><text x="10" y="37">24 MHz</text><rect class="fb" x="95" y="20" width="133.8" height="26"/><text x="285" y="37">22.3 fps</text><text class="m" x="95" y="60">clk_peri 48 MHz (default?)</text><text x="10" y="89">31.25 MHz</text><rect class="fm" x="95" y="72" width="174.60000000000002" height="26"/><text x="277.6" y="89">29.1 fps</text><text class="m" x="95" y="112">125 MHz, request ≤ 40</text><text x="10" y="141">62.5 MHz</text><rect class="fa" x="95" y="124" width="348.6" height="26"/><text x="451.6" y="141">58.1 fps</text><text class="m" x="95" y="164">clk_peri 125 MHz</text></svg><figcaption>Transfer-only ceiling for a full 240×280 RGB565 frame. Computed from the datasheet formula, not measured.</figcaption></figure>
+<h2>Try it</h2>
+<div class="card calc">
+<label>clk_peri (MHz) <input id="clk" type="number" value="48"></label>
+<label>requested SPI (MHz) <input id="want" type="number" value="100"></label>
+<output id="out"></output></div>
+<p>Try 48 → 24 MHz → 22 fps. Then 125 → 62.5 MHz → 58 fps. Then 125 with a 40 MHz request: the best available is 31.25 MHz, 29 fps, just under 30. Rates fall in steps, not smoothly.</p>
+<p class="mut">The calculator assumes the driver picks the closest rate not above the request. That is my assumption about the driver; the formula is the datasheet's.</p>
+
+<h2>Why it still isn't the animation rate</h2>
+<p>This is transfer only. Reading frames from flash, decoding them, and Python overhead all add time. Uncompressed 30 fps is 32.3 Mbit/s of pixels, so a changed-region update or compression is needed (see <code>display-frame-rate.md</code>).</p>
+
+<h2>Check</h2>
+<div class="q" data-a="0"><p>SPI input clock 48 MHz: best full-frame rate?</p>
+<button>About 22 frames/s</button><button>About 29 frames/s</button><button>About 44 frames/s</button><button>About 58 frames/s</button>
+<div class="why">48 / 2 = 24 MHz; 1,075,200 / 24,000,000 = 44.8 ms, so 22.3 fps.</div></div>
+<div class="q" data-a="2"><p>What does a 100 MHz SPI request give?</p>
+<button>Exactly 100 MHz</button><button>An error message</button><button>A lower real rate</button><button>A faster display</button>
+<div class="why">The hardware divides clk_peri; it cannot exceed clk_peri / 2.</div></div>
+<div class="q" data-a="1"><p>How do you find the real SPI rate?</p>
+<button>Trust the argument</button><button>Print the SPI object</button><button>Read the wiki page</button><button>Count backlight flicker</button>
+<div class="why">The MicroPython SPI docs advise this; the benchmark script already does it.</div></div>
+
+<p><b>Read next:</b> MicroPython <a href="https://docs.micropython.org/en/latest/library/machine.SPI.html">machine.SPI</a> and <a href="https://docs.micropython.org/en/latest/rp2/quickref.html">RP2 quick reference</a> (machine.freq).</p>
+<script src="../assets/spi-calc.js"></script><script src="../assets/quiz.js"></script></body></html>

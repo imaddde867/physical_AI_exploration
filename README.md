@@ -12,8 +12,8 @@ Hardware next step: [ordered prototype bring-up](docs/hardware/shortlist-handoff
 | Physical design | [CAD decisions and commands](cad/slab/DECISIONS.md) | Approved appearance; concept geometry |
 | Character | [Blender library](animation/README.md) | Eight validated states, planted claw contacts, 30 FPS exports |
 | Earlier face experiments | `sim/` and `experiments/occupant_idle.py` | Approved 2D checkpoint retained |
-| Hardware | [Bring-up log](docs/hardware/bringup-log.md), [Mac measurements](docs/hardware/measure-mac.md) | Waveshare RP2040-Touch-LCD-1.69 ordered; no recorded first light |
-| Device prototype | [Local blink setup](firmware/rp2040/README.md) | Prepared MicroPython blink; hardware validation awaits delivery |
+| Hardware | [Bring-up log](docs/hardware/bringup-log.md), [Mac measurements](docs/hardware/measure-mac.md) | Waveshare RP2040-Touch-LCD-1.69 delivered and flashed 2026-11-12; bench measurements open |
+| Device prototype | [Local blink setup](firmware/rp2040/README.md) | MicroPython blink loaded on the board 2026-11-12; bench results not recorded yet |
 | Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec, watchdog, and host line-transport helper tested; no running service or device command handler |
 
 Older simulator plans in `docs/superpowers/`, the [November 1 slab record](docs/archive/2026-11-01-slab-decisions.md), and `cad/slab/src/scale_compare.py` are historical references. The removed 1.64" pod work remains in git history.

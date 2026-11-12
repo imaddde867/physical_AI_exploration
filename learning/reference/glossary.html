@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glossary</title><link rel="stylesheet" href="../assets/style.css"></head><body>
+<h1>Glossary</h1><p class="mut">Used consistently across lessons.</p>
+<table>
+<tr><td><b>MCU</b></td><td>Microcontroller: a tiny computer on one chip. Here the RP2040.</td></tr>
+<tr><td><b>SRAM</b></td><td>Working memory, 264 kB in six banks. Lost on power-off.</td></tr>
+<tr><td><b>Flash</b></td><td>Separate chip storing firmware and files; RP2040 reads it over QSPI (XIP). Waveshare's specification lists 16 MB; the installed chip is not independently verified.</td></tr><tr><td><b>clk_peri</b></td><td>Clock feeding SPI/UART. MicroPython default 48 MHz unless set with machine.freq.</td></tr><tr><td><b>CASET / RASET / RAMWR</b></td><td>ST7789 commands: set column range, row range, begin writing frame memory.</td></tr><tr><td><b>REPL</b></td><td>Interactive Python prompt over USB serial.</td></tr>
+<tr><td><b>Bus</b></td><td>Wires plus a protocol for chips to talk.</td></tr>
+<tr><td><b>SPI</b></td><td>Fast bus used for the screen. Pins: SCK clock, MOSI data, CS select, plus DC.</td></tr>
+<tr><td><b>I2C</b></td><td>Slow two-wire shared bus (touch, motion sensor); devices have addresses.</td></tr>
+<tr><td><b>GPIO</b></td><td>General-purpose pin you set high/low or read.</td></tr>
+<tr><td><b>Framebuffer</b></td><td>RAM array holding the next image. 134,400 bytes here.</td></tr>
+<tr><td><b>RGB565</b></td><td>16-bit colour: 5 red, 6 green, 5 blue bits.</td></tr>
+<tr><td><b>DC / CS / RST / BL</b></td><td>Screen pins: data-or-command, chip select, reset, backlight.</td></tr>
+<tr><td><b>UF2 / BOOT</b></td><td>Hold BOOT while plugging in; board appears as drive <code>RPI-RP2</code>; drop a .uf2 firmware file on it.</td></tr>
+<tr><td><b>MicroPython</b></td><td>Python runtime that runs on the MCU. Files <code>main.py</code> run at power-up.</td></tr>
+</table></body></html>

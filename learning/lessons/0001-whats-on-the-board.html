@@ -1,0 +1,69 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1. The board and its parts</title><link rel="stylesheet" href="../assets/style.css"></head><body>
+<nav class="l"><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/pins.html">Pin map</a> · next: <a href="0002-pixel-path.html">2. Pixel path</a></nav>
+<h1>1. The board and its parts</h1>
+<p>The board is one microcontroller plus several separate chips. Each chip has its own memory and its own link to the microcontroller. Most hardware bugs are "wrong chip, wrong link, or wrong assumption about who holds the data".</p>
+
+<h2>The real board</h2>
+<p>Photo of the board seen from the electronics side (the screen is the faded rectangle behind it). The glass screen is on the other side.</p>
+<figure><div class="ph"><img src="https://www.waveshare.net/w/upload/6/63/RP2040-Touch-LCD-1.69-details-9.jpg" alt="Waveshare RP2040-Touch-LCD-1.69 board with pin labels" width="960" height="532"><b style="left:49.5%;top:16%">1</b><b style="left:60.4%;top:16%">2</b><b style="left:72.4%;top:16%">3</b><b style="left:81%;top:40%">4</b><b style="left:62%;top:32%">5</b><b style="left:45%;top:47%">6</b><b style="left:59.4%;top:82%">7</b><b style="left:48.8%;top:78%">8</b><b style="left:42%;top:74%">9</b><b style="left:74.5%;top:77%">10</b></div>
+<figcaption>Image: Waveshare (<a href="https://www.waveshare.net/wiki/RP2040-Touch-LCD-1.69">wiki</a>), all rights reserved, linked not copied. Numbers added by us.</figcaption></figure>
+<ol>
+<li><b>RST</b> button (silkscreen): resets the RP2040.</li>
+<li><b>BOOT</b> button (silkscreen): hold while plugging in USB to get the UF2 drive for flashing.</li>
+<li><b>PWR</b> button (silkscreen): power switch.</li>
+<li><b>RP2040</b>: square chip with the Raspberry Pi logo.</li>
+<li>8-pin chip beside the buttons: <em>probably</em> the external flash (inferred from shape and RP2040 needing one; not confirmed by a source).</li>
+<li><b>Display connector</b>: white latch, the flat cable from the screen goes in here.</li>
+<li><b>USB-C</b> port: power, programming, serial.</li>
+<li><b>Buzzer</b>: the round component next to USB-C.</li>
+<li><b>RTC</b> 2-pin header (silkscreen): backup battery for the clock.</li>
+<li><b>BAT</b> header (silkscreen, + / - marked): lithium cell for the charger.</li>
+</ol>
+<p class="todo">Not marked: the IMU (QMI8658) and the touch controller. No source I found shows where they sit, and I will not guess. Touch is probably driven through the screen's flat cable. When the board arrives, look for a tiny (about 3 mm) square chip and tell me its position.</p>
+<figure><img src="https://www.waveshare.net/w/upload/3/38/RP2040-Touch-LCD-1.69-details-size.jpg" alt="Waveshare dimension drawing, front and back, in mm" style="max-width:420px;width:100%"><figcaption>Size in mm: whole front 41.13 × 33.13, visible screen 32.634 × 27.972, PCB 37.12 × 29.83. Image: Waveshare, linked.</figcaption></figure>
+<figure><svg class="d" viewBox="0 0 600 250" role="img" aria-label="Block diagram of the board">
+<rect class="b" x="30" y="95" width="120" height="60" rx="6"/><text x="90" y="122" text-anchor="middle">External flash</text><text class="m" x="90" y="140" text-anchor="middle">firmware, files</text>
+<rect class="hi" x="230" y="85" width="140" height="80" rx="6"/><text x="300" y="115" text-anchor="middle">RP2040</text><text class="m" x="300" y="133" text-anchor="middle">2 cores, 264 kB SRAM</text><text class="m" x="300" y="148" text-anchor="middle">your framebuffer lives here</text>
+<rect class="b" x="440" y="15" width="140" height="60" rx="6"/><text x="510" y="42" text-anchor="middle">ST7789V2</text><text class="m" x="510" y="60" text-anchor="middle">frame memory → panel</text>
+<rect class="b" x="440" y="95" width="140" height="60" rx="6"/><text x="510" y="122" text-anchor="middle">Touch controller</text><text class="m" x="510" y="140" text-anchor="middle">addr 0x15</text>
+<rect class="b" x="440" y="175" width="140" height="60" rx="6"/><text x="510" y="202" text-anchor="middle">QMI8658 IMU</text><text class="m" x="510" y="220" text-anchor="middle">accel + gyro</text>
+<path class="ln" d="M150 125H230"/><text class="m" x="190" y="117" text-anchor="middle">QSPI</text>
+<path class="ln" d="M370 110C405 110 405 45 440 45"/><text class="m" x="410" y="38" text-anchor="middle">SPI (fast)</text>
+<path class="ln" d="M370 125H440"/><path class="ln" d="M370 140C405 140 405 205 440 205"/><text class="m" x="395" y="200" text-anchor="end">I2C (shared by touch and IMU)</text>
+</svg><figcaption>Who talks to whom. The display link is SPI; touch and IMU share one I2C bus.</figcaption></figure>
+<h2>The chips</h2>
+<table>
+<tr><th>Chip</th><th>Role</th><th>Link</th></tr>
+<tr><td>RP2040</td><td>Runs your code. Two Cortex-M0+ cores, 264 kB SRAM in six banks.</td><td>-</td></tr>
+<tr><td>External flash</td><td>Holds firmware and files. RP2040 has none on-chip; it reads external flash over QSPI and supports up to 16 MB.</td><td>QSPI</td></tr>
+<tr><td>ST7789V2</td><td>Display controller. Has its own frame memory, 240×320×18 bit, and drives the 240×280 panel.</td><td>SPI</td></tr>
+<tr><td>Touch controller</td><td>Reports finger position and gestures. Wiki says CST816T; vendor code names it CST816D.</td><td>I2C</td></tr>
+<tr><td>QMI8658</td><td>Accelerometer + gyroscope.</td><td>I2C</td></tr>
+<tr><td>RTC, buzzer, charger</td><td>Not needed for the v1 character.</td><td>-</td></tr>
+</table>
+<p class="mut">Sources: RP2040 datasheet (features list, §2.6 memory); ST7789V2 datasheet §2 (frame memory); <a href="https://www.waveshare.net/wiki/RP2040-Touch-LCD-1.69">Waveshare wiki</a> (chip list); <code>firmware/rp2040/waveshare_lcd.py</code> (pins).</p>
+
+<h2>Two copies of the image</h2>
+<div class="card">Your program draws into a <b>framebuffer</b> in RP2040 SRAM. Sending it over SPI copies it into the ST7789's own frame memory. The panel is refreshed from <em>that</em> memory, not from yours. So the image can stay on screen while your program does nothing, and you only need to send when something changes.</div>
+
+<h2>Two kinds of link</h2>
+<div class="card"><b>SPI</b>: clock + data lines, no addresses, one device selected by a CS wire. Fast; used for pixels.<br>
+<b>I2C</b>: two shared wires, each device has a 7-bit address. Slower; used for small reads like touch coordinates.</div>
+
+<h2>Unresolved</h2>
+<p class="todo">Flash size: Waveshare's product specification lists 16 MB; the wiki page still says 4 MB. <code>os.statvfs('/')</code> reports the filesystem MicroPython can use, which can be smaller than the chip, so it cannot settle the chip size. Check the installed chip's marking if that matters.</p>
+
+<h2>Check</h2>
+<div class="q" data-a="1"><p>The panel refreshes from which memory?</p>
+<button>RP2040 framebuffer</button><button>ST7789 frame memory</button><button>External flash chip</button><button>Touch chip registers</button>
+<div class="why">The ST7789's frame memory. Your framebuffer is a staging copy.</div></div>
+<div class="q" data-a="0"><p>Where is the program stored when power is off?</p>
+<button>External flash chip</button><button>RP2040 SRAM bank</button><button>ST7789 frame RAM</button><button>RTC backup cell</button>
+<div class="why">SRAM loses its contents without power. The RP2040 has no on-chip flash.</div></div>
+<div class="q" data-a="2"><p>Which link carries touch coordinates?</p>
+<button>The USB data pair</button><button>The SPI display bus</button><button>The I2C shared bus</button><button>The backlight PWM</button>
+<div class="why">I2C, device address 0x15 in the vendor driver.</div></div>
+
+<p><b>Read next:</b> nothing required. If you want a source, the <a href="https://www.waveshare.net/wiki/RP2040-Touch-LCD-1.69">Waveshare wiki</a> overview and spec section is a few screens. (The RP2040 datasheet is a reference to search when a question comes up, not something to read through.) Questions about anything above: ask me.</p>
+<script src="../assets/quiz.js"></script></body></html>

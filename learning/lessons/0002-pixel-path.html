@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2. How a pixel reaches the panel</title><link rel="stylesheet" href="../assets/style.css"></head><body>
+<nav class="l"><a href="0001-whats-on-the-board.html">1</a> · <a href="../reference/glossary.html">Glossary</a> · next: <a href="0003-spi-speed.html">3. SPI speed</a></nav>
+<h1>2. How a pixel reaches the panel</h1>
+<p>The ST7789 is a command-driven chip. You never "set pixel (x,y)"; you send a command, then parameters, then a long run of colour bytes.</p>
+
+<h2>Four wires, two roles</h2>
+<table>
+<tr><td>SCK, MOSI</td><td>Clock and data (GP10, GP11). Data is sampled on the rising clock edge, most significant bit first.</td></tr>
+<tr><td>CS (GP9)</td><td>Low = chip is listening. A falling edge starts a transfer.</td></tr>
+<tr><td>DC (GP8)</td><td>Low = this byte is a command. High = this byte is a parameter or pixel data. Read at the 8th clock of each byte.</td></tr>
+<tr><td>RST (GP13)</td><td>Hardware reset. BL (GP25): backlight, PWM at 5 kHz in the vendor code.</td></tr>
+</table>
+<p class="mut">ST7789V2 datasheet §8.4.2 (command write mode), Table 6. Pins from the vendor driver.</p>
+
+<figure><svg class="d" viewBox="0 0 600 175" role="img" aria-label="SPI timing for one command and two data bytes">
+<text x="10" y="40">CS</text><path class="w" d="M100 20H120V40H456V20H476"/>
+<text x="10" y="82">DC</text><path class="w" d="M100 92H232V72H456"/>
+<text x="10" y="122">SCK</text><path class="w" d="M120 130H123.5V112H130.5V130H137.5V112H144.5V130H151.5V112H158.5V130H165.5V112H172.5V130H179.5V112H186.5V130H193.5V112H200.5V130H207.5V112H214.5V130H221.5V112H228.5V130H235.5V112H242.5V130H249.5V112H256.5V130H263.5V112H270.5V130H277.5V112H284.5V130H291.5V112H298.5V130H305.5V112H312.5V130H319.5V112H326.5V130H333.5V112H340.5V130H347.5V112H354.5V130H361.5V112H368.5V130H375.5V112H382.5V130H389.5V112H396.5V130H403.5V112H410.5V130H417.5V112H424.5V130H431.5V112H438.5V130H445.5V112H452.5V130H456"/>
+<text x="10" y="150"></text><rect class="b" x="120" y="142" width="112" height="22"/><text class="m" x="176.0" y="157" text-anchor="middle">command 2Ah</text><rect class="b" x="232" y="142" width="112" height="22"/><text class="m" x="288.0" y="157" text-anchor="middle">data byte 1</text><rect class="b" x="344" y="142" width="112" height="22"/><text class="m" x="400.0" y="157" text-anchor="middle">data byte 2</text><text x="10" y="157">MOSI</text></svg><figcaption>One CASET command followed by two parameter bytes, as seen on the wires. DC is low for the 8 command clocks, then high; CS stays low throughout. Schematic drawn from the datasheet description, not a measurement.</figcaption></figure>
+<h2>Drawing a full frame</h2>
+<pre>DC=0  send 2Ah            CASET: column range
+DC=1  send x0_hi x0_lo x1_hi x1_lo   (16-bit, big-endian)
+DC=0  send 2Bh            RASET: row range
+DC=1  send y0_hi y0_lo y1_hi y1_lo
+DC=0  send 2Ch            RAMWR: start writing frame memory
+DC=1  stream 134,400 bytes  (240 × 280 × 2)</pre>
+<p>Each pixel written advances an internal address inside the window you set, so a partial update is just a smaller window and fewer bytes. That is what the vendor's <code>Windows_show()</code> does.</p>
+
+<h2>The 20-row offset</h2>
+<p>Frame memory has 320 rows; this panel shows 280. The vendor driver (and our <code>main.py</code>) adds 20 to the row numbers. The vendor <code>setWindows()</code> also computes the bottom row from the start row by mistake, so our code replaces it (<code>firmware/rp2040/README.md</code>).</p>
+
+<figure><svg class="d" viewBox="0 0 600 200" role="img" aria-label="Frame memory rows versus panel rows">
+<rect class="fm" x="60" y="10" width="110" height="10"/><rect class="fa" x="60" y="20" width="110" height="140"/><rect class="fm" x="60" y="160" width="110" height="10"/>
+<rect class="dash" x="60" y="10" width="110" height="160"/>
+<text x="190" y="18">row 0</text><text x="190" y="30" class="m">memory rows 0–19: not visible</text>
+<text x="190" y="95">rows 20–299: the 280 visible rows</text><text x="190" y="110" class="m">your row 0 is memory row 20</text>
+<text x="190" y="160" class="m">memory rows 300–319: not visible</text><text x="190" y="176">row 319</text>
+<text x="60" y="192" class="m">ST7789 frame memory: 240 × 320 (not to scale vertically)</text>
+</svg><figcaption>Why the vendor code adds 20 to every row number. Which 20 rows are hidden at the top versus bottom follows the vendor offset.</figcaption></figure>
+<h2>Colour: two traps</h2>
+<div class="card"><b>Format.</b> RGB565 = 16 bits: 5 red, 6 green, 5 blue. Set by command 3Ah. The datasheet says write <code>55h</code> for 16-bit pixels; the vendor writes <code>05h</code>. I infer the difference is in the RGB-interface bits, which an SPI display does not use. Confirm with a colour test.<br><br>
+<b>Byte order.</b> The display wants the high byte first. MicroPython's <code>framebuf</code> keeps 16-bit values in the RP2040's byte order, so bytes arrive swapped. The vendor constants show it: <code>red = 0x07E0</code> and <code>blue = 0xF800</code> are the "wrong" way round. Black (0x0000) and white (0xFFFF) are unaffected, which is why the blink works before colour is settled. The controller's MADCTL command (36h) also has an RGB/BGR bit.</div>
+
+<h2>Power-up order</h2>
+<p>Reset pulse, then the vendor's register settings, then <code>11h</code> (sleep out) and a <b>120 ms wait</b> (datasheet), then <code>29h</code> (display on). Skipping the wait is a classic cause of a blank screen.</p>
+
+<h2>Check</h2>
+<div class="q" data-a="3"><p>DC is high during which bytes?</p>
+<button>Reset command bytes</button><button>Sleep command bytes</button><button>Display-on commands</button><button>Pixel data bytes</button>
+<div class="why">High means data or parameter; low means command.</div></div>
+<div class="q" data-a="0"><p>Why do the row numbers get +20?</p>
+<button>Memory has 320 rows</button><button>SPI skips 20 bytes</button><button>Touch uses 20 rows</button><button>Backlight needs rows</button>
+<div class="why">The controller memory is 320 rows tall; the panel shows 280 of them.</div></div>
+<div class="q" data-a="2"><p>Which colours survive a byte-order swap unchanged?</p>
+<button>Pure red, pure blue</button><button>Mid grey, pure red</button><button>Black and white only</button><button>Yellow and cyan only</button>
+<div class="why">0x0000 and 0xFFFF have identical high and low bytes. Mid grey like 0x8410 does not.</div></div>
+
+<p><b>Read next:</b> ST7789V2 datasheet <a href="https://files.waveshare.com/wiki/common/ST7789V2.pdf">PDF</a>, §8.4 (interface) and the CASET, RASET, RAMWR entries in §9.1. Then ask me about anything in <code>waveshare_lcd.py</code>.</p>
+<script src="../assets/quiz.js"></script></body></html>
