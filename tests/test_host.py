@@ -114,6 +114,25 @@ class HostTests(unittest.TestCase):
         h.step()
         self.assertEqual(drain(link), [CLEAR0])
 
+    def test_invalid_show_raises_and_leaves_host_usable(self):
+        bad = [
+            ("nope", {"face": FACE}),
+            ("ambient", {"face": {"v": 1, "t": "face", "x": "left"}}),
+            ("ambient", {"bar": {"v": 1, "t": "bar", "id": 0, "value": 1}}),
+            ("ambient", {"barx": {"v": 1, "t": "bar", "id": 0, "value": 1}}),
+        ]
+        for prio, state in bad:
+            with self.subTest(prio=prio, state=state):
+                h, _, link = make()
+                with self.assertRaises((KeyError, ValueError, protocol.ProtocolError)):
+                    h.show("m", prio, state, ttl=10)
+                self.assertEqual(h.slots, {})
+                h.step()
+                drain(link)
+                h.show("ok", "ambient", {"face": FACE}, ttl=10)
+                h.step()
+                self.assertEqual(drain(link), [FACE])
+
 
 class SuperviseTests(unittest.IsolatedAsyncioTestCase):
     async def test_restarts_with_growing_delay_then_returns(self):

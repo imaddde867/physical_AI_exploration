@@ -2,8 +2,9 @@
 import asyncio
 import time
 
-from daemon.arbiter import ALERT_GAP_S, Slot, pick, visible_slots
-from daemon.reconciler import Reconciler
+from daemon import protocol
+from daemon.arbiter import ALERT_GAP_S, PRIORITY, Slot, pick, visible_slots
+from daemon.reconciler import Reconciler, revert
 
 STABLE_S = 60.0  # a module that ran this long before crashing gets a fresh backoff
 MAX_BACKOFF_S = 30.0
@@ -18,6 +19,11 @@ class Host:
         self.cooldown_until, self._alert_shown = 0.0, False
 
     def show(self, name, priority, state, ttl, hard=False):
+        PRIORITY[priority]  # KeyError here, in the module, not later in step()
+        for k, v in state.items():  # validate before storing: a bad slot must not reach step()
+            protocol.encode(v)
+            if (r := revert(k)) is not None:
+                protocol.encode(r)
         self.slots[name] = Slot(name, priority, {k: dict(v) for k, v in state.items()},
                                 self.clock() + ttl, hard)
 
