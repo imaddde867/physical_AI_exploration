@@ -14,9 +14,13 @@ and turns off the backlight. No touch, batteries, or host commands are needed.
 ## Status, 2026-11-12
 
 - Done on the board: MicroPython 1.22.2 installed; vendor driver and this blink loaded.
-- Not recorded yet: free heap after initialization, orientation, colour, flicker and tearing from that session.
-- Not measured: real SPI rate, delivered frame rate, brightness, corner clipping.
-- Not yet exercised: vendor demo baseline, on-device transfer benchmark, unplug/replug, Mac sleep/wake.
+- Free heap after initialization: 86,400 bytes (printed by `main.py`).
+- Power: the board and screen ran from Mac USB-C, iPhone USB-C, and a USB wall charger. No battery or power bank was tested.
+- Display: colours correct (soft white on black), no flicker or tearing, 12.5% backlight duty dims the glow as designed.
+- Stability: 1-2 hour runs on the above supplies, with repeated unplug/replug, without a reset or freeze.
+- Not recorded yet: orientation and corner cropping.
+- Not measured: real SPI rate, delivered frame rate, brightness.
+- Not yet exercised: vendor demo baseline, on-device transfer benchmark, Mac sleep/wake.
 
 ## Prepare the vendor driver on the Mac
 
