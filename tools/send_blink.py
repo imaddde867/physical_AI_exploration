@@ -1,7 +1,7 @@
 """Send one blink to the RP2040 over USB serial; standard library only.
 
 Usage: python3 tools/send_blink.py [/dev/cu.usbmodem1101]
-Exits 0 only when the device answered `ok`; the eyes are the real confirmation.
+Exits 0 only when both messages were answered `ok`; the eyes are the real confirmation.
 """
 import os
 import select
@@ -42,6 +42,17 @@ def read_replies(fd, timeout=REPLY_WAIT_S):
         chunks.append(chunk)
 
 
+def acks(replies):
+    """How many complete `ok` replies the device sent; other output never counts."""
+    count = 0
+    for line in replies.splitlines():
+        try:
+            count += protocol.decode(line)["t"] == "ok"
+        except protocol.ProtocolError:
+            pass
+    return count
+
+
 def open_raw(path):
     """The port, with echo and line translation off so JSON arrives unmodified."""
     fd = os.open(path, os.O_RDWR | os.O_NOCTTY)
@@ -58,15 +69,16 @@ def open_raw(path):
 
 def main(argv):
     path = argv[1] if len(argv) > 1 else DEFAULT_PORT
+    lines = blink_lines()
     fd, saved = open_raw(path)
     try:
-        send(fd, blink_lines())
+        send(fd, lines)
         replies = read_replies(fd)
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, saved)
         os.close(fd)
     sys.stdout.write(replies.decode(errors="replace") or "no reply\n")
-    return 0 if b'"t":"ok"' in replies else 1
+    return 0 if acks(replies) == len(lines) else 1
 
 
 if __name__ == "__main__":

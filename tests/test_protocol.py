@@ -1,6 +1,8 @@
 import os
 import sys
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from daemon.protocol import (MAX_LINE, MAX_STR, ProtocolError, Watchdog, decode,
@@ -64,6 +66,12 @@ class ProtocolTest(unittest.TestCase):
         self.assertTrue(w.expired())
         w.feed()
         self.assertFalse(w.expired())
+
+    def test_watchdog_refuses_a_millisecond_clock(self):
+        # ticks_ms would make the timeout 1000x short and wraps; fail loudly instead.
+        with patch("daemon.protocol.time", SimpleNamespace(ticks_ms=lambda: 0)):
+            with self.assertRaises(AttributeError):
+                Watchdog()
 
     def test_errors_carry_the_documented_reply_code(self):
         cases = [(b"not json\n", "bad_json"), (b'{"v":2,"t":"ping"}\n', "bad_version"),

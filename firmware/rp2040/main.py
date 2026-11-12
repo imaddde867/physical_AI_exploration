@@ -16,21 +16,22 @@ OVERFLOW = object()  # LineReader sentinel: the line exceeded MAX_LINE and was d
 
 
 class LineReader:
-    """Frames newline-terminated lines and never buffers past the protocol limit."""
+    """Frames newline-terminated lines and never buffers past the protocol byte limit."""
 
     def __init__(self, limit=protocol.MAX_LINE - 1):
-        self.limit, self.chars, self.dropping = limit, [], False
+        self.limit, self.chars, self.size, self.dropping = limit, [], 0, False
 
     def feed(self, ch):
         """One character in: None to continue, a complete line, or OVERFLOW."""
         if ch == "\n":
             over, self.dropping = self.dropping, False
-            line, self.chars = "".join(self.chars).rstrip("\r"), []
+            line, self.chars, self.size = "".join(self.chars).rstrip("\r"), [], 0
             return OVERFLOW if over else line
         if self.dropping:
             return None
-        if len(self.chars) >= self.limit:
-            self.chars, self.dropping = [], True  # drop to the next newline
+        self.size += len(ch.encode())  # MAX_LINE counts UTF-8 bytes, not characters
+        if self.size > self.limit:
+            self.chars, self.size, self.dropping = [], 0, True  # drop to the next newline
             return None
         self.chars.append(ch)
         return None

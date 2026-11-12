@@ -94,13 +94,13 @@ python3 tools/send_blink.py /dev/cu.usbmodem1101
 With no argument it uses `/dev/cu.usbmodem1101`, which changes when the board is
 plugged into a different port. The sender writes the two `face.blink` messages
 from [protocol.md](../../docs/protocol.md), prints the device's reply, and exits
-non-zero if the device did not answer `ok`. Standard library only, no `pyserial`.
+non-zero unless both messages were answered `ok`; extra serial output never counts
+as an acknowledgement. Standard library only, no `pyserial`.
 
 The device answers `ping` and `face.blink` today and replies `err`/`unsupported`
 to the other documented commands. It holds the eyes closed for at most 2000 ms
 per `blink:true`, so a sender that dies mid-blink cannot leave them shut.
 Ctrl-C still stops the loop and turns the backlight off.
-
 
 ## Checks without hardware
 

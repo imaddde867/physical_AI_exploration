@@ -30,7 +30,6 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 - Strings counted in characters (<=200 for `text`/`msg`, <=16 for `label`); the 512-byte line cap still applies, so multi-byte text can be shorter.
 - Unknown `t`, unknown field, bad type, or out-of-range value: device ignores the message and replies `err` (`unknown_type`, `bad_field`, `bad_version`, `bad_json`). Never crash or blank on bad input.
 - Valid messages the device cannot render yet are answered `err` (`unsupported`). The RP2040 blink prototype does this for `bar`, `text`, `brightness`, `sleep`, `wake`, and `face` fields other than `blink`.
-- The device counts the line cap in characters, not bytes. Commands are ASCII, where the two are equal.
 
 ## Device implementation, 2026-11-12
 
@@ -40,9 +39,10 @@ host is connected, and input is consumed in bounded slices of at most 256
 characters per tick, with at most one reply written per tick, so a flood costs
 reply latency rather than animation frames. A host that stays connected but
 stops reading its port can still stall a single reply write for the USB transmit
-timeout; nothing in the prototype can prevent that. `daemon/protocol.py` is copied to the board's root as
-`protocol.py`, so validator and encoder behaviour cannot drift between the two
-sides. Replies are ASCII JSON, one line per received line.
+timeout; nothing in the prototype can prevent that. `daemon/protocol.py` is
+copied to the board's root as `protocol.py`, so validator and encoder behaviour
+cannot drift between the two sides. Replies are ASCII JSON, one line per
+received line.
 
 ### Blink hold rule
 
@@ -57,7 +57,6 @@ duration by sending `true`, waiting, then `false`.
 
 - `hello` on connect, and `hello` in reply to a first `ping`.
 - The `WATCHDOG_S` blanking rule and the explicit `sleep`/`wake` latch.
-
 
 ## Failure behaviour
 

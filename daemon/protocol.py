@@ -97,9 +97,9 @@ class Watchdog:
 
     def __init__(self, timeout=WATCHDOG_S, clock=None):
         self.timeout = timeout
-        # Host-side only. MicroPython has no time.monotonic; the ticks_ms fallback
-        # exists so the device can import this module, not so it can time out.
-        self.clock = clock or getattr(time, "monotonic", None) or time.ticks_ms
+        # Host-side only: MicroPython has no monotonic clock, and ticks_ms counts
+        # milliseconds and wraps, so it cannot stand in for a seconds timeout.
+        self.clock = clock or time.monotonic
         self.last = self.clock()
 
     def feed(self):

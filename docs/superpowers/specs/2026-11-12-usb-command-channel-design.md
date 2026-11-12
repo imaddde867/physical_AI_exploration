@@ -37,8 +37,10 @@ the four-second autonomous blink continues afterwards.
 source of truth and is copied to the board's root as `protocol.py` at deploy
 time. Two edits make that possible without duplicating validators:
 
-1. `Watchdog` no longer defaults to `time.monotonic`, which MicroPython lacks; it
-   falls back to `time.ticks_ms`. The class stays unused on the device.
+1. `Watchdog` resolves its default clock (`time.monotonic`) at construction, not
+   at import, so the module imports on MicroPython, which lacks it. There is no
+   `ticks_ms` fallback: it counts milliseconds and wraps, so it would silently
+   break a seconds timeout. The class stays unused on the device.
 2. `encode` drops `ensure_ascii=False`. ASCII-escaped output is still valid JSON
    and round-trips identically (covered by the existing `héllo ♪` test), and it
    is the one keyword MicroPython's `json.dumps` does not accept.
@@ -54,10 +56,9 @@ reproduces the autonomous blink. A hold that lasts 2000 ms releases itself, so a
 sender that dies mid-blink cannot leave the eyes shut. This timeout is a device
 behaviour the protocol document now states explicitly.
 
-**Bounded input.** `LineReader` keeps at most `MAX_LINE` characters, drops the
+**Bounded input.** `LineReader` keeps at most `MAX_LINE` bytes of UTF-8, drops the
 rest of an overlong line to the next newline, and answers `too_long`. At most
 256 characters are consumed per 20 ms tick, so a flood cannot starve rendering.
-The cap counts characters; commands are ASCII, where that equals bytes.
 
 **Sender uses `termios` and `os`.** Same two messages the device accepts, no
 `pyserial` dependency. It prints the device's reply so the link is confirmed

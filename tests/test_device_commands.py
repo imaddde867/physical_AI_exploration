@@ -95,7 +95,14 @@ class LineReaderTests(unittest.TestCase):
         reader = LineReader()
         for _ in range(600):
             reader.feed("x")
+            self.assertLessEqual(reader.size, protocol.MAX_LINE - 1)
             self.assertLessEqual(len(reader.chars), protocol.MAX_LINE - 1)
+
+    def test_limit_counts_utf8_bytes_not_characters(self):
+        # 300 two-byte characters: 600 bytes, over the cap even though under it in characters.
+        self.assertEqual(self.feed_all(LineReader(), "é" * 300 + "\n")[-1], OVERFLOW)
+        line = "é" * 255  # 510 bytes, plus the newline = 511
+        self.assertEqual(self.feed_all(LineReader(), line + "\n")[-1], line)
 
 
 class HandleTests(unittest.TestCase):
