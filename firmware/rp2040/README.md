@@ -27,7 +27,8 @@ command channel is optional: without a host it blinks on its own.
   - Gesture mode reported up 0x02, down 0x01, left 0x03, right 0x04, double click 0x0B, long press 0x0C. Double click and long press arrived twice each (one per interrupt edge), so debounce them in any consumer.
   - `show()` alone: mean 23.2 ms, p95 24.0 ms, max 37.6 ms (43 fps transfer-only).
   - Full `draw()`: 59.5 ms with open eyes, 28.1 ms closed. The open-eye pixel loops cost about 36 ms on top of the transfer.
-  - Follow-up: `draw()` now renders one open eye into a 39x39 RGB565 buffer (3 KB) on first use and blits it for both eyes. Not yet re-measured on the board; rerun `touch_probe.py` to compare against the 59.5 ms above.
+  - Follow-up: `draw()` now renders one open eye into a 39x39 RGB565 buffer (3 KB) on first use and blits it for both eyes. Measured on the board: open-eye `draw()` 30.0 ms (was 59.5), closed 27.1 ms; `show()` unchanged at 23.2 ms mean. Free heap read 44,256 bytes afterwards, higher than the earlier 29,456 because the old pixel loops left uncollected float garbage; the two heap readings are not a like-for-like comparison.
+  - Touch axes, second run: edge touches gave y=1 and x 23-46 near one top corner, x 205-224 near the other, and y=278 at the bottom (x 12 at y 244). That fits x increasing rightward and y downward like the display, assuming those were the physical corners touched; the reach stops around x=224, short of 239. A single tap was reported as gesture 0x05.
   - Free heap was 29,456 bytes with the probe, benchmark, `main`, protocol and touch all loaded, against 86,400 for the blink alone. Touch plus the imports cost memory; budget for it before adding it to `main.py`.
 
 ## Touch and frame-time probe
