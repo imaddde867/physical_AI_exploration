@@ -1,8 +1,24 @@
 import math
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
+from firmware.rp2040 import main as device
 from firmware.rp2040.main import EYE_DX, EYE_R, HEIGHT, WIDTH, draw, gray, run, set_window
 from sim.screen import Screen
+
+
+class FakeFrameBuffer:
+    """Host stand-in for MicroPython's framebuf.FrameBuffer: remembers drawn pixels."""
+    RGB565 = 1
+
+    def __init__(self, buf, w, h, fmt):
+        self.px = {}
+
+    def fill_rect(self, x, y, w, h, color):
+        for i in range(w):
+            for j in range(h):
+                self.px[(x + i, y + j)] = color
 
 
 class FakeLCD:
@@ -19,6 +35,11 @@ class FakeLCD:
         rgb = ((packed >> 11) * 255 // 31,
                ((packed >> 5) & 63) * 255 // 63, (packed & 31) * 255 // 31)
         self.screen.fill_rect(x, y, w, h, rgb)
+
+    def blit(self, eye, x, y):
+        for (px, py), color in eye.px.items():
+            if color:
+                self.fill_rect(x + px, y + py, 1, 1, color)
 
     def show(self):
         self.frames += 1
@@ -41,6 +62,12 @@ class NoInput:
 
 
 class DeviceBlinkTests(unittest.TestCase):
+    def setUp(self):
+        fake = SimpleNamespace(FrameBuffer=FakeFrameBuffer, RGB565=1)
+        for ctx in (patch.dict("sys.modules", {"framebuf": fake}), patch.object(device, "_open_eye", [])):
+            ctx.start()
+            self.addCleanup(ctx.stop)
+
     def test_smooth_eyes_blink_and_restore_without_a_halo(self):
         lcd = FakeLCD()
         frames = []

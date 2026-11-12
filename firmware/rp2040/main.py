@@ -88,27 +88,45 @@ def set_window(lcd, x0, y0, x1, y1):
     lcd.write_cmd(0x2C)
 
 
+EYE_BOX = 2 * EYE_R + 3  # one-pixel margin for the antialiased rim
+_open_eye = []  # built on first use: the pixel loops cost ~36 ms, a blit a few
+
+
+def paint_eye(target, cx, cy):
+    for dy in range(-EYE_R, EYE_R + 1):
+        inner_sq = (EYE_R - 0.5) ** 2 - dy * dy
+        inner = int(math.sqrt(inner_sq)) if inner_sq >= 0 else -1
+        if inner >= 0:
+            target.fill_rect(cx - inner, cy + dy, 2 * inner + 1, 1, EYE_COLOR)
+        outer = int(math.sqrt((EYE_R + 0.5) ** 2 - dy * dy))
+        for dx in range(inner + 1, outer + 1):
+            # A one-pixel coverage ramp smooths the silhouette without a halo.
+            coverage = EYE_R + 0.5 - math.sqrt(dx * dx + dy * dy)
+            if coverage > 0:
+                color = EYE_COLOR if coverage >= 1 else gray(int(232 * coverage))
+                target.fill_rect(cx + dx, cy + dy, 1, 1, color)
+                if dx:
+                    target.fill_rect(cx - dx, cy + dy, 1, 1, color)
+
+
+def make_open_eye():
+    import framebuf
+
+    eye = framebuf.FrameBuffer(bytearray(EYE_BOX * EYE_BOX * 2), EYE_BOX, EYE_BOX, framebuf.RGB565)
+    paint_eye(eye, EYE_R + 1, EYE_R + 1)  # background stays 0, the screen's black
+    return eye
+
+
 def draw(lcd, blink):
     lcd.fill(0)
+    if not blink and not _open_eye:
+        _open_eye.append(make_open_eye())
     for sign in (-1, 1):
         cx, cy = WIDTH // 2 + sign * EYE_DX, HEIGHT // 2
         if blink:
             lcd.fill_rect(cx - EYE_R, cy - 2, 2 * EYE_R + 1, 4, EYE_COLOR)
         else:
-            for dy in range(-EYE_R, EYE_R + 1):
-                inner_sq = (EYE_R - 0.5) ** 2 - dy * dy
-                inner = int(math.sqrt(inner_sq)) if inner_sq >= 0 else -1
-                if inner >= 0:
-                    lcd.fill_rect(cx - inner, cy + dy, 2 * inner + 1, 1, EYE_COLOR)
-                outer = int(math.sqrt((EYE_R + 0.5) ** 2 - dy * dy))
-                for dx in range(inner + 1, outer + 1):
-                    # A one-pixel coverage ramp smooths the silhouette without a halo.
-                    coverage = EYE_R + 0.5 - math.sqrt(dx * dx + dy * dy)
-                    if coverage > 0:
-                        color = EYE_COLOR if coverage >= 1 else gray(int(232 * coverage))
-                        lcd.fill_rect(cx + dx, cy + dy, 1, 1, color)
-                        if dx:
-                            lcd.fill_rect(cx - dx, cy + dy, 1, 1, color)
+            lcd.blit(_open_eye[0], cx - EYE_R - 1, cy - EYE_R - 1)
     lcd.show()
 
 

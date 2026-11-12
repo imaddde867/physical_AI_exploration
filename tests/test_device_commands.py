@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from daemon import protocol
+from firmware.rp2040 import main as device
 from firmware.rp2040.main import HOLD_MS, OVERFLOW, PARTIAL_LINE_MS, LineReader, handle, run
 
 CLOSE = '{"v":1,"t":"face","blink":true}\n'
@@ -216,6 +217,47 @@ class LoopTests(unittest.TestCase):
                            '{"v":1,"t":"ping"}\n')
         self.assertEqual([protocol.decode(line) for line in out.splitlines()],
                          [{"v": 1, "t": "ok"}])
+
+
+class DrawTests(unittest.TestCase):
+    class Canvas:
+        def __init__(self):
+            self.px, self.blits = {}, []
+
+        def fill(self, color): pass
+        def show(self): pass
+        def blit(self, eye, x, y): self.blits.append((eye, x, y))
+
+        def fill_rect(self, x, y, w, h, color):
+            for i in range(w):
+                for j in range(h):
+                    self.px[(x + i, y + j)] = color
+
+    def test_eye_fits_its_box_and_is_symmetric(self):
+        c, mid = self.Canvas(), device.EYE_R + 1
+        device.paint_eye(c, mid, mid)
+        self.assertTrue(all(0 <= x < device.EYE_BOX and 0 <= y < device.EYE_BOX for x, y in c.px))
+        self.assertTrue(all(c.px.get((2 * mid - x, y)) == v for (x, y), v in c.px.items()))
+        self.assertEqual(c.px[(mid, mid)], device.EYE_COLOR)
+
+    def test_open_eyes_are_blitted_once_built(self):
+        lcd, eye = self.Canvas(), object()
+        with patch.object(device, "make_open_eye", return_value=eye) as make, \
+                patch.object(device, "_open_eye", []):
+            device.draw(lcd, False)
+            device.draw(lcd, False)
+        make.assert_called_once()
+        left, right = lcd.blits[0], lcd.blits[1]
+        self.assertEqual((left[0], left[1], right[1]), (eye, 120 - 42 - 19, 120 + 42 - 19))
+        self.assertEqual(left[2], 140 - 19)
+        self.assertEqual(len(lcd.blits), 4)
+
+    def test_closed_eyes_skip_the_cache(self):
+        lcd = self.Canvas()
+        with patch.object(device, "make_open_eye") as make:
+            device.draw(lcd, True)
+        make.assert_not_called()
+        self.assertEqual(lcd.blits, [])
 
 
 if __name__ == "__main__":
