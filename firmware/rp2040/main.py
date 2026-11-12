@@ -1,8 +1,70 @@
 """Local blink for Waveshare RP2040-Touch-LCD-1.69; see README.md."""
 import math
 
+try:  # on the board, daemon/protocol.py is copied to the root as protocol.py
+    from daemon import protocol
+except ImportError:
+    import protocol
+
 WIDTH, HEIGHT = 240, 280
 EYE_R, EYE_DX, BLINK_MS, BLINK_EVERY_MS = 18, 42, 140, 4000
+HOLD_MS = 2000  # a host-held blink releases itself, so a dead sender cannot freeze it
+MAX_CHARS_PER_TICK = 256  # caps input work per tick; frame timing under a flood is not measured
+PARTIAL_LINE_MS = 1000  # a half-received line is discarded after this much silence
+# One reply per tick: each write can stall for the USB TX timeout if the host stops reading.
+MAX_REPLIES_PER_TICK = 1
+OVERFLOW = object()  # LineReader sentinel: the line exceeded MAX_LINE and was dropped
+
+
+class LineReader:
+    """Frames newline-terminated lines and never buffers past the protocol byte limit."""
+
+    def __init__(self, limit=protocol.MAX_LINE - 1):
+        self.limit, self.chars, self.size, self.dropping = limit, [], 0, False
+        self.quiet = 0
+
+    def feed(self, ch):
+        """One character in: None to continue, a complete line, or OVERFLOW."""
+        self.quiet = 0
+        if ch == "\n":
+            over, self.dropping = self.dropping, False
+            line, self.chars, self.size = "".join(self.chars).rstrip("\r"), [], 0
+            return OVERFLOW if over else line
+        if self.dropping:
+            return None
+        self.size += len(ch.encode())  # MAX_LINE counts UTF-8 bytes, not characters
+        if self.size > self.limit:
+            self.chars, self.size, self.dropping = [], 0, True  # drop to the next newline
+            return None
+        self.chars.append(ch)
+        return None
+
+    def tick(self, elapsed):
+        """Silence of `elapsed` ms: drop a partial line so a dead sender cannot corrupt the next."""
+        if self.size or self.dropping:
+            self.quiet += elapsed
+            if self.quiet >= PARTIAL_LINE_MS:
+                self.chars, self.size, self.dropping, self.quiet = [], 0, False, 0
+
+
+def _line(msg):
+    return protocol.encode(msg).decode()
+
+
+def handle(text):
+    """Apply one command line: (reply line, eyelid hold in ms or None)."""
+    try:
+        msg = protocol.decode(text)
+    except protocol.ProtocolError as e:
+        return _line({"v": 1, "t": "err", "code": e.code}), None
+    if msg["t"] == "ping":
+        return _line({"v": 1, "t": "ok"}), None
+    if msg["t"] == "face" and not {"x", "y", "mood"} & set(msg):
+        if "blink" in msg:
+            return _line({"v": 1, "t": "ok"}), HOLD_MS if msg["blink"] else 0
+        return _line({"v": 1, "t": "ok"}), None
+    # Valid protocol messages this prototype cannot render yet.
+    return _line({"v": 1, "t": "err", "code": "unsupported"}), None
 
 
 def gray(level):
@@ -52,6 +114,8 @@ def draw(lcd, blink):
 
 def run():
     import gc
+    import select
+    import sys
     import time
     from waveshare_lcd import LCD_1inch69
 
@@ -64,15 +128,46 @@ def run():
     try:
         lcd.set_bl_pwm(8192)
         gc.collect()
+        # USB serial shares one stream with the REPL, so reads are polled, not blocked on.
+        poller = select.poll()
+        poller.register(sys.stdin, select.POLLIN)
+        reader = LineReader()
         print("blink ready; free heap:", gc.mem_free(), "bytes; Ctrl-C to stop")
         previous = time.ticks_ms()
-        phase, last_blink = BLINK_MS, None
+        phase, last_blink, hold_ms = BLINK_MS, None, 0
         while True:
             now = time.ticks_ms()
+            elapsed = time.ticks_diff(now, previous)
             # Accumulate short tick differences so long runs survive clock wraparound.
-            phase = (phase + time.ticks_diff(now, previous)) % BLINK_EVERY_MS
+            phase = (phase + elapsed) % BLINK_EVERY_MS
             previous = now
-            blink = phase < BLINK_MS
+            reader.tick(elapsed)
+            if hold_ms:
+                hold_ms = max(0, hold_ms - elapsed)  # release a hold the host left behind
+            replied = 0
+            for _ in range(MAX_CHARS_PER_TICK):
+                if replied >= MAX_REPLIES_PER_TICK:
+                    break
+                if not poller.poll(0):
+                    break
+                ch = sys.stdin.read(1)
+                if not ch:  # a vanished host keeps the eyes animating
+                    break
+                line = reader.feed(ch)
+                if line is None:
+                    continue
+                if line is OVERFLOW:
+                    sys.stdout.write(_line({"v": 1, "t": "err", "code": "too_long"}))
+                    replied += 1
+                    continue
+                reply, hold = handle(line)
+                if hold is not None:
+                    hold_ms = hold
+                    if not hold:
+                        phase = BLINK_MS  # reopen now, and start a fresh four-second cycle
+                sys.stdout.write(reply)
+                replied += 1
+            blink = hold_ms > 0 or phase < BLINK_MS
             if blink != last_blink:
                 draw(lcd, blink)
                 last_blink = blink

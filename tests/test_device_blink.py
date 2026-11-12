@@ -30,6 +30,16 @@ class FakeLCD:
         self.commands.append(("data", value))
 
 
+class NoInput:
+    """Stand-in poller: the loop must animate with nothing on USB serial."""
+
+    def register(self, obj, mask=0):
+        pass
+
+    def poll(self, timeout=0):
+        return []
+
+
 class DeviceBlinkTests(unittest.TestCase):
     def test_smooth_eyes_blink_and_restore_without_a_halo(self):
         lcd = FakeLCD()
@@ -117,7 +127,9 @@ class DeviceBlinkTests(unittest.TestCase):
             sleep_ms=Mock(side_effect=[None, None, KeyboardInterrupt]),
         )
         modules = {"waveshare_lcd": SimpleNamespace(LCD_1inch69=Driver), "time": clock,
-                   "gc": SimpleNamespace(collect=lambda: None, mem_free=lambda: 50000)}
+                   "gc": SimpleNamespace(collect=lambda: None, mem_free=lambda: 50000),
+                   # run() polls USB stdin; keep it off the test runner's real stdin.
+                   "select": SimpleNamespace(POLLIN=1, poll=NoInput)}
         with patch.dict("sys.modules", modules), patch("builtins.print"):
             with self.assertRaises(KeyboardInterrupt):
                 run()

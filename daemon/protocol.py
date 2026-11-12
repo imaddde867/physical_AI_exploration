@@ -40,53 +40,67 @@ SPEC = {
 }
 
 
+class ProtocolError(ValueError):
+    """A rejected message, carrying the documented `err` code for the reply."""
+
+    def __init__(self, code, msg):
+        super().__init__(msg)
+        self.code = code
+
+
 def _check(msg):
     if not isinstance(msg, dict):
-        raise ValueError("message must be a JSON object")
+        raise ProtocolError("bad_json", "message must be a JSON object")
     if type(msg.get("v")) is not int or msg["v"] != VERSION:
-        raise ValueError(f"unsupported version {msg.get('v')!r}, expected {VERSION}")
+        raise ProtocolError("bad_version",
+                            f"unsupported version {msg.get('v')!r}, expected {VERSION}")
     t = msg.get("t")
     if not isinstance(t, str) or t not in SPEC:
-        raise ValueError(f"unknown type {t!r}")
+        raise ProtocolError("unknown_type", f"unknown type {t!r}")
     req, opt = SPEC[t]
     for k in req:
         if k not in msg:
-            raise ValueError(f"{t}: missing field {k!r}")
+            raise ProtocolError("bad_field", f"{t}: missing field {k!r}")
     for k, val in msg.items():
         if k in ("v", "t"):
             continue
         check = req.get(k) or opt.get(k)
         if check is None:
-            raise ValueError(f"{t}: unknown field {k!r}")
+            raise ProtocolError("bad_field", f"{t}: unknown field {k!r}")
         if not check(val):
-            raise ValueError(f"{t}: bad value for {k!r}: {val!r}")
+            raise ProtocolError("bad_field", f"{t}: bad value for {k!r}: {val!r}")
     return msg
 
 
 def encode(msg: dict) -> bytes:
     _check(msg)
-    line = json.dumps(msg, ensure_ascii=False, separators=(",", ":")).encode() + b"\n"
+    # ASCII-escaped output: MicroPython's json.dumps has no ensure_ascii keyword,
+    # and the device runs this same encoder. Escaping round-trips identically.
+    line = json.dumps(msg, separators=(",", ":")).encode() + b"\n"
     if len(line) > MAX_LINE:
-        raise ValueError(f"line is {len(line)} bytes, max {MAX_LINE}")
+        raise ProtocolError("too_long", f"line is {len(line)} bytes, max {MAX_LINE}")
     return line
 
 
 def decode(line: bytes) -> dict:
     if len(line) > MAX_LINE:
-        raise ValueError(f"line is {len(line)} bytes, max {MAX_LINE}")
+        raise ProtocolError("too_long", f"line is {len(line)} bytes, max {MAX_LINE}")
     try:
         msg = json.loads(line)
     except ValueError as e:  # includes UnicodeDecodeError
-        raise ValueError(f"invalid JSON: {e}") from None
+        raise ProtocolError("bad_json", f"invalid JSON: {e}") from None
     return _check(msg)
 
 
 class Watchdog:
     """Liveness only: feed() after valid messages; explicit sleep is separate."""
 
-    def __init__(self, timeout=WATCHDOG_S, clock=time.monotonic):
-        self.timeout, self.clock = timeout, clock
-        self.last = clock()
+    def __init__(self, timeout=WATCHDOG_S, clock=None):
+        self.timeout = timeout
+        # Host-side only: MicroPython has no monotonic clock, and ticks_ms counts
+        # milliseconds and wraps, so it cannot stand in for a seconds timeout.
+        self.clock = clock or time.monotonic
+        self.last = self.clock()
 
     def feed(self):
         self.last = self.clock()

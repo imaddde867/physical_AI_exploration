@@ -9,7 +9,8 @@ antialiased circle edge and 12.5% backlight duty to reduce the black-level glow:
 one 140 ms blink every four seconds. It uses the vendor driver's single packed
 RGB565 framebuffer (134,400 bytes), prints the remaining MicroPython heap after
 initialization, and redraws only when blink state changes. Ctrl-C stops the loop
-and turns off the backlight. No touch, batteries, or host commands are needed.
+and turns off the backlight. No touch or battery is needed, and the USB serial
+command channel is optional: without a host it blinks on its own.
 
 ## Status, 2026-11-12
 
@@ -69,8 +70,10 @@ vendor example, not a measured stable rate on this board.
    `Python/RPI_PICO-20240222-v1.22.2.uf2` (MicroPython 1.22.2, sha256
    `e92c2a253d2d4830d56cd6aebae1bbc6c913f413122dabba3cc2de74b984bba9`): hold BOOT while plugging in, then copy it to the `RPI-RP2` drive.
    Run the original vendor example from Thonny to establish a working baseline.
-3. In Thonny, copy `waveshare_lcd.py` and our `main.py` to the board's root.
-   Both files must be on the board. Saving as `main.py` makes the blink start on boot.
+3. In Thonny, copy `waveshare_lcd.py`, `daemon/protocol.py` (as `protocol.py`) and our
+   `main.py` to the board's root. All three files must be on the board. Saving as
+   `main.py` makes the blink start on boot. The board has no `daemon` package, so
+   `protocol.py` sits beside `main.py` and the shared codec is not duplicated in git.
 4. Run `main.py`. Expect two centered eyes and a short blink every four seconds.
    Record the reported free heap, screen orientation, cropping, flicker, and any errors.
 5. Stop with Ctrl-C. Restart to confirm recovery. Unplug/replug and Mac sleep were
@@ -78,6 +81,29 @@ vendor example, not a measured stable rate on this board.
 
 If allocation fails or the screen is blank, stop and record the error plus the
 firmware version; return to the vendor demo before changing display registers.
+
+## Host commands
+
+The blink also listens on the same USB serial port, without blocking the
+animation. From the repository root:
+
+```sh
+python3 tools/send_blink.py /dev/cu.usbmodem1101
+```
+
+With no argument it uses `/dev/cu.usbmodem1101`, which changes when the board is
+plugged into a different port. The sender writes the two `face.blink` messages
+from [protocol.md](../../docs/protocol.md), prints the device's reply, and exits
+non-zero unless both messages were answered `ok`; extra serial output never counts
+as an acknowledgement. Standard library only, no `pyserial`.
+
+Quit Thonny (or disconnect it) first: it reads the same port, steals reply bytes and
+can reset the board. Only one program should hold `/dev/cu.usbmodem*` at a time.
+
+The device answers `ping` and `face.blink` today and replies `err`/`unsupported`
+to the other documented commands. It holds the eyes closed for at most 2000 ms
+per `blink:true`, so a sender that dies mid-blink cannot leave them shut.
+Ctrl-C still stops the loop and turns the backlight off.
 
 ## Checks without hardware
 

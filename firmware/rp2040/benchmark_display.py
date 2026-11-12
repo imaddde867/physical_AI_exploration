@@ -40,6 +40,8 @@ def run():
         print('Free heap before:', gc.mem_free())
         print(measure_show(lcd, time))
         print('Free heap after:', gc.mem_free())
+        gc.collect()
+        print('Free heap after GC (display still active):', gc.mem_free())
         print('Transfer only: add flash reads, decoding and scheduling before choosing animation FPS.')
     finally:
         lcd.set_bl_pwm(0)

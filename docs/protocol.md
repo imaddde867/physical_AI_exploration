@@ -1,6 +1,6 @@
 # MacDesk Buddy serial protocol (DRAFT v1)
 
-Status, 2026-11-04: proposed interface, not a running host/device system. Only the Python codec and watchdog helper exist; transport, firmware, keepalive scheduling, and reconnect behavior below are not implemented. The ordered bench prototype uses an integrated RP2040; see the [product brief](product-brief.md).
+Status, 2026-11-12: `daemon/protocol.py` is the shared codec, and the RP2040 blink prototype now implements `face` (`blink` only) and `ping` from it. Every other valid message is answered `err` (`unsupported`). The host daemon, keepalive scheduling, and reconnect behavior are still not implemented. The ordered bench prototype uses an integrated RP2040; see the [product brief](product-brief.md).
 
 Proposed Mac service <-> display controller over USB CDC serial. One JSON object per line (UTF-8, `\n` terminated).
 Every message has `v` (protocol version, currently `1`) and `t` (type). Reference: `daemon/protocol.py`.
@@ -9,7 +9,7 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 
 | t | fields | notes |
 |---|---|---|
-| `face` | `x`,`y` float -1..1 (gaze); `blink` bool; `mood` neutral/happy/sad/sleepy/surprised/angry | all optional; omitted fields keep their last value. Idle animation runs on the device |
+| `face` | `x`,`y` float -1..1 (gaze); `blink` bool; `mood` neutral/happy/sad/sleepy/surprised/angry | all optional; omitted fields keep their last value. Idle animation runs on the device. `blink:true` holds the eyelids closed; see the hold rule below |
 | `bar` | `id` 0..7, `value` int 0..100, `label` str <=16 (optional) | usage bars (Claude/Codex) |
 | `text` | `slot` 0..3, `s` str <=200 chars | lyrics, chat; empty string clears the slot |
 | `brightness` | `value` 0..100 | sets desired brightness, retained while blanked |
@@ -29,6 +29,37 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 - Line max 512 bytes including `\n`. Longer lines are dropped up to the next `\n` and answered with `err` (`code: "too_long"`).
 - Strings counted in characters (<=200 for `text`/`msg`, <=16 for `label`); the 512-byte line cap still applies, so multi-byte text can be shorter.
 - Unknown `t`, unknown field, bad type, or out-of-range value: device ignores the message and replies `err` (`unknown_type`, `bad_field`, `bad_version`, `bad_json`). Never crash or blank on bad input.
+- Valid messages the device cannot render yet are answered `err` (`unsupported`). The RP2040 blink prototype does this for `bar`, `text`, `brightness`, `sleep`, `wake`, and `face` fields other than `blink`.
+
+## Device implementation, 2026-11-12
+
+The RP2040 prototype reads lines from USB CDC with `select.poll(0)` in the same
+20 ms loop that animates the eyes: the autonomous blink keeps running while a
+host is connected, and input is consumed in bounded slices of at most 256
+characters per tick, with at most one reply written per tick. This bounds the
+work per tick; frame timing under a flood has not been measured. A partial line
+with no input for 1 s is discarded, so a sender that dies mid-line does not
+corrupt the next connection's first command (one that connects sooner than that
+can still get a `bad_json` for it). A host that stays connected but
+stops reading its port can still stall a single reply write for the USB transmit
+timeout; nothing in the prototype can prevent that. `daemon/protocol.py` is
+copied to the board's root as `protocol.py`, so validator and encoder behaviour
+cannot drift between the two sides. Replies are ASCII JSON, one line per
+received line.
+
+### Blink hold rule
+
+`blink:true` holds the eyes closed and `blink:false` releases them immediately:
+the eyes reopen on the next 20 ms tick and the idle four-second cycle restarts
+from the release. A hold that lasts **2000 ms** releases itself, so a sender that
+dies mid-blink cannot leave the eyes shut. This timeout is a transport
+safeguard, not part of the sender's blink: the sender still chooses the visible
+duration by sending `true`, waiting, then `false`.
+
+### Not implemented on the device yet
+
+- `hello` on connect, and `hello` in reply to a first `ping`.
+- The `WATCHDOG_S` blanking rule and the explicit `sleep`/`wake` latch.
 
 ## Failure behaviour
 
