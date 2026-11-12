@@ -78,3 +78,4 @@ if __name__ == "__main__":
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "exports")
     for name, m in (("waveshare_fit_coupon", coupon().shape), *((c.label, c) for c in case().shape.children)):
         bd.export_stl(m, os.path.join(out, name + ".stl"), tolerance=0.02, angular_tolerance=0.1)
+    bd.export_step(case().shape, os.path.join(out, "waveshare_case.step"))  # for Fusion
