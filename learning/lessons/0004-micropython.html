@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4. Running MicroPython on the board</title><link rel="stylesheet" href="../assets/style.css"></head><body>
+<nav class="l"><a href="0003-spi-speed.html">3</a> · <a href="../reference/glossary.html">Glossary</a> · next: <a href="0005-first-day.html">5. First day</a></nav>
+<h1>4. Running MicroPython on the board</h1>
+<p>MicroPython is a Python interpreter stored in the board's flash. You get a prompt (the REPL) over USB serial and a small filesystem for your files.</p>
+
+<h2>Installing it</h2>
+<ol>
+<li>Hold the <b>BOOT</b> button, plug in USB, release. The board appears as a drive named <code>RPI-RP2</code>.</li>
+<li>Copy a <code>.uf2</code> firmware file onto that drive. The board reboots by itself and the drive disappears.</li>
+<li>Open Thonny, choose the MicroPython (Raspberry Pi Pico) interpreter, and you have a REPL.</li>
+</ol>
+<p class="mut">Steps from <code>firmware/rp2040/README.md</code>; the Waveshare archive includes MicroPython 1.22.2. The BOOT drive is a ROM bootloader, so it works even if your code is broken. That makes it the recovery path.</p>
+
+<h2>What runs when</h2>
+<p>After a reset the interpreter runs <code>boot.py</code> if present, then <code>main.py</code>. Our blink is <code>main.py</code>. <b>Ctrl-C</b> stops a running loop. <b>Ctrl-D</b> is a soft reset: Python objects and most peripheral setup are cleared, the USB connection stays up. A hard reset (power cycle, <code>machine.reset()</code>) resets the hardware too.</p>
+<p class="mut">MicroPython docs, "Reset and Boot Sequence".</p>
+
+<h2>Memory is the constraint</h2>
+<p>SRAM is 264 kB. The interpreter, heap, and your objects share it. The 134,400-byte framebuffer is one contiguous <code>bytearray</code>, so a fragmented heap can fail an allocation even when total free memory looks sufficient. That is why <code>main.py</code> calls <code>gc.collect()</code> before creating the display and prints <code>gc.mem_free()</code>. The real free figure is unknown until the board runs; record it.</p>
+
+<figure><svg class="d" viewBox="0 0 600 170" role="img" aria-label="SRAM budget">
+<text x="10" y="18" class="m">SRAM 270,336 bytes (264 KiB), bar widths to scale</text>
+<rect class="fa" x="10" y="28" width="278" height="30"/><rect class="b" x="288" y="28" width="282" height="30"/>
+<text x="20" y="48">framebuffer 134,400</text><text x="298" y="48">everything else ~135,936</text>
+<text x="10" y="90" class="m">With a second buffer</text>
+<rect class="fa" x="10" y="100" width="278" height="30"/><rect class="fb" x="288" y="100" width="278" height="30"/><rect class="b" x="566" y="100" width="4" height="30"/>
+<text x="20" y="120">buffer 1</text><text x="298" y="120">buffer 2</text>
+<text x="10" y="155" class="m">1,536 bytes left for MicroPython itself: does not fit</text>
+</svg><figcaption>Why one framebuffer is the practical limit. "Everything else" includes the interpreter and heap; its real size is a number to record on the board.</figcaption></figure>
+<h2>Time in MicroPython</h2>
+<p><code>time.ticks_ms()</code> wraps around, so you never subtract it directly. Use <code>time.ticks_diff(now, previous)</code>. Our <code>main.py</code> accumulates small differences for this reason, so a blink loop can run for days.</p>
+
+<h2>Check</h2>
+<div class="q" data-a="3"><p>Your code hangs the board. How do you recover?</p>
+<button>Reflash the wiki demo</button><button>Replace the USB cable</button><button>Wait for it to finish</button><button>BOOT drive, reinstall</button>
+<div class="why">The ROM bootloader does not depend on the flash contents, so BOOT-plug always gives you the drive.</div></div>
+<div class="q" data-a="0"><p>What does Ctrl-D in the REPL do?</p>
+<button>Soft reset, USB stays</button><button>Hard reset, USB drops</button><button>Delete main.py file</button><button>Switch off backlight</button>
+<div class="why">Soft reset restarts the interpreter only.</div></div>
+<div class="q" data-a="1"><p>Why use ticks_diff, not subtraction?</p>
+<button>Subtraction is slower</button><button>The counter wraps round</button><button>ticks_ms is negative</button><button>Python forbids minus</button>
+<div class="why">The counter wraps; ticks_diff handles the wrap.</div></div>
+
+<p><b>Read next:</b> <a href="https://docs.micropython.org/en/latest/rp2/quickref.html">RP2 quick reference</a>, then <a href="https://docs.micropython.org/en/latest/reference/reset_boot.html">Reset and boot sequence</a>.</p>
+<script src="../assets/quiz.js"></script></body></html>

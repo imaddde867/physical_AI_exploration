@@ -28,12 +28,12 @@ Claude/Codex usage meters, a focus timer, lyrics, and chat are later candidates,
 | CAD | Display exterior, magnets, rear plate, contact pads, cable, plug, simplified laptop | Electronics cavity, closures, real contact assembly, manufacturing tolerances, and cable fastening |
 | Simulator | 240×280 portrait RGB565 drawing for the ordered prototype, native macOS physical sizing, animation examples | Real refresh rate, brightness, and final face |
 | Host/device software | Draft messages, validation, watchdog helper, and [local blink prototype](../firmware/rp2040/README.md) | Running Mac service, serial transport, and hardware validation |
-| Hardware | Ordered: Waveshare RP2040-Touch-LCD-1.69 (BerryBase order 1097674) | Delivery, first light, frame rate, sleep/wake behaviour; final power circuit and connectors |
+| Hardware | Delivered: Waveshare RP2040-Touch-LCD-1.69 (BerryBase order 1097674) | Bench measurements, frame rate, sleep/wake behaviour; final power circuit and connectors |
 | Printing | Concept meshes can be exported | Printable enclosure, printer/profile/material details recorded in this repo, tolerances, and fit tests |
 
-The previous Good Display GDOJ0269C01 / ESP32-P4 proposal is **on hold**. Its dimensions still drive the CAD concept, while the simulator now follows the ordered prototype. The [hardware log](hardware/bringup-log.md) records the earlier panel-selection pause; no first light or final enclosure fit is established.
+The previous Good Display GDOJ0269C01 / ESP32-P4 proposal is **on hold**. Its dimensions still drive the CAD concept, while the simulator now follows the ordered prototype. The [hardware log](hardware/bringup-log.md) records the earlier panel-selection pause; no first-light results or final enclosure fit are recorded.
 
-**Ordered prototype hardware (2026-11-04):** Waveshare RP2040-Touch-LCD-1.69 (BerryBase WS-28161, order 1097674): [1.69" 240×280 capacitive touch display](https://www.waveshare.com/product/rp2040-touch-lcd-1.69.htm) with an integrated RP2040 (133 MHz, 264 KB SRAM, 16 MB flash). €19.90 + €9.90 DHL shipping = **€29.80** delivered to Finland, on the €30 target. This replaces the Pico WH + Pico-LCD-1.8 + CU0240 basket in the [budget report](../reports/Budget%20companion%20learning%20hardware.md#final-basket-2026-11-04), which was never ordered. No cable was bought: use the existing 50 cm Apple USB-C to USB-C cable (power + data) and find a shorter one later. Pinout, driver setup and the firmware path still need bring-up checks; read Waveshare's wiki for this board first. The [display shortlist report](../reports/Companion%20display%20hardware%20shortlist.md) remains background evidence.
+**Ordered prototype hardware (ordered 2026-11-04, delivered 2026-11-12):** Waveshare RP2040-Touch-LCD-1.69 (BerryBase WS-28161, order 1097674): [1.69" 240×280 capacitive touch display](https://www.waveshare.com/product/rp2040-touch-lcd-1.69.htm) with an integrated RP2040 (133 MHz, 264 KB SRAM, 16 MB flash). €19.90 + €9.90 DHL shipping = **€29.80** delivered to Finland, on the €30 target. This replaces the Pico WH + Pico-LCD-1.8 + CU0240 basket in the [budget report](../reports/Budget%20companion%20learning%20hardware.md#final-basket-2026-11-04), which was never ordered. No cable was bought: use the existing 50 cm Apple USB-C to USB-C cable (power + data) and find a shorter one later. Pinout, driver setup and the firmware path still need bring-up checks; read Waveshare's wiki for this board first. The [display shortlist report](../reports/Companion%20display%20hardware%20shortlist.md) remains background evidence.
 
 ## Device renderer plan
 
@@ -41,7 +41,7 @@ Render the face locally from small commands; do not stream desktop frames. Start
 
 ## Next decisions, in order
 
-1. Wait for delivery. Meanwhile read the Waveshare wiki for the RP2040-Touch-LCD-1.69 (driver setup, pinout, MicroPython/C demos).
+1. Board delivered and flashed 2026-11-12. Record that session (free heap, orientation, colour, flicker) in the [bring-up log](hardware/bringup-log.md).
 2. Run Waveshare's demo, then a blink, then one Mac serial command over the 50 cm USB-C cable. Do not freeze final CAD from board width and height alone.
 3. Prove the display works on the bench. In parallel, collect the [real Mac measurements](hardware/measure-mac.md), [printer filament/profile](hardware/printer.md) (model recorded), and a physical cable-route test.
 4. Adapt the enclosure and mount around actual hardware, then print a fit prototype. Check lid movement, magnet retention, contacts, assembly access, and strain relief before final print files.
@@ -55,4 +55,4 @@ The current cable route has a documented slack shortfall; do not treat the rende
 - `daemon/protocol.py` and [protocol draft](protocol.md): candidate software boundary; tests do not imply an implemented device.
 - `docs/superpowers/`, [old slab decisions](archive/2026-11-01-slab-decisions.md), and `scale_compare.py`: historical or paused work; use their status notices before following them.
 
-The reset preserves existing uncommitted work and historical files. The prototype board is ordered (not yet delivered). No history is deleted, and no commit is implied by this brief.
+The reset preserves existing uncommitted work and historical files. The prototype board was delivered and flashed on 2026-11-12. No history is deleted, and no commit is implied by this brief.

@@ -18,3 +18,4 @@ animation/vendor/
 .local-archive/
 
 .claude/
+.agents/

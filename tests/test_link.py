@@ -15,8 +15,10 @@ class LinkTests(unittest.TestCase):
         self.assertIsNone(link.recv())
 
     def test_overlong_line_rejected(self):
+        link = Link(io.BytesIO(b"x" * 600 + b"\n" + b'{"v":1,"t":"ping"}\n'))
         with self.assertRaises(ValueError):
-            Link(io.BytesIO(b"x" * 600 + b"\n")).recv()
+            link.recv()
+        self.assertEqual(link.recv(), {"v": 1, "t": "ping"})  # one error per overlong line
 
 
 if __name__ == "__main__":
