@@ -14,7 +14,8 @@ original rig, texture maps and earlier takes are preserved.
 
 `crying-head-2-anchored.blend` is the only scene tracked in the repo. The three
 earlier scenes are kept in the checkpoint commits above and in the gitignored
-local archive `.local-archive/2026-11-12/animation/`.
+local archive `.local-archive/2026-11-12/animation/`. Restore one with
+`git show 17157bb:animation/<name>.blend > animation/<name>.blend`.
 The final planted scene contains all eight new `ANCHORED | ...` Actions.
 
 ## Current behavior library
