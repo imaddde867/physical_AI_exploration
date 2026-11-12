@@ -97,6 +97,9 @@ from [protocol.md](../../docs/protocol.md), prints the device's reply, and exits
 non-zero unless both messages were answered `ok`; extra serial output never counts
 as an acknowledgement. Standard library only, no `pyserial`.
 
+Quit Thonny (or disconnect it) first: it reads the same port, steals reply bytes and
+can reset the board. Only one program should hold `/dev/cu.usbmodem*` at a time.
+
 The device answers `ping` and `face.blink` today and replies `err`/`unsupported`
 to the other documented commands. It holds the eyes closed for at most 2000 ms
 per `blink:true`, so a sender that dies mid-blink cannot leave them shut.
