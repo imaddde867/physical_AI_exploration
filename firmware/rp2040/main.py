@@ -8,7 +8,8 @@ except ImportError:
 
 WIDTH, HEIGHT = 240, 280
 EYE_R, EYE_DX, BLINK_MS, BLINK_EVERY_MS = 18, 42, 140, 4000
-GAZE_PX = 10  # eye travel at |x| or |y| = 1
+GAZE_PX = 20  # eye travel at |x| or |y| = 1
+GAZE_EASE = 0.3  # share of the remaining gap closed per 20 ms tick
 HOLD_MS = 2000  # a host-held blink releases itself, so a dead sender cannot freeze it
 MAX_CHARS_PER_TICK = 256  # caps input work per tick; frame timing under a flood is not measured
 PARTIAL_LINE_MS = 1000  # a half-received line is discarded after this much silence
@@ -164,6 +165,7 @@ def run():
         previous = time.ticks_ms()
         phase, last_drawn, hold_ms = BLINK_MS, None, 0
         gaze = [0.0, 0.0]
+        eased = [0.0, 0.0]
         while True:
             now = time.ticks_ms()
             elapsed = time.ticks_diff(now, previous)
@@ -196,8 +198,10 @@ def run():
                         phase = BLINK_MS  # reopen now, and start a fresh four-second cycle
                 sys.stdout.write(reply)
                 replied += 1
+            for i in (0, 1):
+                eased[i] += (gaze[i] - eased[i]) * GAZE_EASE
             blink = hold_ms > 0 or phase < BLINK_MS
-            shown = (blink, round(gaze[0] * GAZE_PX), round(gaze[1] * GAZE_PX))
+            shown = (blink, round(eased[0] * GAZE_PX), round(eased[1] * GAZE_PX))
             if shown != last_drawn:
                 draw(lcd, *shown)
                 last_drawn = shown
