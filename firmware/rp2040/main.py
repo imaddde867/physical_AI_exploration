@@ -9,7 +9,8 @@ except ImportError:
 WIDTH, HEIGHT = 240, 280
 EYE_R, EYE_DX, BLINK_MS, BLINK_EVERY_MS = 18, 42, 140, 4000
 HOLD_MS = 2000  # a host-held blink releases itself, so a dead sender cannot freeze it
-MAX_CHARS_PER_TICK = 256  # bounds input work so a flood cannot starve rendering
+MAX_CHARS_PER_TICK = 256  # caps input work per tick; frame timing under a flood is not measured
+PARTIAL_LINE_MS = 1000  # a half-received line is discarded after this much silence
 # One reply per tick: each write can stall for the USB TX timeout if the host stops reading.
 MAX_REPLIES_PER_TICK = 1
 OVERFLOW = object()  # LineReader sentinel: the line exceeded MAX_LINE and was dropped
@@ -20,9 +21,11 @@ class LineReader:
 
     def __init__(self, limit=protocol.MAX_LINE - 1):
         self.limit, self.chars, self.size, self.dropping = limit, [], 0, False
+        self.quiet = 0
 
     def feed(self, ch):
         """One character in: None to continue, a complete line, or OVERFLOW."""
+        self.quiet = 0
         if ch == "\n":
             over, self.dropping = self.dropping, False
             line, self.chars, self.size = "".join(self.chars).rstrip("\r"), [], 0
@@ -35,6 +38,13 @@ class LineReader:
             return None
         self.chars.append(ch)
         return None
+
+    def tick(self, elapsed):
+        """Silence of `elapsed` ms: drop a partial line so a dead sender cannot corrupt the next."""
+        if self.size or self.dropping:
+            self.quiet += elapsed
+            if self.quiet >= PARTIAL_LINE_MS:
+                self.chars, self.size, self.dropping, self.quiet = [], 0, False, 0
 
 
 def _line(msg):
@@ -131,6 +141,7 @@ def run():
             # Accumulate short tick differences so long runs survive clock wraparound.
             phase = (phase + elapsed) % BLINK_EVERY_MS
             previous = now
+            reader.tick(elapsed)
             if hold_ms:
                 hold_ms = max(0, hold_ms - elapsed)  # release a hold the host left behind
             replied = 0

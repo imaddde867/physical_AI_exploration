@@ -58,7 +58,9 @@ behaviour the protocol document now states explicitly.
 
 **Bounded input.** `LineReader` keeps at most `MAX_LINE` bytes of UTF-8, drops the
 rest of an overlong line to the next newline, and answers `too_long`. At most
-256 characters are consumed per 20 ms tick, so a flood cannot starve rendering.
+256 characters are consumed per 20 ms tick, which bounds input work per tick;
+frame timing under a flood is not measured. A partial line with no input for 1 s
+is discarded so a dead sender cannot corrupt the next connection.
 
 **Sender uses `termios` and `os`.** Same two messages the device accepts, no
 `pyserial` dependency. It prints the device's reply so the link is confirmed

@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from daemon import protocol
-from firmware.rp2040.main import HOLD_MS, OVERFLOW, LineReader, handle, run
+from firmware.rp2040.main import HOLD_MS, OVERFLOW, PARTIAL_LINE_MS, LineReader, handle, run
 
 CLOSE = '{"v":1,"t":"face","blink":true}\n'
 OPEN = '{"v":1,"t":"face","blink":false}\n'
@@ -104,6 +104,21 @@ class LineReaderTests(unittest.TestCase):
         line = "é" * 255  # 510 bytes, plus the newline = 511
         self.assertEqual(self.feed_all(LineReader(), line + "\n")[-1], line)
 
+    def test_silence_discards_a_partial_line_so_the_next_sender_starts_clean(self):
+        reader = LineReader()
+        self.feed_all(reader, '{"v":1,"t":"pi')
+        reader.tick(PARTIAL_LINE_MS - 1)
+        reader.feed("n")  # input resets the silence clock
+        reader.tick(PARTIAL_LINE_MS - 1)
+        reader.tick(1)
+        self.assertEqual(self.feed_all(reader, '{"v":1,"t":"ping"}\n')[-1], '{"v":1,"t":"ping"}')
+
+    def test_silence_also_ends_an_overlong_drop(self):
+        reader = LineReader()
+        self.feed_all(reader, "x" * 600)
+        reader.tick(PARTIAL_LINE_MS)
+        self.assertEqual(self.feed_all(reader, "ok\n")[-1], "ok")
+
 
 class HandleTests(unittest.TestCase):
     def test_valid_blink_closes_and_opens(self):
@@ -194,6 +209,13 @@ class LoopTests(unittest.TestCase):
                          [{"v": 1, "t": "err", "code": "too_long"},
                           {"v": 1, "t": "err", "code": "bad_json"},
                           {"v": 1, "t": "ok"}])
+
+    def test_a_sender_that_died_mid_line_does_not_corrupt_the_next_command(self):
+        # one idle tick per empty chunk; 60 ticks x 20 ms outlasts PARTIAL_LINE_MS
+        out, _ = self.loop(Clock(step=20, ticks=70), '{"v":1,"t":"pi', *[""] * 60,
+                           '{"v":1,"t":"ping"}\n')
+        self.assertEqual([protocol.decode(line) for line in out.splitlines()],
+                         [{"v": 1, "t": "ok"}])
 
 
 if __name__ == "__main__":

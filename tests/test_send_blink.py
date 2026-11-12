@@ -33,6 +33,11 @@ class SendBlinkTests(unittest.TestCase):
         self.assertEqual(acks(b"MicroPython v1.22.2 on 2024-02-22\r\n"), 0)
         self.assertEqual(acks(b'{"v":1,"t":"o'), 0)  # a truncated line is not a reply
 
+    def test_an_error_between_oks_is_not_success(self):
+        err = b'{"v":1,"t":"err","code":"bad_field"}\n'
+        self.assertEqual(acks(OK + err + OK), 1)
+        self.assertEqual(acks(err + OK * 2), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

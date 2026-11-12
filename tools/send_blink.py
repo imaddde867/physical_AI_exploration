@@ -43,13 +43,19 @@ def read_replies(fd, timeout=REPLY_WAIT_S):
 
 
 def acks(replies):
-    """How many complete `ok` replies the device sent; other output never counts."""
+    """Leading `ok` replies, in order; the first protocol `err` ends the count.
+
+    Startup banners and truncated lines are not protocol replies and are skipped.
+    """
     count = 0
     for line in replies.splitlines():
         try:
-            count += protocol.decode(line)["t"] == "ok"
+            msg = protocol.decode(line)
         except protocol.ProtocolError:
-            pass
+            continue
+        if msg["t"] != "ok":
+            break
+        count += 1
     return count
 
 

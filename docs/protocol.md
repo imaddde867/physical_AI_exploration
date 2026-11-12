@@ -36,8 +36,11 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 The RP2040 prototype reads lines from USB CDC with `select.poll(0)` in the same
 20 ms loop that animates the eyes: the autonomous blink keeps running while a
 host is connected, and input is consumed in bounded slices of at most 256
-characters per tick, with at most one reply written per tick, so a flood costs
-reply latency rather than animation frames. A host that stays connected but
+characters per tick, with at most one reply written per tick. This bounds the
+work per tick; frame timing under a flood has not been measured. A partial line
+with no input for 1 s is discarded, so a sender that dies mid-line does not
+corrupt the next connection's first command (one that connects sooner than that
+can still get a `bad_json` for it). A host that stays connected but
 stops reading its port can still stall a single reply write for the USB transmit
 timeout; nothing in the prototype can prevent that. `daemon/protocol.py` is
 copied to the board's root as `protocol.py`, so validator and encoder behaviour
