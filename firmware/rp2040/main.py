@@ -16,6 +16,18 @@ PARTIAL_LINE_MS = 1000  # a half-received line is discarded after this much sile
 # One reply per tick: each write can stall for the USB TX timeout if the host stops reading.
 MAX_REPLIES_PER_TICK = 1
 OVERFLOW = object()  # LineReader sentinel: the line exceeded MAX_LINE and was dropped
+FW = "blink-0.3"
+
+
+def make_hello():
+    try:
+        import binascii
+        import os
+        boot_id = binascii.hexlify(os.urandom(4)).decode()
+    except (ImportError, AttributeError):
+        boot_id = "00000000"
+    return {"v": 1, "t": "hello", "fw": FW, "w": WIDTH, "h": HEIGHT, "proto": 1,
+            "caps": [], "boot_id": boot_id}
 
 
 class LineReader:
@@ -53,7 +65,7 @@ def _line(msg):
     return protocol.encode(msg).decode()
 
 
-def handle(text, gaze=None):
+def handle(text, gaze=None, hello=None):
     """Apply one command line: (reply line, eyelid hold in ms or None).
 
     `gaze` is a mutable [x, y]; a face message with x/y updates it in place. Without it,
@@ -64,7 +76,7 @@ def handle(text, gaze=None):
     except protocol.ProtocolError as e:
         return _line({"v": 1, "t": "err", "code": e.code}), None
     if msg["t"] == "ping":
-        return _line({"v": 1, "t": "ok"}), None
+        return _line(hello.pop() if hello else {"v": 1, "t": "ok"}), None
     if msg["t"] == "face" and "mood" not in msg and (gaze is not None or not {"x", "y"} & set(msg)):
         if gaze is not None:
             for i, k in enumerate("xy"):
@@ -165,6 +177,7 @@ def run():
         previous = time.ticks_ms()
         phase, last_drawn, hold_ms = BLINK_MS, None, 0
         gaze = [0.0, 0.0]
+        hello = [make_hello()]
         eased = [0.0, 0.0]
         while True:
             now = time.ticks_ms()
@@ -191,7 +204,7 @@ def run():
                     sys.stdout.write(_line({"v": 1, "t": "err", "code": "too_long"}))
                     replied += 1
                     continue
-                reply, hold = handle(line, gaze)
+                reply, hold = handle(line, gaze, hello)
                 if hold is not None:
                     hold_ms = hold
                     if not hold:

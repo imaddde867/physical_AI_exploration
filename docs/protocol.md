@@ -20,7 +20,7 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 
 | t | fields | notes |
 |---|---|---|
-| `hello` | `fw` str, `w`, `h` int | sent on connect (and on host `ping` before first hello) |
+| `hello` | `fw` str, `w`, `h` int; optional `proto` int, `caps` list of str (<=16 items of <=16 chars), `boot_id` str (<=32) | sent only as the reply to the first `ping` after boot. A new `boot_id` or any reconnect means the host resends all state |
 | `ok` | none | reply to each valid message |
 | `err` | `code` str, `msg` str (optional) | reply to an invalid message |
 
@@ -58,7 +58,7 @@ duration by sending `true`, waiting, then `false`.
 
 ### Not implemented on the device yet
 
-- `hello` on connect, and `hello` in reply to a first `ping`.
+- `hello` on connect (it is sent in reply to the first `ping` after boot only; a host that connects later and pings gets `ok`, so the daemon resyncs on every connect anyway).
 - The `WATCHDOG_S` blanking rule and the explicit `sleep`/`wake` latch.
 
 ## Failure behaviour
@@ -67,7 +67,7 @@ duration by sending `true`, waiting, then `false`.
 - Link drop / daemon dead: the device separately blanks after no valid message for `WATCHDOG_S = 5` s. The daemon sends at least one valid message every 2 s. The next valid message clears timeout blanking, but an explicit sleep latch keeps the panel off. Invalid messages do not count as keepalive.
 - The Python `Watchdog` only tracks liveness; it does not implement the sleep latch, display blanking, or brightness state. Its caller must feed it only after validation.
 - Mac sleep: the daemon sends `sleep` before sleeping; on wake it sends `wake`.
-- On (re)connect the device sends `hello`; the daemon then resends full state (face, bars, text, brightness).
+- The device sends `hello` only in reply to the first `ping` after boot; the daemon resyncs on every (re)connect and on `hello`, resending full state (face, bars, text, brightness).
 
 ## Out of scope
 
