@@ -20,7 +20,7 @@ Every message has `v` (protocol version, currently `1`) and `t` (type). Referenc
 
 | t | fields | notes |
 |---|---|---|
-| `hello` | `fw` str, `w`, `h` int | sent on connect (and on host `ping` before first hello) |
+| `hello` | `fw` str, `w`, `h` int; optional `proto` int, `caps` list of str (<=16 items of <=16 chars), `boot_id` str (<=32) | sent on connect (and on host `ping` before first hello). A new `boot_id` or any reconnect means the host resends all state |
 | `ok` | none | reply to each valid message |
 | `err` | `code` str, `msg` str (optional) | reply to an invalid message |
 

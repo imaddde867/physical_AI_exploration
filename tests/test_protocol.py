@@ -38,6 +38,17 @@ class ProtocolTest(unittest.TestCase):
             with self.assertRaises(ValueError, msg=msg):
                 encode(msg)
 
+    def test_hello_capabilities_are_optional_and_validated(self):
+        base = m("hello", fw="0.1", w=240, h=280)
+        full = {**base, "proto": 1, "caps": ["frame", "touch"], "boot_id": "a1b2c3d4"}
+        self.assertEqual(decode(encode(full)), full)
+        self.assertEqual(decode(encode(base)), base)
+        for bad in ({"caps": "frame"}, {"caps": [1]}, {"caps": ["x" * 17]},
+                    {"caps": ["a"] * 17}, {"proto": 0}, {"proto": True},
+                    {"boot_id": "x" * 33}, {"boot_id": 5}):
+            with self.assertRaises(ValueError, msg=bad):
+                encode({**base, **bad})
+
     def test_max_line(self):
         # 200 chars of 3-byte UTF-8 passes the string check but busts 512 bytes
         with self.assertRaises(ValueError):

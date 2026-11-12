@@ -24,6 +24,13 @@ def _str(n):
     return lambda v: isinstance(v, str) and len(v) <= n
 
 
+def _str_list(max_items, max_chars):
+    def ok(v):
+        return (isinstance(v, list) and len(v) <= max_items
+                and all(isinstance(c, str) and len(c) <= max_chars for c in v))
+    return ok
+
+
 # type -> (required fields, optional fields); each field -> validator
 SPEC = {
     "face": ({}, {"x": _num(-1, 1), "y": _num(-1, 1),
@@ -34,7 +41,8 @@ SPEC = {
     "brightness": ({"value": _int(0, 100)}, {}),
     "sleep": ({}, {}), "wake": ({}, {}), "ping": ({}, {}),
     # device -> host
-    "hello": ({"fw": _str(32), "w": _int(1, 10000), "h": _int(1, 10000)}, {}),
+    "hello": ({"fw": _str(32), "w": _int(1, 10000), "h": _int(1, 10000)},
+              {"proto": _int(1, 99), "caps": _str_list(16, 16), "boot_id": _str(32)}),
     "ok": ({}, {}),
     "err": ({"code": _str(32)}, {"msg": _str(MAX_STR)}),
 }
