@@ -22,7 +22,12 @@ command channel is optional: without a host it blinks on its own.
 - Mac sleep: the device kept blinking while the MacBook slept; wake-transition behaviour was not separately measured.
 - Not measured: real SPI rate, delivered frame rate, brightness.
 - Not yet exercised: vendor demo baseline, on-device transfer benchmark, touch.
-- Touch and frame-time probe written, not yet run on the board (results go here).
+- Probe run 2026-11-12 (`touch_probe.py`):
+  - Touch works. Point mode gave x up to 224, y up to 271, consistent with a 240x280 portrait panel; only the bottom-right and bottom-centre were touched, so the axis directions and the top-left corner are not confirmed.
+  - Gesture mode reported up 0x02, down 0x01, left 0x03, right 0x04, double click 0x0B, long press 0x0C. Double click and long press arrived twice each (one per interrupt edge), so debounce them in any consumer.
+  - `show()` alone: mean 23.2 ms, p95 24.0 ms, max 37.6 ms (43 fps transfer-only).
+  - Full `draw()`: 59.5 ms with open eyes, 28.1 ms closed. The open-eye pixel loops cost about 36 ms on top of the transfer.
+  - Free heap was 29,456 bytes with the probe, benchmark, `main`, protocol and touch all loaded, against 86,400 for the blink alone. Touch plus the imports cost memory; budget for it before adding it to `main.py`.
 
 ## Touch and frame-time probe
 
