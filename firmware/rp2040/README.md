@@ -14,9 +14,13 @@ and turns off the backlight. No touch, batteries, or host commands are needed.
 ## Status, 2026-11-12
 
 - Done on the board: MicroPython 1.22.2 installed; vendor driver and this blink loaded.
-- Not recorded yet: free heap after initialization, orientation, colour, flicker and tearing from that session.
-- Not measured: real SPI rate, delivered frame rate, brightness, corner clipping.
-- Not yet exercised: vendor demo baseline, on-device transfer benchmark, unplug/replug, Mac sleep/wake.
+- Free heap after initialization: 86,400 bytes (printed by `main.py`).
+- Power: the board and screen ran from Mac USB-C, iPhone USB-C, and a USB wall charger. No battery or power bank was tested.
+- Display: portrait orientation, eye alignment, smooth edges and clipping visually checked and passed. Soft-white eyes visually confirmed (colour accuracy not measured). No flicker or tearing observed; 12.5% backlight duty dims the glow as designed.
+- Stability: about 1-2 hours of operation without observed problems, with successful reconnects. Individual run durations and internal resets were not instrumented.
+- Mac sleep: the device kept blinking while the MacBook slept; wake-transition behaviour was not separately measured.
+- Not measured: real SPI rate, delivered frame rate, brightness.
+- Not yet exercised: vendor demo baseline, on-device transfer benchmark.
 
 ## Prepare the vendor driver on the Mac
 
@@ -69,8 +73,8 @@ vendor example, not a measured stable rate on this board.
    Both files must be on the board. Saving as `main.py` makes the blink start on boot.
 4. Run `main.py`. Expect two centered eyes and a short blink every four seconds.
    Record the reported free heap, screen orientation, cropping, flicker, and any errors.
-5. Stop with Ctrl-C. Restart to confirm recovery. Unplug/replug and Mac sleep/wake
-   have not been exercised yet; test them after a stable blink.
+5. Stop with Ctrl-C. Restart to confirm recovery. Unplug/replug and Mac sleep were
+   exercised on 2026-11-12; repeat them if the wiring or firmware changes.
 
 If allocation fails or the screen is blank, stop and record the error plus the
 firmware version; return to the vendor demo before changing display registers.
