@@ -58,7 +58,7 @@ duration by sending `true`, waiting, then `false`.
 
 ### Not implemented on the device yet
 
-- `hello` on connect, and `hello` in reply to a first `ping`.
+- `hello` on connect (it is sent in reply to the first `ping` after boot only; a host that connects later and pings gets `ok`, so the daemon resyncs on every connect anyway).
 - The `WATCHDOG_S` blanking rule and the explicit `sleep`/`wake` latch.
 
 ## Failure behaviour

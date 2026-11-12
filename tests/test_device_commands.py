@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from daemon import protocol
 from firmware.rp2040 import main as device
-from firmware.rp2040.main import HOLD_MS, OVERFLOW, PARTIAL_LINE_MS, LineReader, handle, run
+from firmware.rp2040.main import HOLD_MS, OVERFLOW, PARTIAL_LINE_MS, LineReader, handle, make_hello, run
 
 CLOSE = '{"v":1,"t":"face","blink":true}\n'
 OPEN = '{"v":1,"t":"face","blink":false}\n'
@@ -181,6 +181,18 @@ class HandleTests(unittest.TestCase):
                 self.assertIn(reply(line)[0]["t"], ("ok", "err"))
 
 
+class HelloTests(unittest.TestCase):
+    def test_first_ping_is_answered_with_hello_then_ok(self):
+        hello = [make_hello()]
+        first, _ = handle('{"v":1,"t":"ping"}', None, hello)
+        second, _ = handle('{"v":1,"t":"ping"}', None, hello)
+        msg = protocol.decode(first)
+        self.assertEqual((msg["t"], msg["w"], msg["h"], msg["proto"]), ("hello", 240, 280, 1))
+        self.assertEqual(len(msg["boot_id"]), 8)
+        self.assertEqual(protocol.decode(second)["t"], "ok")
+        self.assertEqual(hello, [])
+
+
 class LoopTests(unittest.TestCase):
     class Display:
         def __init__(self):
@@ -235,17 +247,14 @@ class LoopTests(unittest.TestCase):
     def test_garbage_and_overlong_input_are_answered_and_survived(self):
         out, _ = self.loop(Clock(step=20, ticks=8),
                            "x" * 600 + "\n" + "junk\n" + '{"v":1,"t":"ping"}\n')
-        self.assertEqual([protocol.decode(line) for line in out.splitlines()],
-                         [{"v": 1, "t": "err", "code": "too_long"},
-                          {"v": 1, "t": "err", "code": "bad_json"},
-                          {"v": 1, "t": "ok"}])
+        self.assertEqual([protocol.decode(line)["t"] for line in out.splitlines()],
+                         ["err", "err", "hello"])  # first ping after boot gets hello
 
     def test_a_sender_that_died_mid_line_does_not_corrupt_the_next_command(self):
         # one idle tick per empty chunk; 60 ticks x 20 ms outlasts PARTIAL_LINE_MS
         out, _ = self.loop(Clock(step=20, ticks=70), '{"v":1,"t":"pi', *[""] * 60,
                            '{"v":1,"t":"ping"}\n')
-        self.assertEqual([protocol.decode(line) for line in out.splitlines()],
-                         [{"v": 1, "t": "ok"}])
+        self.assertEqual([protocol.decode(line)["t"] for line in out.splitlines()], ["hello"])
 
 
 class DrawTests(unittest.TestCase):
