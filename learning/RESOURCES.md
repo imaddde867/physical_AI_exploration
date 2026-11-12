@@ -21,7 +21,7 @@
   Use for: runtime and driver questions.
 
 ## Gaps
-- Flash size conflict: Chinese wiki says 4MB, our brief says 16MB. Verify on the board.
+- Flash size: Waveshare's product specification lists 16 MB; the wiki page's 4 MB figure is older. `os.statvfs('/')` reports the filesystem, not the chip, so verify the installed chip separately if needed.
 - Pinout image is not machine-readable; transcribe from the board silkscreen/vendor code.
 
 ## Added (primary sources read in full or in part)

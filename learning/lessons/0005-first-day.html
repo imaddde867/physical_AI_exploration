@@ -10,7 +10,7 @@
 <tr><td>2</td><td>BOOT + plug in</td><td><code>RPI-RP2</code> drive</td><td>Cable again. This step needs no working firmware.</td></tr>
 <tr><td>3</td><td>Install the .uf2, open Thonny</td><td>REPL prompt <code>&gt;&gt;&gt;</code></td><td>Wrong interpreter selected in Thonny, or port not chosen.</td></tr>
 <tr><td>4</td><td>Run the vendor example unchanged</td><td>Display + touch work</td><td>This is your baseline. Don't touch our code until it works.</td></tr>
-<tr><td>5</td><td><code>os.statvfs('/')</code>, <code>machine.freq()</code></td><td>Filesystem size; 125000000</td><td>Settles the 4 MB / 16 MB question.</td></tr>
+<tr><td>5</td><td><code>os.statvfs('/')</code>, <code>machine.freq()</code></td><td>Filesystem size; 125000000</td><td>Filesystem space, not chip size. Waveshare's specification lists 16 MB of flash.</td></tr>
 <tr><td>6</td><td>Scan I2C (SDA GP6, SCL GP7)</td><td>Touch at 0x15; IMU address unknown</td><td>Nothing found: reset pin GP22, wiring, or wrong bus id.</td></tr>
 <tr><td>7</td><td><code>benchmark_display.py</code></td><td>Printed SPI object, mean and p95 ms</td><td>Compare with lesson 3. Then repeat after <code>machine.freq(125_000_000, 125_000_000)</code>.</td></tr>
 <tr><td>8</td><td>Our blink <code>main.py</code></td><td>Two white eyes blinking</td><td>Offset or window wrong: check the +20 rows (lesson 2).</td></tr>
@@ -30,8 +30,8 @@
 <div class="q" data-a="0"><p>Why run the vendor demo before ours?</p>
 <button>It gives a baseline</button><button>It resets the flash</button><button>It speeds up SPI</button><button>It sets the colours</button>
 <div class="why">If the vendor code works and ours doesn't, the fault is in our code, not the hardware.</div></div>
-<div class="q" data-a="1"><p>Which step answers the flash-size question?</p>
-<button>The I2C bus scan</button><button>The filesystem query</button><button>The colour fill test</button><button>The blink program</button>
-<div class="why">os.statvfs reports the filesystem MicroPython can use.</div></div>
+<div class="q" data-a="1"><p>What does <code>os.statvfs('/')</code> measure?</p>
+<button>The flash chip size</button><button>The MicroPython filesystem capacity</button><button>The RAM available</button><button>The SPI clock rate</button>
+<div class="why">It reports the filesystem MicroPython can use, which can be smaller than the flash chip. Waveshare's specification lists 16 MB of flash; the filesystem query does not prove the chip size.</div></div>
 <p>Ask me about any step before you do it.</p>
 <script src="../assets/quiz.js"></script></body></html>

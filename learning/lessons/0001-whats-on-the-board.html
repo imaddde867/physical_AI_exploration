@@ -52,7 +52,7 @@
 <b>I2C</b>: two shared wires, each device has a 7-bit address. Slower; used for small reads like touch coordinates.</div>
 
 <h2>Unresolved</h2>
-<p class="todo">Flash size: Waveshare's wiki says 4 MB, its product specification says 16 MB. Check on the board with <code>os.statvfs('/')</code> after installing MicroPython (the filesystem is smaller than the chip).</p>
+<p class="todo">Flash size: Waveshare's product specification lists 16 MB; the wiki page still says 4 MB. <code>os.statvfs('/')</code> reports the filesystem MicroPython can use, which can be smaller than the chip, so it cannot settle the chip size. Check the installed chip's marking if that matters.</p>
 
 <h2>Check</h2>
 <div class="q" data-a="1"><p>The panel refreshes from which memory?</p>
