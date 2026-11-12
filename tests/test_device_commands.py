@@ -62,6 +62,25 @@ def reply(text):
     return protocol.decode(line), hold
 
 
+class GazeTests(unittest.TestCase):
+    def test_face_xy_updates_gaze_and_is_acked(self):
+        gaze = [0.0, 0.0]
+        line, hold = handle('{"v":1,"t":"face","x":0.5,"y":-1}', gaze)
+        self.assertEqual(protocol.decode(line), {"v": 1, "t": "ok"})
+        self.assertEqual((gaze, hold), ([0.5, -1], None))
+
+    def test_omitted_axis_keeps_its_last_value(self):
+        gaze = [0.5, -1]
+        handle('{"v":1,"t":"face","x":0}', gaze)
+        self.assertEqual(gaze, [0, -1])
+
+    def test_mood_is_still_unsupported_and_leaves_gaze_alone(self):
+        gaze = [0.0, 0.0]
+        line, _ = handle('{"v":1,"t":"face","x":1,"mood":"happy"}', gaze)
+        self.assertEqual(protocol.decode(line)["code"], "unsupported")
+        self.assertEqual(gaze, [0.0, 0.0])
+
+
 class LineReaderTests(unittest.TestCase):
     def feed_all(self, reader, text):
         return [reader.feed(ch) for ch in text]
@@ -179,29 +198,34 @@ class LoopTests(unittest.TestCase):
         with patch.dict("sys.modules", modules), patch("builtins.print"), \
                 patch("sys.stdin", stdin), patch("sys.stdout", out), \
                 patch("firmware.rp2040.main.draw",
-                      side_effect=lambda lcd, blink: drawn.append((clock.now, blink))):
+                      side_effect=lambda lcd, blink, *gaze: drawn.append((clock.now, blink, *gaze))):
             with self.assertRaises(KeyboardInterrupt):
                 run()
         return out.getvalue(), drawn
 
     def test_autonomous_blink_keeps_running_without_a_host(self):
         _, drawn = self.loop(Clock(step=20, ticks=210))
-        self.assertEqual(drawn[:3], [(0, False), (3860, True), (4000, False)])
+        self.assertEqual([d[:2] for d in drawn[:3]], [(0, False), (3860, True), (4000, False)])
 
     def test_command_blinks_immediately_and_releases_after_two_seconds(self):
         # 50 ms ticks: a per-tick countdown would take 2000 ticks, not 40, so this fails loudly.
         out, drawn = self.loop(Clock(step=50, ticks=80), CLOSE)
-        self.assertEqual(drawn[0], (0, True))  # closed on the tick the command arrived
-        released_at = next(t for t, blink in drawn[1:] if blink is False)
+        self.assertEqual(drawn[0][:2], (0, True))  # closed on the tick the command arrived
+        released_at = next(t for t, blink, *_ in drawn[1:] if blink is False)
         self.assertEqual(released_at, HOLD_MS)  # a dead sender cannot hold the eyes shut
-        self.assertIn(True, [blink for t, blink in drawn if t > released_at])  # idle blink resumes
+        self.assertIn(True, [blink for t, blink, *_ in drawn if t > released_at])  # idle blink resumes
         self.assertEqual(protocol.decode(out), {"v": 1, "t": "ok"})
 
     def test_blink_false_reopens_the_eyes_and_restarts_the_idle_cycle(self):
         _, drawn = self.loop(Clock(step=20, ticks=210), CLOSE, OPEN)
-        self.assertEqual(drawn[:2], [(0, True), (40, False)])  # one tick per chunk boundary
+        self.assertEqual([d[:2] for d in drawn[:2]], [(0, True), (40, False)])  # one tick per chunk boundary
         # phase restarted at 140 ms on the release, so the next idle blink lands 4 s later
-        self.assertEqual(drawn[2], (3900, True))
+        self.assertEqual(drawn[2][:2], (3900, True))
+
+    def test_gaze_command_redraws_with_the_pixel_offset(self):
+        out, drawn = self.loop(Clock(step=20, ticks=10), '{"v":1,"t":"face","x":0.5,"y":-1}\n')
+        self.assertEqual([d[1:] for d in drawn], [(False, 5, -10)])  # drawn once, on the command's tick
+        self.assertEqual(protocol.decode(out), {"v": 1, "t": "ok"})
 
     def test_garbage_and_overlong_input_are_answered_and_survived(self):
         out, _ = self.loop(Clock(step=20, ticks=8),
