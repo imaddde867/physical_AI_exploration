@@ -21,7 +21,16 @@ command channel is optional: without a host it blinks on its own.
 - Stability: about 1-2 hours of operation without observed problems, with successful reconnects. Individual run durations and internal resets were not instrumented.
 - Mac sleep: the device kept blinking while the MacBook slept; wake-transition behaviour was not separately measured.
 - Not measured: real SPI rate, delivered frame rate, brightness.
-- Not yet exercised: vendor demo baseline, on-device transfer benchmark.
+- Not yet exercised: vendor demo baseline, on-device transfer benchmark, touch.
+- Touch and frame-time probe written, not yet run on the board (results go here).
+
+## Touch and frame-time probe
+
+Copy `touch_probe.py` and `benchmark_display.py` to the board (with `main.py` and
+`waveshare_lcd.py` already there). In Thonny press Ctrl-C to stop the blink, then run
+`touch_probe.py`. Follow the printed prompts; it prints touch `x, y`, gesture codes,
+`show()` timing and the full `draw()` time for open and closed eyes. Quit Thonny
+afterwards before any host-side serial test. Paste the output into the status list above.
 
 ## Prepare the vendor driver on the Mac
 
