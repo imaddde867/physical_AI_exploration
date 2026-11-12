@@ -1,6 +1,6 @@
 # MacDesk Buddy serial protocol (DRAFT v1)
 
-Status, 2026-11-12: `daemon/protocol.py` is the shared codec, and the RP2040 blink prototype now implements `face` (`blink` only) and `ping` from it. Every other valid message is answered `err` (`unsupported`). The host daemon, keepalive scheduling, and reconnect behavior are still not implemented. The ordered bench prototype uses an integrated RP2040; see the [product brief](product-brief.md).
+Status, 2026-11-12: `daemon/protocol.py` is the shared codec, and the RP2040 prototype implements `face` (`blink`, `x`, `y`) and `ping` from it. `x`/`y` shift both eyes by up to 10 px, in whole pixels with no easing. Every other valid message, including any `face` carrying `mood`, is answered `err` (`unsupported`). The host daemon, keepalive scheduling, and reconnect behavior are still not implemented. The ordered bench prototype uses an integrated RP2040; see the [product brief](product-brief.md).
 
 Proposed Mac service <-> display controller over USB CDC serial. One JSON object per line (UTF-8, `\n` terminated).
 Every message has `v` (protocol version, currently `1`) and `t` (type). Reference: `daemon/protocol.py`.

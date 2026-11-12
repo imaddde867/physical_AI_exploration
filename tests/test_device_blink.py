@@ -68,6 +68,15 @@ class DeviceBlinkTests(unittest.TestCase):
             ctx.start()
             self.addCleanup(ctx.stop)
 
+    def test_gaze_shifts_both_eyes_by_whole_pixels(self):
+        def lit(gx, gy):
+            lcd = FakeLCD()
+            draw(lcd, False, gx, gy)
+            return {(x, y) for y, row in enumerate(lcd.screen.rows()) for x, px in enumerate(row) if px != lcd.screen.rows()[0][0]}
+
+        base = lit(0, 0)
+        self.assertEqual(lit(7, -3), {(x + 7, y - 3) for x, y in base})
+
     def test_smooth_eyes_blink_and_restore_without_a_halo(self):
         lcd = FakeLCD()
         frames = []

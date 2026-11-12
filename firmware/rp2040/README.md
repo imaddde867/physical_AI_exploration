@@ -31,6 +31,10 @@ command channel is optional: without a host it blinks on its own.
   - Touch axes, second run: edge touches gave y=1 and x 23-46 near one top corner, x 205-224 near the other, and y=278 at the bottom (x 12 at y 244). That fits x increasing rightward and y downward like the display, assuming those were the physical corners touched; the reach stops around x=224, short of 239. A single tap was reported as gesture 0x05.
   - Free heap was 29,456 bytes with the probe, benchmark, `main`, protocol and touch all loaded, against 86,400 for the blink alone. Touch plus the imports cost memory; budget for it before adding it to `main.py`.
 
+## Gaze
+
+`face` messages with `x`/`y` (-1..1) shift both eyes by up to `GAZE_PX` = 10 px and redraw once per change. Moves are whole-pixel jumps with no easing. Host tests pass; **not yet run on the board**: copy `main.py` over and check with `python3 tools/buddy_service.py`, which sends a slow gaze drift and a blink every 5 s. A `face` carrying `mood` is still answered `unsupported`.
+
 ## Touch and frame-time probe
 
 Copy `touch_probe.py` and `benchmark_display.py` to the board (with `main.py` and

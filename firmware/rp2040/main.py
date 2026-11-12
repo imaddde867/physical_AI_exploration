@@ -8,6 +8,7 @@ except ImportError:
 
 WIDTH, HEIGHT = 240, 280
 EYE_R, EYE_DX, BLINK_MS, BLINK_EVERY_MS = 18, 42, 140, 4000
+GAZE_PX = 10  # eye travel at |x| or |y| = 1
 HOLD_MS = 2000  # a host-held blink releases itself, so a dead sender cannot freeze it
 MAX_CHARS_PER_TICK = 256  # caps input work per tick; frame timing under a flood is not measured
 PARTIAL_LINE_MS = 1000  # a half-received line is discarded after this much silence
@@ -51,15 +52,23 @@ def _line(msg):
     return protocol.encode(msg).decode()
 
 
-def handle(text):
-    """Apply one command line: (reply line, eyelid hold in ms or None)."""
+def handle(text, gaze=None):
+    """Apply one command line: (reply line, eyelid hold in ms or None).
+
+    `gaze` is a mutable [x, y]; a face message with x/y updates it in place. Without it,
+    gaze messages are reported unsupported.
+    """
     try:
         msg = protocol.decode(text)
     except protocol.ProtocolError as e:
         return _line({"v": 1, "t": "err", "code": e.code}), None
     if msg["t"] == "ping":
         return _line({"v": 1, "t": "ok"}), None
-    if msg["t"] == "face" and not {"x", "y", "mood"} & set(msg):
+    if msg["t"] == "face" and "mood" not in msg and (gaze is not None or not {"x", "y"} & set(msg)):
+        if gaze is not None:
+            for i, k in enumerate("xy"):
+                if k in msg:
+                    gaze[i] = msg[k]
         if "blink" in msg:
             return _line({"v": 1, "t": "ok"}), HOLD_MS if msg["blink"] else 0
         return _line({"v": 1, "t": "ok"}), None
@@ -117,12 +126,13 @@ def make_open_eye():
     return eye
 
 
-def draw(lcd, blink):
+def draw(lcd, blink, gx=0, gy=0):
+    """gx, gy: whole-pixel gaze offset of both eyes."""
     lcd.fill(0)
     if not blink and not _open_eye:
         _open_eye.append(make_open_eye())
     for sign in (-1, 1):
-        cx, cy = WIDTH // 2 + sign * EYE_DX, HEIGHT // 2
+        cx, cy = WIDTH // 2 + sign * EYE_DX + gx, HEIGHT // 2 + gy
         if blink:
             lcd.fill_rect(cx - EYE_R, cy - 2, 2 * EYE_R + 1, 4, EYE_COLOR)
         else:
@@ -152,7 +162,8 @@ def run():
         reader = LineReader()
         print("blink ready; free heap:", gc.mem_free(), "bytes; Ctrl-C to stop")
         previous = time.ticks_ms()
-        phase, last_blink, hold_ms = BLINK_MS, None, 0
+        phase, last_drawn, hold_ms = BLINK_MS, None, 0
+        gaze = [0.0, 0.0]
         while True:
             now = time.ticks_ms()
             elapsed = time.ticks_diff(now, previous)
@@ -178,7 +189,7 @@ def run():
                     sys.stdout.write(_line({"v": 1, "t": "err", "code": "too_long"}))
                     replied += 1
                     continue
-                reply, hold = handle(line)
+                reply, hold = handle(line, gaze)
                 if hold is not None:
                     hold_ms = hold
                     if not hold:
@@ -186,9 +197,10 @@ def run():
                 sys.stdout.write(reply)
                 replied += 1
             blink = hold_ms > 0 or phase < BLINK_MS
-            if blink != last_blink:
-                draw(lcd, blink)
-                last_blink = blink
+            shown = (blink, round(gaze[0] * GAZE_PX), round(gaze[1] * GAZE_PX))
+            if shown != last_drawn:
+                draw(lcd, *shown)
+                last_drawn = shown
             time.sleep_ms(20)
     finally:
         lcd.set_bl_pwm(0)
