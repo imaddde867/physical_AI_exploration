@@ -1,5 +1,7 @@
 # Measure the real Mac (10 minutes, free)
 
+> No calipers are available (2026-11-12): rows already filled from Apple's drawing stay as they are; the rest remain ASSUMED in `params.py` and are covered by clearances and the printed fit coupon, not measured here.
+
 Values in `cad/slab/src/params.py` marked ASSUMED depend on these. Tools: calipers, a USB-C power meter (inline tester), a piece of string or thin wire.
 
 | # | Measure | How | Assumed in CAD | Measured |
