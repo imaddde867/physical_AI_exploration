@@ -1,14 +1,22 @@
 # RP2040 local blink prototype
 
 For **Waveshare RP2040-Touch-LCD-1.69 (SKU 28161)** only. Prepared before
-delivery; not flashed or validated on a board. USB power from the Mac is enough
+delivery; first loaded on the board on 2026-11-12 with MicroPython 1.22.2. USB power from the Mac is enough
 for this prototype. Run the vendor demo first, then this blink.
 
-`main.py` draws the simulator's placeholder eye geometry in white on black:
+`main.py` draws the placeholder eyes in soft white on black, with a one-pixel
+antialiased circle edge and 12.5% backlight duty to reduce the black-level glow:
 one 140 ms blink every four seconds. It uses the vendor driver's single packed
 RGB565 framebuffer (134,400 bytes), prints the remaining MicroPython heap after
 initialization, and redraws only when blink state changes. Ctrl-C stops the loop
 and turns off the backlight. No touch, batteries, or host commands are needed.
+
+## Status, 2026-11-12
+
+- Done on the board: MicroPython 1.22.2 installed; vendor driver and this blink loaded.
+- Not recorded yet: free heap after initialization, orientation, colour, flicker and tearing from that session.
+- Not measured: real SPI rate, delivered frame rate, brightness, corner clipping.
+- Not yet exercised: vendor demo baseline, on-device transfer benchmark, unplug/replug, Mac sleep/wake.
 
 ## Prepare the vendor driver on the Mac
 
@@ -45,24 +53,24 @@ importing it does not run that demo.
 The vendor `setWindows()` calculates the row end from `Ystart`, ignoring `Yend`.
 Our subclass corrects that method, including the 20-row panel offset and splitting
 coordinates into high/low bytes. The vendor initialization sequence is unchanged.
-The blink uses only black/white; vendor color constants and RGB byte order still
-need a separate physical color test. Requested SPI speed is inherited from the
+Gray shades are packed as RGB565 and byte-swapped for the driver's direct buffer
+transfer. Vendor color constants still need a separate physical color test.
+Requested SPI speed is inherited from the
 vendor example, not a measured stable rate on this board.
 
-## On arrival
+## Bring-up steps
 
 1. Connect the existing USB-C data cable. Check the factory demo if present.
 2. Follow the board wiki's MicroPython setup. The example archive above already contains
    `Python/RPI_PICO-20240222-v1.22.2.uf2` (MicroPython 1.22.2, sha256
    `e92c2a253d2d4830d56cd6aebae1bbc6c913f413122dabba3cc2de74b984bba9`): hold BOOT while plugging in, then copy it to the `RPI-RP2` drive.
    Run the original vendor example from Thonny to establish a working baseline.
-   Record the installed MicroPython version; no version has been board-tested here.
 3. In Thonny, copy `waveshare_lcd.py` and our `main.py` to the board's root.
    Both files must be on the board. Saving as `main.py` makes the blink start on boot.
 4. Run `main.py`. Expect two centered eyes and a short blink every four seconds.
    Record the reported free heap, screen orientation, cropping, flicker, and any errors.
-5. Stop with Ctrl-C. Restart to confirm recovery. Test unplug/replug and Mac sleep/wake
-   after a stable blink; those behaviors remain unverified.
+5. Stop with Ctrl-C. Restart to confirm recovery. Unplug/replug and Mac sleep/wake
+   have not been exercised yet; test them after a stable blink.
 
 If allocation fails or the screen is blank, stop and record the error plus the
 firmware version; return to the vendor demo before changing display registers.
@@ -73,7 +81,7 @@ firmware version; return to the vendor demo before changing display registers.
 python3 -m unittest discover -s tests -p test_device_blink.py -v
 ```
 
-Checks compare open/blink/open geometry with the desktop face, verify the SPI
+Checks verify smooth edges and open/blink/open restoration, verify the SPI
 window commands, reject invalid bounds, and exercise tick wraparound and stopping.
 They do not emulate the controller, measure available device memory, or establish
 electrical/display performance. MicroPython APIs: [framebuf](https://docs.micropython.org/en/latest/library/framebuf.html)
