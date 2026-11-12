@@ -1,6 +1,7 @@
+import math
 import unittest
 
-from firmware.rp2040.main import draw, gray, run, set_window
+from firmware.rp2040.main import EYE_DX, EYE_R, HEIGHT, WIDTH, draw, gray, run, set_window
 from sim.screen import Screen
 
 
@@ -51,6 +52,35 @@ class DeviceBlinkTests(unittest.TestCase):
         self.assertEqual(gray(0), 0)
         self.assertEqual(gray(255), 0xFFFF)
         self.assertEqual(gray(232), 0x5DEF)
+
+    def test_eye_geometry_matches_demo_and_stays_inside_circles(self):
+        from experiments.hello_buddy import update as sim_update
+
+        def lit(frame):
+            return {(x, y): color for y, row in enumerate(frame)
+                    for x, color in enumerate(row) if color != "#000000"}
+
+        lcd = FakeLCD()
+        draw(lcd, False)
+        actual = lit(lcd.screen.rows())
+        sim = Screen()
+        sim_update(sim, 200)  # open eyes, matching draw(lcd, False)
+        expected = lit(sim.rows())
+
+        centers = (WIDTH // 2 - EYE_DX, WIDTH // 2 + EYE_DX)
+        for cx in centers:
+            self.assertEqual(actual[(cx, HEIGHT // 2)], max(actual.values()))
+            for dx, dy in ((-EYE_R, -EYE_R), (EYE_R, -EYE_R), (-EYE_R, EYE_R), (EYE_R, EYE_R)):
+                self.assertEqual(lcd.screen.rows()[HEIGHT // 2 + dy][cx + dx], "#000000")
+        for (x, y), color in actual.items():
+            self.assertEqual(actual.get((WIDTH - x, y)), color)  # mirror both eyes exactly
+            self.assertLessEqual(min(math.hypot(x - cx, y - HEIGHT // 2) for cx in centers),
+                                 EYE_R + 0.5)
+        for left in (True, False):
+            device_eye = [p for p in actual if (p[0] < WIDTH // 2) == left]
+            demo_eye = [p for p in expected if (p[0] < WIDTH // 2) == left]
+            self.assertEqual([(min(v), max(v)) for v in zip(*device_eye)],
+                             [(min(v), max(v)) for v in zip(*demo_eye)])
 
     def test_full_window_includes_all_280_rows(self):
         lcd = FakeLCD()

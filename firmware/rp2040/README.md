@@ -11,6 +11,13 @@ RGB565 framebuffer (134,400 bytes), prints the remaining MicroPython heap after
 initialization, and redraws only when blink state changes. Ctrl-C stops the loop
 and turns off the backlight. No touch, batteries, or host commands are needed.
 
+## Status, 2026-11-12
+
+- Done on the board: MicroPython 1.22.2 installed; vendor driver and this blink loaded.
+- Not recorded yet: free heap after initialization, orientation, colour, flicker and tearing from that session.
+- Not measured: real SPI rate, delivered frame rate, brightness, corner clipping.
+- Not yet exercised: vendor demo baseline, on-device transfer benchmark, unplug/replug, Mac sleep/wake.
+
 ## Prepare the vendor driver on the Mac
 
 Use the [board wiki](https://www.waveshare.net/wiki/RP2040-Touch-LCD-1.69)
@@ -51,20 +58,19 @@ transfer. Vendor color constants still need a separate physical color test.
 Requested SPI speed is inherited from the
 vendor example, not a measured stable rate on this board.
 
-## On arrival
+## Bring-up steps
 
 1. Connect the existing USB-C data cable. Check the factory demo if present.
 2. Follow the board wiki's MicroPython setup. The example archive above already contains
    `Python/RPI_PICO-20240222-v1.22.2.uf2` (MicroPython 1.22.2, sha256
    `e92c2a253d2d4830d56cd6aebae1bbc6c913f413122dabba3cc2de74b984bba9`): hold BOOT while plugging in, then copy it to the `RPI-RP2` drive.
    Run the original vendor example from Thonny to establish a working baseline.
-   Record the installed MicroPython version; no version has been board-tested here.
 3. In Thonny, copy `waveshare_lcd.py` and our `main.py` to the board's root.
    Both files must be on the board. Saving as `main.py` makes the blink start on boot.
 4. Run `main.py`. Expect two centered eyes and a short blink every four seconds.
    Record the reported free heap, screen orientation, cropping, flicker, and any errors.
-5. Stop with Ctrl-C. Restart to confirm recovery. Test unplug/replug and Mac sleep/wake
-   after a stable blink; those behaviors remain unverified.
+5. Stop with Ctrl-C. Restart to confirm recovery. Unplug/replug and Mac sleep/wake
+   have not been exercised yet; test them after a stable blink.
 
 If allocation fails or the screen is blank, stop and record the error plus the
 firmware version; return to the vendor demo before changing display registers.
