@@ -1,10 +1,11 @@
 # RP2040 local blink prototype
 
 For **Waveshare RP2040-Touch-LCD-1.69 (SKU 28161)** only. Prepared before
-delivery; not flashed or validated on a board. USB power from the Mac is enough
+delivery; first loaded on the board on 2026-11-12 with MicroPython 1.22.2. USB power from the Mac is enough
 for this prototype. Run the vendor demo first, then this blink.
 
-`main.py` draws the simulator's placeholder eye geometry in white on black:
+`main.py` draws the placeholder eyes in soft white on black, with a one-pixel
+antialiased circle edge and 12.5% backlight duty to reduce the black-level glow:
 one 140 ms blink every four seconds. It uses the vendor driver's single packed
 RGB565 framebuffer (134,400 bytes), prints the remaining MicroPython heap after
 initialization, and redraws only when blink state changes. Ctrl-C stops the loop
@@ -45,8 +46,9 @@ importing it does not run that demo.
 The vendor `setWindows()` calculates the row end from `Ystart`, ignoring `Yend`.
 Our subclass corrects that method, including the 20-row panel offset and splitting
 coordinates into high/low bytes. The vendor initialization sequence is unchanged.
-The blink uses only black/white; vendor color constants and RGB byte order still
-need a separate physical color test. Requested SPI speed is inherited from the
+Gray shades are packed as RGB565 and byte-swapped for the driver's direct buffer
+transfer. Vendor color constants still need a separate physical color test.
+Requested SPI speed is inherited from the
 vendor example, not a measured stable rate on this board.
 
 ## On arrival
@@ -73,7 +75,7 @@ firmware version; return to the vendor demo before changing display registers.
 python3 -m unittest discover -s tests -p test_device_blink.py -v
 ```
 
-Checks compare open/blink/open geometry with the desktop face, verify the SPI
+Checks verify smooth edges and open/blink/open restoration, verify the SPI
 window commands, reject invalid bounds, and exercise tick wraparound and stopping.
 They do not emulate the controller, measure available device memory, or establish
 electrical/display performance. MicroPython APIs: [framebuf](https://docs.micropython.org/en/latest/library/framebuf.html)

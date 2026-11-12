@@ -5,6 +5,15 @@ WIDTH, HEIGHT = 240, 280
 EYE_R, EYE_DX, BLINK_MS, BLINK_EVERY_MS = 18, 42, 140, 4000
 
 
+def gray(level):
+    """RGB565 gray, byte-swapped for the driver's direct SPI buffer write."""
+    packed = ((level >> 3) << 11) | ((level >> 2) << 5) | (level >> 3)
+    return ((packed & 255) << 8) | (packed >> 8)
+
+
+EYE_COLOR = gray(232)
+
+
 def set_window(lcd, x0, y0, x1, y1):
     """Exclusive end coordinates, with the panel's 20-row offset."""
     if not (0 <= x0 < x1 <= WIDTH and 0 <= y0 < y1 <= HEIGHT):
@@ -22,11 +31,22 @@ def draw(lcd, blink):
     for sign in (-1, 1):
         cx, cy = WIDTH // 2 + sign * EYE_DX, HEIGHT // 2
         if blink:
-            lcd.fill_rect(cx - EYE_R, cy - 2, 2 * EYE_R + 1, 4, 0xFFFF)
+            lcd.fill_rect(cx - EYE_R, cy - 2, 2 * EYE_R + 1, 4, EYE_COLOR)
         else:
             for dy in range(-EYE_R, EYE_R + 1):
-                half = int(math.sqrt(EYE_R * EYE_R - dy * dy) + 0.5)
-                lcd.fill_rect(cx - half, cy + dy, 2 * half + 1, 1, 0xFFFF)
+                inner_sq = (EYE_R - 0.5) ** 2 - dy * dy
+                inner = int(math.sqrt(inner_sq)) if inner_sq >= 0 else -1
+                if inner >= 0:
+                    lcd.fill_rect(cx - inner, cy + dy, 2 * inner + 1, 1, EYE_COLOR)
+                outer = int(math.sqrt((EYE_R + 0.5) ** 2 - dy * dy))
+                for dx in range(inner + 1, outer + 1):
+                    # A one-pixel coverage ramp smooths the silhouette without a halo.
+                    coverage = EYE_R + 0.5 - math.sqrt(dx * dx + dy * dy)
+                    if coverage > 0:
+                        color = EYE_COLOR if coverage >= 1 else gray(int(232 * coverage))
+                        lcd.fill_rect(cx + dx, cy + dy, 1, 1, color)
+                        if dx:
+                            lcd.fill_rect(cx - dx, cy + dy, 1, 1, color)
     lcd.show()
 
 
@@ -42,7 +62,7 @@ def run():
     gc.collect()
     lcd = Display()  # The vendor driver owns the only 134,400-byte framebuffer.
     try:
-        lcd.set_bl_pwm(32768)
+        lcd.set_bl_pwm(8192)
         gc.collect()
         print("blink ready; free heap:", gc.mem_free(), "bytes; Ctrl-C to stop")
         previous = time.ticks_ms()

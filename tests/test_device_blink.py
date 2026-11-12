@@ -1,7 +1,6 @@
 import unittest
 
-from firmware.rp2040.main import draw, run, set_window
-from experiments.hello_buddy import update
+from firmware.rp2040.main import draw, gray, run, set_window
 from sim.screen import Screen
 
 
@@ -15,7 +14,10 @@ class FakeLCD:
         self.screen.clear((255, 255, 255) if color else (0, 0, 0))
 
     def fill_rect(self, x, y, w, h, color):
-        self.screen.fill_rect(x, y, w, h, (255, 255, 255) if color else (0, 0, 0))
+        packed = ((color & 255) << 8) | (color >> 8)
+        rgb = ((packed >> 11) * 255 // 31,
+               ((packed >> 5) & 63) * 255 // 63, (packed & 31) * 255 // 31)
+        self.screen.fill_rect(x, y, w, h, rgb)
 
     def show(self):
         self.frames += 1
@@ -28,15 +30,27 @@ class FakeLCD:
 
 
 class DeviceBlinkTests(unittest.TestCase):
-    def test_open_blink_open_matches_simulator_geometry(self):
-        lcd, expected = FakeLCD(), Screen()
-        for blink, t_ms in ((False, 200), (True, 4000), (False, 4200)):
+    def test_smooth_eyes_blink_and_restore_without_a_halo(self):
+        lcd = FakeLCD()
+        frames = []
+        for blink in (False, True, False):
             draw(lcd, blink)
-            update(expected, t_ms)
-            actual_mask = [[c != "#000000" for c in row] for row in lcd.screen.rows()]
-            expected_mask = [[c != "#000000" for c in row] for row in expected.rows()]
-            self.assertEqual(actual_mask, expected_mask)
+            frames.append([row[:] for row in lcd.screen.rows()])
+        self.assertEqual(frames[0], frames[2])
+        self.assertNotEqual(frames[0], frames[1])
+        for cx in (78, 162):
+            center, edge = frames[0][140][cx], frames[0][140][cx + 18]
+            self.assertTrue("#000000" < edge < center < "#ffffff")
+            self.assertEqual(frames[0][140][cx + 19], "#000000")
+            self.assertEqual(frames[0][121][cx], "#000000")
+            self.assertEqual(frames[1][140][cx], center)
+            self.assertEqual(frames[1][142][cx], "#000000")
         self.assertEqual(lcd.frames, 3)
+
+    def test_gray_wire_byte_order(self):
+        self.assertEqual(gray(0), 0)
+        self.assertEqual(gray(255), 0xFFFF)
+        self.assertEqual(gray(232), 0x5DEF)
 
     def test_full_window_includes_all_280_rows(self):
         lcd = FakeLCD()
@@ -78,7 +92,7 @@ class DeviceBlinkTests(unittest.TestCase):
             with self.assertRaises(KeyboardInterrupt):
                 run()
         self.assertEqual(displays[0].frames, 3)
-        self.assertEqual(displays[0].set_bl_pwm.call_args_list, [((32768,),), ((0,),)])
+        self.assertEqual(displays[0].set_bl_pwm.call_args_list, [((8192,),), ((0,),)])
         self.assertIn(("data", 43), displays[0].commands)
 
 
