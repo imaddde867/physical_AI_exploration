@@ -33,7 +33,7 @@ command channel is optional: without a host it blinks on its own.
 
 ## Gaze
 
-`face` messages with `x`/`y` (-1..1) shift both eyes by up to `GAZE_PX` = 10 px and redraw once per change. Moves are whole-pixel jumps with no easing. Host tests pass; **not yet run on the board**: copy `main.py` over and check with `python3 tools/buddy_service.py`, which sends a slow gaze drift and a blink every 5 s. A `face` carrying `mood` is still answered `unsupported`.
+`face` messages with `x`/`y` (-1..1) shift both eyes by up to `GAZE_PX` = 20 px. The shown offset eases toward the target at 30% of the remaining gap per 20 ms tick (`GAZE_EASE` = 0.3) and redraws only when the whole-pixel offset changes. Host tests pass; **not yet run on the board**: copy `main.py` over and check with `python3 tools/buddy_service.py`, which sends a slow gaze drift and a blink every 5 s. A `face` carrying `mood` is still answered `unsupported`.
 
 ## Touch and frame-time probe
 

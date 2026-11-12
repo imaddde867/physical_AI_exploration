@@ -223,8 +223,13 @@ class LoopTests(unittest.TestCase):
         self.assertEqual(drawn[2][:2], (3900, True))
 
     def test_gaze_command_redraws_with_the_pixel_offset(self):
-        out, drawn = self.loop(Clock(step=20, ticks=10), '{"v":1,"t":"face","x":0.5,"y":-1}\n')
-        self.assertEqual([d[1:] for d in drawn], [(False, 5, -10)])  # drawn once, on the command's tick
+        out, drawn = self.loop(Clock(step=20, ticks=40), '{"v":1,"t":"face","x":0.5,"y":-1}\n')
+        offsets = [d[2:] for d in drawn]
+        self.assertGreater(len(drawn), 1)  # eased over several ticks, not one jump
+        self.assertEqual([x for x, _ in offsets], sorted(x for x, _ in offsets))  # x only grows toward 10
+        self.assertEqual([y for _, y in offsets], sorted((y for _, y in offsets), reverse=True))  # y only falls toward -20
+        self.assertNotEqual(offsets[0], offsets[-1])
+        self.assertEqual(drawn[-1][1:], (False, 10, -20))
         self.assertEqual(protocol.decode(out), {"v": 1, "t": "ok"})
 
     def test_garbage_and_overlong_input_are_answered_and_survived(self):
