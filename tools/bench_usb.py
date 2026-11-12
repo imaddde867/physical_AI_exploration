@@ -64,11 +64,12 @@ def run_one(fd, nbytes, show):
     durations, failures = [], 0
     for _ in range(FRAMES):
         start = time.monotonic()
+        termios.tcflush(fd, termios.TCIFLUSH)  # drop stale replies from earlier frames
         write_all(fd, f"BENCH {nbytes} {show}\n".encode() + data)
         line = read_line(fd, REPLY_TIMEOUT_S)
         elapsed = time.monotonic() - start
         parts = line.split() if line else []
-        if len(parts) == 3 and parts[0] == b"OK" and int(parts[1]) == expect:
+        if len(parts) == 3 and parts[0] == b"OK" and parts[1] == str(expect).encode():
             durations.append(elapsed)
         else:
             failures += 1
