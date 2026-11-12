@@ -3,7 +3,8 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from daemon.protocol import MAX_LINE, MAX_STR, Watchdog, decode, encode
+from daemon.protocol import (MAX_LINE, MAX_STR, ProtocolError, Watchdog, decode,
+                             encode)
 
 
 def m(t, **kw):
@@ -63,6 +64,21 @@ class ProtocolTest(unittest.TestCase):
         self.assertTrue(w.expired())
         w.feed()
         self.assertFalse(w.expired())
+
+    def test_errors_carry_the_documented_reply_code(self):
+        cases = [(b"not json\n", "bad_json"), (b'{"v":2,"t":"ping"}\n', "bad_version"),
+                 (b'{"v":1,"t":"zzz"}\n', "unknown_type"),
+                 (b'{"v":1,"t":"face","blink":1}\n', "bad_field"),
+                 (b"x" * (MAX_LINE + 1), "too_long")]
+        for line, code in cases:
+            with self.subTest(code=code), self.assertRaises(ProtocolError) as caught:
+                decode(line)
+            self.assertEqual(caught.exception.code, code)
+
+    def test_encoding_stays_ascii_so_the_device_shares_one_encoder(self):
+        line = encode(m("text", slot=0, s="héllo ♪"))
+        self.assertTrue(line.isascii())
+        self.assertEqual(decode(line)["s"], "héllo ♪")
 
 
 if __name__ == "__main__":
