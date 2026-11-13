@@ -20,6 +20,8 @@ def parse_header(line):
     fields = line.split()
     if not fields:
         return None
+    if fields == ["BENCH", "0", "0"]:
+        return ("stop",)
     if fields[0] == "SYNC" and len(fields) == 2:
         nonce = fields[1]
         if len(nonce) == 16 and all(c in "0123456789abcdef" for c in nonce):
@@ -120,6 +122,8 @@ def run():
                 session = command[1]
                 sys.stdout.write("SYNCED %s\n" % session)
                 continue
+            if command[0] == "stop":
+                break  # exit the loop through finally before acknowledging teardown
             if session is None:
                 sys.stdout.write("ERR need_sync\n")
                 continue
@@ -141,6 +145,7 @@ def run():
     finally:
         lcd.set_bl_pwm(0)
         micropython.kbd_intr(3)
+    sys.stdout.write("STOPPED\n")  # only after the display and interrupt cleanup succeeds
 
 
 if __name__ == "__main__":

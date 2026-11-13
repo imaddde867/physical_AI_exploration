@@ -13,6 +13,7 @@ byte at a time and supports bounded-stall testing, not throughput decisions.
 """
 import argparse
 import binascii
+import glob
 import json
 import os
 import secrets
@@ -42,10 +43,11 @@ def payload(n):
 
 def decide(kb_s):
     if kb_s >= 500:
-        return "full-region streaming candidate (refresh and reliability still matter)"
+        return "full regions candidate (verify refresh, p95 and reliability)"
     if kb_s >= 150:
-        return "dirty-rectangle streaming candidate (needs a real partial refresh)"
-    return "device-side rendering or a lower-level USB receive implementation"
+        return "dirty rectangles only candidate (real partial refresh unverified)"
+    return ("MicroPython CDC receive path bottleneck candidate: "
+            "investigate C/viper or retain device-side rendering")
 
 
 def _p95(samples):
@@ -187,6 +189,35 @@ def send_frame(link, nonce, seq, nbytes, show, mode):
     return ended - started, ended - began, heap
 
 
+def stop_device(link):
+    """Use the spec's BENCH 0 0 terminator and confirm cleanup completed."""
+    link.write_all(b"BENCH 0 0\n")
+    reply = link.read_line()
+    if reply != b"STOPPED":
+        raise BenchmarkError("device did not acknowledge shutdown: %r" % reply)
+
+
+def resolve_port(value):
+    if value:
+        return value
+    choices = sorted(glob.glob("/dev/cu.usbmodem*"))
+    if len(choices) != 1:
+        raise BenchmarkError("expected one USB modem port, found %d: %s; pass port explicitly" %
+                             (len(choices), ", ".join(choices) or "none"))
+    return choices[0]
+
+
+def save_results(path, port, results, complete):
+    if not path:
+        return
+    with open(path, "w", encoding="utf-8") as output:
+        json.dump({"port": port, "results": results, "complete": complete,
+                   "hardware_validated": False,
+                   "note": "Hardware conclusions require inspected board output and recovery evidence"},
+                  output, indent=2)
+    print("Saved:", path, flush=True)
+
+
 def recovery_test(link):
     nonce = synchronize(link)
     seq = 0
@@ -201,11 +232,12 @@ def recovery_test(link):
     duration, _, heap = send_frame(link, nonce, 1, 16, 0, "S")
     print("SAFE recovery PASS: 17-byte partial frame stalled, resynchronized, then CRC-valid 16-byte frame")
     print("Recovery frame: %.1f ms; free heap: %d B" % (duration * 1000, heap))
+    stop_device(link)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("port", help="actual macOS serial port, e.g. /dev/cu.usbmodem101")
+    parser.add_argument("port", nargs="?", help="serial port (auto-detect if exactly one cu.usbmodem)")
     parser.add_argument("--smoke", action="store_true", help="one 16-byte no-show frame")
     parser.add_argument("--recovery-test", action="store_true", help="SAFE-mode partial-frame recovery")
     parser.add_argument("--frames", type=int, default=FRAMES, help="frames per configuration (default: 100)")
@@ -224,7 +256,8 @@ def main(argv=None):
 
     results = []
     try:
-        with SerialPort(args.port) as link:
+        port = resolve_port(args.port)
+        with SerialPort(port) as link:
             if args.recovery_test:
                 recovery_test(link)
                 return 0
@@ -241,8 +274,17 @@ def main(argv=None):
                         try:
                             duration, cycle, heap = send_frame(link, nonce, seq, nbytes, show, mode)
                         except (TimeoutError, BenchmarkError, OSError) as exc:
-                            print("INCOMPLETE: size=%d show=%d frame=%d/%d: %s" %
-                                  (nbytes, show, len(durations) + 1, frames, exc), flush=True)
+                            # Do not send more frames on an unknown receiver state.
+                            partial = {"size_bytes": nbytes, "show": show, "mode": mode,
+                                       "status": "incomplete", "expected_frames": frames,
+                                       "attempted_frames": len(durations) + 1,
+                                       "completed_frames": len(durations), "failures": 1,
+                                       "error": str(exc)}
+                            if durations:
+                                partial.update(summarize(durations, nbytes, 1, cycles, heaps))
+                            results.append(partial)
+                            print("INCOMPLETE: %s" % partial, flush=True)
+                            save_results(args.json_out, port, results, complete=False)
                             print("STOP. Do not reuse the port until the receiver state is checked.")
                             return 2
                         durations.append(duration)
@@ -253,14 +295,14 @@ def main(argv=None):
                     record = {"size_bytes": nbytes, "show": show, "mode": mode, **stats}
                     results.append(record)
                     print("%d B show=%d mode=%s: %s" % (nbytes, show, mode, stats), flush=True)
-                    if show == 1 and mode == "F":
-                        print("  -> provisional:", decide(stats["kb_s_mean"]), flush=True)
-            if args.json_out:
-                with open(args.json_out, "w", encoding="utf-8") as output:
-                    json.dump({"port": args.port, "results": results, "hardware_validated": False,
-                               "note": "automated result; verify board, LCD, recovery before declaring success"},
-                              output, indent=2)
-                print("Saved:", args.json_out)
+                    if mode == "F":
+                        suffix = " (USB receive path only; no LCD refresh)" if not show else " (includes full LCD refresh)"
+                        print("  -> provisional:", decide(stats["kb_s_mean"]) + suffix, flush=True)
+                    else:
+                        print("  -> safe-mode diagnostic only; do not choose streaming architecture", flush=True)
+            # Saved before teardown: a lost STOPPED ack must not discard measured frames.
+            save_results(args.json_out, port, results, complete=True)
+            stop_device(link)
             if args.smoke:
                 print("Smoke test PASS (16 bytes, binary including 0x03, CRC matched)")
             else:

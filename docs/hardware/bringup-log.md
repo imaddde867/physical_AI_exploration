@@ -2,6 +2,34 @@
 
 Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
 
+## 2026-11-13 USB CDC throughput (slice 0) — incomplete
+
+Status: **not measured**. The first physical attempt used the PR #31 benchmark
+at Git commit `071c14c`, on an M4 MacBook Pro connected to the Waveshare
+RP2040-Touch-LCD-1.69 running MicroPython 1.22.2. Serial port observed:
+`/dev/cu.usbmodem101` (not guaranteed stable across reconnects).
+
+- Verified pre-test: 16-byte payload, `show=0`, device replied
+  `OK 345230767 87024`; host CRC32 check passed; free heap reported: **87,024 B**.
+- Full four-configuration test started but terminated by the host's external
+  **480-second timeout**. **Zero usable full-configuration result lines** were
+  recorded; throughput, display overhead and p95 are **not measured**.
+- Additional 28,800-byte transfer: host wrote 28,814 bytes including header,
+  but received repeated `U` characters from the REPL rather than a valid `OK`;
+  CRC verification failed. No 28,800-byte throughput figure is established.
+- Diagnostic REPL reboot showed `bench ready; free heap: 87424` followed by
+  `ValueError: need more than 0 values to unpack` at `main.py` line 35; a
+  later Ctrl+C produced `KeyboardInterrupt`.
+- Restored the previously backed-up device-side `main.py`; `cmp` verified the
+  restored copy byte-for-byte; board reset and blink resumed normally.
+
+**Not tested / not passed:** sustained 28,800-byte and 134,400-byte transfers,
+`show=1` performance, four-by-100-frame run, fast-mode stall recovery, safe-mode
+recovery, USB cable pull while sending, physical partial-region refresh, and
+Buddy OS streaming/leased-frame operation. **No architecture decision** follows
+from this attempt. Corrected benchmark proposed on draft PR #32; hardware run
+pending separate approval and observation.
+
 ## 2026-11-12 Waveshare board: first load (current hardware)
 
 MicroPython 1.22.2 installed; the vendor driver and `firmware/rp2040/main.py` were loaded. Session results (free heap, orientation, colour, flicker, tearing, SPI rate) are not recorded yet. This is the ordered bench prototype, separate from the paused Good Display proposal below.

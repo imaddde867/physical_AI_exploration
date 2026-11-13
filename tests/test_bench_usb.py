@@ -6,6 +6,8 @@ try:
 except ImportError:
     pty = None
 import select
+import json
+import tempfile
 import threading
 import time
 import unittest
@@ -35,10 +37,11 @@ class BenchHelpers(unittest.TestCase):
         self.assertAlmostEqual(s['cycle_ms_mean'], 180)
 
     def test_decision_rule_thresholds(self):
-        self.assertIn("full-region", host.decide(500))
-        self.assertIn("dirty-rectangle", host.decide(499.9))
-        self.assertIn("dirty-rectangle", host.decide(150))
-        self.assertIn("device-side", host.decide(149.9))
+        self.assertIn("full regions", host.decide(500))
+        self.assertIn("dirty rectangles", host.decide(499.9))
+        self.assertIn("dirty rectangles", host.decide(150))
+        self.assertIn("bottleneck", host.decide(149.9))
+        self.assertIn("MicroPython CDC", host.decide(149.9))
 
     def test_host_rejects_bad_ack_and_crc(self):
         nonce = '0123456789abcdef'
@@ -55,6 +58,19 @@ class BenchHelpers(unittest.TestCase):
                 host.parse_result(bad, nonce, 7, 1234)
 
 
+class PortResolution(unittest.TestCase):
+    def test_auto_detect_one_or_reject_ambiguous_ports(self):
+        with patch.object(host.glob, "glob", return_value=["/dev/cu.usbmodem101"]):
+            self.assertEqual(host.resolve_port(None), "/dev/cu.usbmodem101")
+        with patch.object(host.glob, "glob", return_value=[]):
+            with self.assertRaises(host.BenchmarkError):
+                host.resolve_port(None)
+        with patch.object(host.glob, "glob", return_value=["/dev/cu.usbmodem101", "/dev/cu.usbmodem1101"]):
+            with self.assertRaises(host.BenchmarkError):
+                host.resolve_port(None)
+        self.assertEqual(host.resolve_port("/dev/cu.custom"), "/dev/cu.custom")
+
+
 class FakePoller:
     def __init__(self, stream):
         self.stream = stream
@@ -68,6 +84,7 @@ class DeviceSafety(unittest.TestCase):
         self.assertEqual(device.parse_header('SYNC 0123456789abcdef'), ('sync', '0123456789abcdef'))
         self.assertEqual(device.parse_header('BENCH 5 134400 1 F'), ('bench', 5, 134400, 1, 'F'))
         self.assertEqual(device.parse_header('BENCH 0 1024 0 S'), ('bench', 0, 1024, 0, 'S'))
+        self.assertEqual(device.parse_header('BENCH 0 0'), ('stop',))
 
     def test_malformed_or_unsafe_header_rejected(self):
         for bad in ('BENCH', 'BENCH 1024 1', 'BENCH 1 999999 1 F',
@@ -166,6 +183,10 @@ class FakeDevice(threading.Thread):
                     if cmd[0] == 'sync':
                         self.session = cmd[1]
                         os.write(self.fd, ('SYNCED %s\n' % self.session).encode())
+                    elif cmd[0] == 'stop':
+                        os.write(self.fd, b'STOPPED\n')
+                        self.running = False
+                        return
                     else:
                         _, seq, n, show, mode = cmd
                         os.write(self.fd, ('READY %s %d\n' % (self.session, seq)).encode())
@@ -209,6 +230,63 @@ class HostTransport(unittest.TestCase):
             os.close(slave)
             os.close(master)
             board.join(timeout=1)
+
+    def test_clean_termination_ack(self):
+        master, slave = pty.openpty()
+        board = FakeDevice(master)
+        board.start()
+        try:
+            with host.SerialPort(os.ttyname(slave)) as link:
+                host.synchronize(link)
+                host.stop_device(link)
+            board.join(timeout=1)
+            self.assertFalse(board.is_alive())
+        finally:
+            board.running = False
+            os.close(slave)
+            os.close(master)
+            board.join(timeout=1)
+
+    def test_main_smoke_terminates_cleanly(self):
+        master, slave = pty.openpty()
+        board = FakeDevice(master)
+        board.start()
+        try:
+            rc = host.main([os.ttyname(slave), '--smoke'])
+            self.assertEqual(rc, 0)
+            self.assertEqual(board.frame_count, 1)
+            board.join(timeout=1)
+            self.assertFalse(board.is_alive())
+        finally:
+            board.running = False
+            os.close(slave)
+            os.close(master)
+            board.join(timeout=1)
+
+    def test_fail_fast_records_the_first_failure_without_unsafe_stop(self):
+        class FakeLink:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+        with tempfile.TemporaryDirectory() as directory:
+            output = os.path.join(directory, "partial.json")
+            with (patch.object(host, "SerialPort", return_value=FakeLink()),
+                  patch.object(host, "synchronize", return_value="0123456789abcdef"),
+                  patch.object(host, "send_frame", side_effect=[
+                      (0.1, 0.11, 87024), host.BenchmarkError("bad CRC")]),
+                  patch.object(host, "stop_device") as stop):
+                exit_code = host.main(["/dev/fake", "--frames", "2", "--size", "16",
+                                       "--show", "0", "--json-out", output])
+                self.assertEqual(exit_code, 2)
+                stop.assert_not_called()  # receiver state is unknown
+            with open(output, encoding="utf-8") as result_file:
+                result = json.load(result_file)
+            self.assertFalse(result["complete"])
+            record = result["results"][0]
+            self.assertEqual((record["frames"], record["failures"]), (1, 1))
+            self.assertEqual(record["attempted_frames"], 2)
+            self.assertEqual(record["expected_frames"], 2)
 
     def test_missing_ack_times_out(self):
         master, slave = pty.openpty()
