@@ -18,8 +18,9 @@ Fast mode (`F`), KB = 1000 bytes, second column is the repeat run:
 | 134,400 | 0 | 114.5 / 114.5 | 114.5 | 1174.3 / 1173.8 | 1181.8 |
 | 134,400 | 1 | 112.3 / 112.3 | 112.3 | 1197.0 / 1196.4 | 1203.6 |
 
-Run-to-run spread is 0.01-0.06% on throughput and under 0.2 ms on p95, so the
-numbers are repeatable, not a lucky pass.
+Run-to-run spread is at most 0.1% on throughput and at most 0.6 ms on mean
+latency; `ms p95` was recorded once per configuration, so it carries no
+run-to-run comparison. The numbers are repeatable, not a lucky pass.
 
 **Decision: all four configurations land below 150 KB/s — "MicroPython CDC receive
 path bottleneck".** Throughput is flat across payload size (112.2 / 103.2 / 114.5 /

@@ -243,11 +243,13 @@ def save_results(path, port, results, complete, device_stopped=False):
     """`complete` is the measurement; `device_stopped` is the confirmed teardown."""
     if not path:
         return
-    with open(path, "w", encoding="utf-8") as output:
+    temporary = path + ".tmp"  # an interrupt mid-dump must not truncate the last good evidence
+    with open(temporary, "w", encoding="utf-8") as output:
         json.dump({"port": port, "results": results, "complete": complete,
                    "device_stopped": device_stopped, "hardware_validated": False,
                    "note": "Hardware conclusions require inspected board output and recovery evidence"},
                   output, indent=2)
+    os.replace(temporary, path)
 
 
 def recovery_test(link):
@@ -262,15 +264,16 @@ def recovery_test(link):
         raise BenchmarkError("expected bounded-stall reply %r, got %r" % (expected, reply))
     nonce = synchronize(link)
     duration, _, heap = send_frame(link, nonce, 1, 16, 0, "S")
+    stop_device(link)
     print("SAFE recovery PASS: 17-byte partial frame stalled, resynchronized, then CRC-valid 16-byte frame")
     print("Recovery frame: %.1f ms; free heap: %d B" % (duration * 1000, heap))
-    stop_device(link)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("port", nargs="?", help="serial port (auto-detect if exactly one cu.usbmodem)")
-    parser.add_argument("--smoke", action="store_true", help="one 16-byte no-show frame")
+    parser.add_argument("--smoke", action="store_true",
+                        help="one 16-byte no-show frame in safe mode S; ignores --size/--show/--frames/--mode")
     parser.add_argument("--recovery-test", action="store_true", help="SAFE-mode partial-frame recovery")
     parser.add_argument("--frames", type=int, default=FRAMES, help="frames per configuration (default: 100)")
     parser.add_argument("--size", type=int, action="append", choices=FRAME_SIZES,
@@ -305,7 +308,7 @@ def main(argv=None):
                     for _ in range(frames):
                         try:
                             duration, cycle, heap = send_frame(link, nonce, seq, nbytes, show, mode)
-                        except (TimeoutError, BenchmarkError, OSError) as exc:
+                        except (TimeoutError, BenchmarkError, OSError, termios.error) as exc:
                             # Do not send more frames on an unknown receiver state.
                             partial = {"size_bytes": nbytes, "show": show, "mode": mode,
                                        "status": "incomplete", "expected_frames": frames,
@@ -330,7 +333,8 @@ def main(argv=None):
                         heaps.append(heap)
                         seq += 1
                     stats = summarize(durations, nbytes, 0, cycles, heaps)
-                    record = {"size_bytes": nbytes, "show": show, "mode": mode, **stats}
+                    record = {"size_bytes": nbytes, "show": show, "mode": mode,
+                              "status": "complete", **stats}
                     results.append(record)
                     print("%d B show=%d mode=%s: %s" % (nbytes, show, mode, stats), flush=True)
                     if mode == "F":
@@ -338,6 +342,8 @@ def main(argv=None):
                         print("  -> provisional:", decide(stats["kb_s_mean"]) + suffix, flush=True)
                     else:
                         print("  -> safe-mode diagnostic only; do not choose streaming architecture", flush=True)
+                    # Evidence on disk before the next configuration: an interrupt must not discard it.
+                    save_results(args.json_out, port, results, complete=False)
             # Saved before teardown: a lost STOPPED ack must not discard measured frames.
             save_results(args.json_out, port, results, complete=True)
             stop_device(link)
@@ -345,14 +351,19 @@ def main(argv=None):
             if args.json_out:
                 print("Saved:", args.json_out, flush=True)
             if args.smoke:
-                print("Smoke test PASS (16 bytes, binary including 0x03, CRC matched)")
+                print("Smoke test PASS (16 bytes, mode S, binary including 0x03, CRC matched)")
             else:
                 print("Complete: %d successful transfers, 0 frame failures. Recovery is a separate test." %
                       sum(x["frames"] for x in results))
             return 0
-    except (TimeoutError, BenchmarkError, ConnectionError, OSError) as exc:
+    except (TimeoutError, BenchmarkError, ConnectionError, OSError, termios.error) as exc:
         print("FAIL: %s" % exc, file=sys.stderr)
         return 2
+    except KeyboardInterrupt:
+        # No BENCH 0 0: the receiver may be mid-frame. Completed configurations are already saved.
+        print("INTERRUPTED: completed configurations saved; the in-progress one is lost",
+              file=sys.stderr)
+        return 130
 
 
 if __name__ == "__main__":

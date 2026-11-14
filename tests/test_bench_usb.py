@@ -12,6 +12,7 @@ import termios
 import threading
 import time
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from unittest.mock import patch
 
 from firmware.rp2040 import bench_usb as device
@@ -255,11 +256,15 @@ class HostTransport(unittest.TestCase):
         try:
             with tempfile.TemporaryDirectory() as directory:
                 output = os.path.join(directory, "smoke.json")
-                rc = host.main([os.ttyname(slave), '--smoke', '--json-out', output])
+                buffer = io.StringIO()
+                with redirect_stdout(buffer):
+                    rc = host.main([os.ttyname(slave), '--smoke', '--json-out', output])
                 self.assertEqual(rc, 0)
+                self.assertIn("mode S", buffer.getvalue())
                 with open(output, encoding="utf-8") as result_file:
                     result = json.load(result_file)
             self.assertTrue(result["complete"] and result["device_stopped"])
+            self.assertEqual(result["results"][0]["status"], "complete")
             self.assertEqual(board.frame_count, 1)
             board.join(timeout=1)
             self.assertFalse(board.is_alive())
@@ -349,6 +354,96 @@ class HostTransport(unittest.TestCase):
                               side_effect=termios.error(6, 'Device not configured')):
                 link.close()
             self.assertIsNone(link.fd)
+        finally:
+            os.close(slave)
+            os.close(master)
+
+    def test_interrupt_keeps_completed_configurations(self):
+        class FakeLink:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+        with tempfile.TemporaryDirectory() as directory:
+            output = os.path.join(directory, "interrupted.json")
+            with (patch.object(host, "SerialPort", return_value=FakeLink()),
+                  patch.object(host, "synchronize", return_value="0123456789abcdef"),
+                  patch.object(host, "send_frame", side_effect=[
+                      (0.1, 0.11, 87024), KeyboardInterrupt()]),
+                  patch.object(host, "stop_device") as stop):
+                exit_code = host.main(["/dev/fake", "--frames", "1", "--show", "0",
+                                       "--size", "16", "--size", "1024",
+                                       "--json-out", output])
+                self.assertEqual(exit_code, 130)
+                stop.assert_not_called()  # receiver state is unknown
+            with open(output, encoding="utf-8") as result_file:
+                result = json.load(result_file)
+        self.assertEqual([record["size_bytes"] for record in result["results"]], [16])
+        self.assertFalse(result["complete"])
+        self.assertFalse(result["device_stopped"])
+
+    def test_failed_port_open_keeps_an_existing_results_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = os.path.join(directory, "results.json")
+            with open(output, "w", encoding="utf-8") as existing:
+                existing.write("previous evidence")
+            with patch.object(host, "resolve_port", side_effect=host.BenchmarkError("no port")):
+                exit_code = host.main(["--json-out", output])
+            self.assertEqual(exit_code, 2)
+            with open(output, encoding="utf-8") as result_file:
+                self.assertEqual(result_file.read(), "previous evidence")
+
+    def test_interrupt_during_save_keeps_the_previous_results_file(self):
+        # The save now runs after every configuration, so a Ctrl+C can land inside it.
+        with tempfile.TemporaryDirectory() as directory:
+            output = os.path.join(directory, "results.json")
+            with open(output, "w", encoding="utf-8") as existing:
+                existing.write("previous evidence")
+            with patch.object(host.json, "dump", side_effect=KeyboardInterrupt()):
+                with self.assertRaises(KeyboardInterrupt):
+                    host.save_results(output, "/dev/fake", [], complete=False)
+            with open(output, encoding="utf-8") as result_file:
+                self.assertEqual(result_file.read(), "previous evidence")
+
+    def test_recovery_pass_prints_only_after_the_stop_ack(self):
+        nonce = "0123456789abcdef"
+        crc = binascii.crc32(host.payload(16))
+        replies = iter([("READY %s 0" % nonce).encode(),
+                        ("ERR %s 0 stall 17" % nonce).encode(),
+                        ("READY %s 1" % nonce).encode(),
+                        ("OK %s 1 %d 50776" % (nonce, crc)).encode()])
+
+        class FakeLink:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+            def write_all(self, data, timeout=None):
+                pass
+            def read_line(self, timeout=None):
+                return next(replies)
+
+        buffer = io.StringIO()
+        with (patch.object(host, "SerialPort", return_value=FakeLink()),
+              patch.object(host, "synchronize", return_value=nonce),
+              patch.object(host, "stop_device", side_effect=host.BenchmarkError("no ack")),
+              redirect_stdout(buffer)):
+            exit_code = host.main(["/dev/fake", "--recovery-test"])
+        self.assertEqual(exit_code, 2)
+        self.assertNotIn("SAFE recovery PASS", buffer.getvalue())
+
+    def test_termios_error_at_open_is_a_transport_failure(self):
+        master, slave = pty.openpty()
+        errors = io.StringIO()
+        try:
+            with (patch.object(host, "open_raw",
+                               return_value=(os.dup(slave), termios.tcgetattr(slave))),
+                  patch.object(host.termios, "tcflush",
+                               side_effect=termios.error(6, "Device not configured")),
+                  redirect_stderr(errors)):
+                exit_code = host.main(["/dev/fake", "--smoke"])
+            self.assertEqual(exit_code, 2)
+            self.assertIn("FAIL:", errors.getvalue())
         finally:
             os.close(slave)
             os.close(master)
