@@ -295,6 +295,41 @@ class HostTransport(unittest.TestCase):
             self.assertEqual(record["attempted_frames"], 2)
             self.assertEqual(record["expected_frames"], 2)
 
+    def test_fast_mode_stall_completes_the_frame_and_keeps_the_device_usable(self):
+        # A host-side stall leaves the device blocked in readinto() waiting for
+        # the rest of the declared frame; finishing that frame frees it.
+        master, slave = pty.openpty()
+        board = FakeDevice(master)
+        board.start()
+        stalled = {"done": False}
+        write_all = host.SerialPort.write_all
+
+        def stall_once(link, data, timeout=host.WRITE_TIMEOUT_S):
+            if not stalled["done"] and len(data) == 28800:
+                stalled["done"] = True
+                write_all(link, data[:300])
+                raise host.PartialWrite(300, len(data))
+            return write_all(link, data, timeout)
+
+        try:
+            with tempfile.TemporaryDirectory() as directory:
+                output = os.path.join(directory, "stall.json")
+                with patch.object(host.SerialPort, "write_all", stall_once):
+                    rc = host.main([os.ttyname(slave), "--frames", "1", "--size", "28800",
+                                    "--show", "0", "--json-out", output])
+                self.assertEqual(rc, 2)
+                with open(output, encoding="utf-8") as result_file:
+                    result = json.load(result_file)
+            self.assertFalse(result["complete"])
+            self.assertTrue(result["results"][0]["recovered"])
+            # Not hung: the same board answers a fresh smoke run afterwards.
+            self.assertEqual(host.main([os.ttyname(slave), "--smoke"]), 0)
+        finally:
+            board.running = False
+            os.close(slave)
+            os.close(master)
+            board.join(timeout=1)
+
     def test_missing_ack_times_out(self):
         master, slave = pty.openpty()
         try:

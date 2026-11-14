@@ -7,9 +7,9 @@ Examples:
   python3 tools/bench_usb.py /dev/cu.usbmodem101 --json-out /tmp/buddy-usb.json
   python3 tools/bench_usb.py /dev/cu.usbmodem101 --recovery-test
 
-Mode F (default) measures the bulk-read path but cannot guarantee automatic
-recovery from a partial 256-byte read in MicroPython 1.22.2. Mode S reads one
-byte at a time and supports bounded-stall testing, not throughput decisions.
+Mode F (default) measures the bulk-read path; a stalled write is completed with
+filler so the device leaves its blocked read and resynchronizes. Mode S reads
+one byte at a time and supports bounded-stall testing, not throughput decisions.
 """
 import argparse
 import binascii
@@ -35,6 +35,15 @@ MAX_REPLY = 256
 
 class BenchmarkError(Exception):
     pass
+
+
+class PartialWrite(TimeoutError):
+    """A bounded write stopped after `sent` of `total` bytes."""
+
+    def __init__(self, sent, total):
+        super().__init__("USB write timed out after %d/%d bytes" % (sent, total))
+        self.sent = sent
+        self.total = total
 
 
 def payload(n):
@@ -106,9 +115,9 @@ class SerialPort:
         while sent < len(view):
             remaining = end - time.monotonic()
             if remaining <= 0:
-                raise TimeoutError("USB write timed out after %d/%d bytes" % (sent, len(view)))
+                raise PartialWrite(sent, len(view))
             if not select.select([], [self.fd], [], remaining)[1]:
-                raise TimeoutError("USB write readiness timed out after %d bytes" % sent)
+                raise PartialWrite(sent, len(view))
             try:
                 n = os.write(self.fd, view[sent:])
             except BlockingIOError:
@@ -177,13 +186,36 @@ def parse_result(line, nonce, seq, expected_crc):
     raise BenchmarkError("unexpected acknowledgement: %r" % line)
 
 
+def complete_stalled_frame(link, nbytes, sent):
+    """Finish a fast-mode frame the device is still blocked reading, then resync.
+
+    The device's readinto() waits for every requested byte, so a host that stops
+    mid-frame leaves it blocked. Filler returns it to the command loop; the
+    frame is discarded, so its CRC no longer matters.
+    """
+    try:
+        if nbytes > sent:
+            link.write_all(b"\x00" * (nbytes - sent) + b"\n")
+        reply = link.read_line(3.0)
+        if not reply.startswith((b"OK ", b"ERR ")):
+            raise BenchmarkError("unexpected reply while completing a frame: %r" % reply)
+        synchronize(link)
+    except (TimeoutError, BenchmarkError, OSError, termios.error):
+        return False
+    return True
+
+
 def send_frame(link, nonce, seq, nbytes, show, mode):
     data = payload(nbytes)
     began = time.monotonic()
     link.write_all(("BENCH %d %d %d %s\n" % (seq, nbytes, show, mode)).encode())
     parse_ready(link.read_line(), nonce, seq)
     started = time.monotonic()
-    link.write_all(data)
+    try:
+        link.write_all(data)
+    except PartialWrite as exc:
+        exc.recovered = mode == "F" and complete_stalled_frame(link, nbytes, exc.sent)
+        raise
     heap = parse_result(link.read_line(), nonce, seq, binascii.crc32(data))
     ended = time.monotonic()
     return ended - started, ended - began, heap
@@ -279,6 +311,7 @@ def main(argv=None):
                                        "status": "incomplete", "expected_frames": frames,
                                        "attempted_frames": len(durations) + 1,
                                        "completed_frames": len(durations), "failures": 1,
+                                       "recovered": getattr(exc, "recovered", False),
                                        "error": str(exc)}
                             if durations:
                                 partial.update(summarize(durations, nbytes, 1, cycles, heaps))
@@ -287,7 +320,10 @@ def main(argv=None):
                             save_results(args.json_out, port, results, complete=False)
                             if args.json_out:
                                 print("Saved:", args.json_out, flush=True)
-                            print("STOP. Do not reuse the port until the receiver state is checked.")
+                            if partial["recovered"]:
+                                print("Device resynchronized; the discarded frame does not count, rerun freely.")
+                            else:
+                                print("STOP. Do not reuse the port until the receiver state is checked.")
                             return 2
                         durations.append(duration)
                         cycles.append(cycle)

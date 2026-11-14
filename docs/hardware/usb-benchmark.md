@@ -17,9 +17,14 @@ data is ready. This is visible in MicroPython's
 `readinto(framebuffer[:n])` could block forever if the sender stopped mid-frame.
 
 - **F (fast)**: 256-byte `readinto()` slices, with a single 200 ms poll between
-  slices. Measures a practical Python/C USB receive path. **Does not guarantee
-  recovery if the host stops halfway through a slice.** On a fast-mode timeout
-  or unplug, stop, power-cycle if needed, and restore/restart deliberately.
+  slices. Measures a practical Python/C USB receive path. The device's
+  `readinto()` waits for every requested byte, so a host that stops mid-slice
+  would leave it blocked; on a stalled write the host fills the rest of the
+  declared frame, discards the CRC-mismatched result, and resynchronizes with a
+  fresh `SYNC`. This is covered by a pty test, not by a hardware run. If the
+  host process dies (nothing is left to send filler), the device still needs a
+  power cycle; a device-side 200 ms timeout inside a slice still needs a
+  nonblocking native receive path or a verified watchdog.
 - **S (safe)**: polls before every 1-byte read, ensuring the read itself cannot
   wait for more than one already-available byte. On a 200 ms gap, reports
   `ERR <session> <seq> stall <count>` and requires a fresh `SYNC`. Its per-byte
@@ -124,9 +129,11 @@ python3 tools/bench_usb.py "$PORT" --recovery-test
 ```
 
 `SAFE recovery PASS` establishes only the bounded-read path on that physical
-connection. It **does not** prove optimized fast-mode stall recovery. The latter
-requires a nonblocking native CDC receive implementation or a separately
-verified watchdog/reboot strategy.
+connection. It **does not** prove fast-mode stall recovery on hardware. A host
+that stalls mid-frame now completes the frame with filler and resynchronizes
+(pty test only); a device-side 200 ms timeout inside a fast-mode slice still
+needs a nonblocking native receive implementation or a verified
+watchdog/reboot strategy.
 
 **The original specification's unplug-mid-frame test PASSED on 2026-11-14** for the
 power-cycle path: pulling the cable during a fast-mode 134,400-byte run failed the
@@ -134,8 +141,9 @@ host fast with `complete: false`, `device_stopped: false`, and the completed fra
 kept; after replug, smoke and one 28,800-byte frame passed without reflashing.
 Evidence: `bringup-log.md`, section 2026-11-14. This is **not** proof that a
 stalled fast-mode read recovers in place: the pull cut power, so the board rebooted
-into a fresh benchmark. That limitation still needs a nonblocking native CDC
-receive implementation or a verified watchdog/reboot strategy.
+into a fresh benchmark. A host-side stall is now handled by completing the frame
+and resynchronizing; an in-place device-side timeout still needs a nonblocking
+native CDC receive implementation or a verified watchdog/reboot strategy.
 
 **Unplug test is separate:** unplugging the current USB-powered board also cuts
 its power. Only after safe results should you deliberately unplug it between
@@ -147,10 +155,13 @@ partially transmitted frame without a reset.
 
 If the host prints `INCOMPLETE`, `FAIL`, an unexpected acknowledgement, or a
 CRC mismatch, stop. **Do not repeatedly send frames against an unknown
-receiver state.** The fast path may be blocked inside a partial 256-byte read:
-reconnecting USB power resets it. After that, confirm the port and begin with
-`--smoke`. Preserve logs as evidence; no failed run counts toward a throughput
-threshold. Use Thonny or `mpremote repl` to inspect a traceback if available.
+receiver state.** When the failure is a stalled write, the host fills the frame,
+prints `Device resynchronized`, and sets `recovered: true` in the JSON; the
+discarded frame does not count, and the port can be rerun from `--smoke`. If the
+host process itself died mid-frame, nothing is left to complete it: reconnect
+USB power, then confirm the port and begin with `--smoke`. Preserve logs as
+evidence; no failed run counts toward a throughput threshold. Use Thonny or
+`mpremote repl` to inspect a traceback if available.
 
 ## Restore verified working firmware
 
