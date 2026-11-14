@@ -12,6 +12,7 @@ import termios
 import threading
 import time
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from firmware.rp2040 import bench_usb as device
@@ -387,6 +388,33 @@ class HostTransport(unittest.TestCase):
             self.assertEqual(exit_code, 2)
             with open(output, encoding="utf-8") as result_file:
                 self.assertEqual(result_file.read(), "previous evidence")
+
+    def test_recovery_pass_prints_only_after_the_stop_ack(self):
+        nonce = "0123456789abcdef"
+        crc = binascii.crc32(host.payload(16))
+        replies = iter([("READY %s 0" % nonce).encode(),
+                        ("ERR %s 0 stall 17" % nonce).encode(),
+                        ("READY %s 1" % nonce).encode(),
+                        ("OK %s 1 %d 50776" % (nonce, crc)).encode()])
+
+        class FakeLink:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+            def write_all(self, data, timeout=None):
+                pass
+            def read_line(self, timeout=None):
+                return next(replies)
+
+        buffer = io.StringIO()
+        with (patch.object(host, "SerialPort", return_value=FakeLink()),
+              patch.object(host, "synchronize", return_value=nonce),
+              patch.object(host, "stop_device", side_effect=host.BenchmarkError("no ack")),
+              redirect_stdout(buffer)):
+            exit_code = host.main(["/dev/fake", "--recovery-test"])
+        self.assertEqual(exit_code, 2)
+        self.assertNotIn("SAFE recovery PASS", buffer.getvalue())
 
 
 if __name__ == '__main__':

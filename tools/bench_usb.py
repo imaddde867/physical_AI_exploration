@@ -262,9 +262,9 @@ def recovery_test(link):
         raise BenchmarkError("expected bounded-stall reply %r, got %r" % (expected, reply))
     nonce = synchronize(link)
     duration, _, heap = send_frame(link, nonce, 1, 16, 0, "S")
+    stop_device(link)
     print("SAFE recovery PASS: 17-byte partial frame stalled, resynchronized, then CRC-valid 16-byte frame")
     print("Recovery frame: %.1f ms; free heap: %d B" % (duration * 1000, heap))
-    stop_device(link)
 
 
 def main(argv=None):
