@@ -42,13 +42,26 @@ Smoke: 16-byte CRC frame passed with a confirmed `STOPPED` (`complete: true`,
 (`--recovery-test`) passed on hardware: 17-byte partial frame stalled,
 resynchronized, then a CRC-valid 16-byte frame at 7.8 ms, 75,776 B free.
 
-**Not measured / not passed:** a physical USB cable pull mid-frame (needs a hand on
-the plug and a power-cycle plan), fast-mode stall recovery on a truncated 256-byte
-read, real partial-region refresh (only whole-screen `lcd.show()` was exercised),
-and sustained runs longer than 100 frames per configuration.
+**Cable pull, measured (2026-11-14).** Unplugged during a 200-frame, 134,400-byte
+fast-mode run, at frame 5. The host failed fast with `[Errno 6] Device not
+configured` and kept the four completed frames plus `failures: 1` in
+`cablepull-6355c0d.json` with `complete: false`, `device_stopped: false`. Before
+fix `039843e` it also printed a `termios.error` traceback and exited 1 instead of
+2; that is fixed and pinned by `test_close_survives_a_cable_pull`. After replug
+(same port name, no reflash, no second replug) a 16-byte smoke passed with
+`STOPPED`, then one 28,800-byte fast-mode frame passed at 112.6 KB/s - within
+0.4% of the pre-pull average. Each later invocation needs the documented
+`mpremote connect "$PORT" reset`, because `STOPPED` leaves the board at the REPL.
+
+**Not measured / not passed:** fast-mode stall recovery on a truncated 256-byte
+read (the pull proved power-cycle recovery, not in-place stall recovery), real
+partial-region refresh (only whole-screen `lcd.show()` was exercised), and
+sustained runs longer than 100 frames per configuration.
 
 Artifacts kept outside the repo, in the 2026-11-13 backup folder:
-`full-6355c0d.json`, `full-6355c0d-run2.json`, `smoke-6355c0d.json`.
+`full-6355c0d.json`, `full-6355c0d-run2.json`, `smoke-6355c0d.json`,
+`cablepull-6355c0d.json`, `cablepull-recovery-6355c0d.json`,
+`cablepull-recovery-28800.json`.
 
 ## 2026-11-13 USB CDC throughput (slice 0) — incomplete
 

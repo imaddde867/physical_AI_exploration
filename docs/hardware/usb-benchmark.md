@@ -128,11 +128,14 @@ connection. It **does not** prove optimized fast-mode stall recovery. The latter
 requires a nonblocking native CDC receive implementation or a separately
 verified watchdog/reboot strategy.
 
-**The original specification's unplug-mid-frame test is still OPEN and NOT PASSED.**
-The safe-mode partial-frame probe does not replace it. Before any unplug during
-an active transfer, implement and review a separate, bounded host test with a
-power-cycle recovery procedure and explicit evidence recording. No result from
-this PR is evidence of fast-mode recovery after a physical USB cable pull.
+**The original specification's unplug-mid-frame test PASSED on 2026-11-14** for the
+power-cycle path: pulling the cable during a fast-mode 134,400-byte run failed the
+host fast with `complete: false`, `device_stopped: false`, and the completed frames
+kept; after replug, smoke and one 28,800-byte frame passed without reflashing.
+Evidence: `bringup-log.md`, section 2026-11-14. This is **not** proof that a
+stalled fast-mode read recovers in place: the pull cut power, so the board rebooted
+into a fresh benchmark. That limitation still needs a nonblocking native CDC
+receive implementation or a verified watchdog/reboot strategy.
 
 **Unplug test is separate:** unplugging the current USB-powered board also cuts
 its power. Only after safe results should you deliberately unplug it between
