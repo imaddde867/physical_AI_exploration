@@ -2,6 +2,34 @@
 
 Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
 
+## 2026-11-14 Fast-mode stall completion (host-side fix) — measured
+
+Host: merged `main` (`861f82f`), MicroPython 1.22.2, same board, port and cable.
+Firmware: `firmware/rp2040/bench_usb.py` copied temporarily to `:main.py`; the
+blink firmware was restored afterwards and compared byte-identical to the backup
+(`f3931442...`). Baseline in the same session, before the probe: one 28,800 B
+fast frame at 112.5 KB/s, free heap 72,288 B.
+
+Probe (`stall-recovery-2026-11-14.py`): `SYNC`, `BENCH 0 28800 0 F`, write 300 of
+28,800 bytes, wait 1 s. The device produced **no output for that second**, i.e. it
+was blocked inside `readinto()`, which is the pre-fix failure mode. The host then
+wrote 28,500 filler bytes plus a newline; the frame is discarded, not counted:
+
+- `complete_stalled_frame` returned true after **257 ms**, including the `OK` for
+  the padded frame and a fresh `SYNC` / `SYNCED`.
+- A fresh 16 B safe-mode frame passed in 7.9 ms (CRC matched).
+- A fresh 28,800 B fast frame passed at **112.6 KB/s** (CRC matched), within the
+  recorded baseline range of 112.2-112.6 KB/s.
+- `BENCH 0 0` teardown was acknowledged with `STOPPED`.
+
+**Not measured:** a device-side 200 ms timeout *inside* a fast-mode slice (the
+device cannot author one while blocked in `readinto()`), and recovery after the
+host process itself dies mid-frame. Both still need a nonblocking native receive
+path or a verified watchdog, which is the slice 0 architecture decision.
+
+Evidence: `~/Desktop/macdesk-buddy-usb-2026-11-13/stall-recovery-2026-11-14.{py,log}`,
+`stall-baseline-28800.log`, `stall-smoke.{json,log}`.
+
 ## 2026-11-14 USB CDC throughput (slice 0) — measured
 
 Benchmark commit `6355c0d`, MicroPython 1.22.2, Waveshare RP2040-Touch-LCD-1.69,
