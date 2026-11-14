@@ -252,8 +252,13 @@ class HostTransport(unittest.TestCase):
         board = FakeDevice(master)
         board.start()
         try:
-            rc = host.main([os.ttyname(slave), '--smoke'])
-            self.assertEqual(rc, 0)
+            with tempfile.TemporaryDirectory() as directory:
+                output = os.path.join(directory, "smoke.json")
+                rc = host.main([os.ttyname(slave), '--smoke', '--json-out', output])
+                self.assertEqual(rc, 0)
+                with open(output, encoding="utf-8") as result_file:
+                    result = json.load(result_file)
+            self.assertTrue(result["complete"] and result["device_stopped"])
             self.assertEqual(board.frame_count, 1)
             board.join(timeout=1)
             self.assertFalse(board.is_alive())
@@ -283,6 +288,7 @@ class HostTransport(unittest.TestCase):
             with open(output, encoding="utf-8") as result_file:
                 result = json.load(result_file)
             self.assertFalse(result["complete"])
+            self.assertFalse(result["device_stopped"])
             record = result["results"][0]
             self.assertEqual((record["frames"], record["failures"]), (1, 1))
             self.assertEqual(record["attempted_frames"], 2)

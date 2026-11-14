@@ -207,15 +207,15 @@ def resolve_port(value):
     return choices[0]
 
 
-def save_results(path, port, results, complete):
+def save_results(path, port, results, complete, device_stopped=False):
+    """`complete` is the measurement; `device_stopped` is the confirmed teardown."""
     if not path:
         return
     with open(path, "w", encoding="utf-8") as output:
         json.dump({"port": port, "results": results, "complete": complete,
-                   "hardware_validated": False,
+                   "device_stopped": device_stopped, "hardware_validated": False,
                    "note": "Hardware conclusions require inspected board output and recovery evidence"},
                   output, indent=2)
-    print("Saved:", path, flush=True)
 
 
 def recovery_test(link):
@@ -285,6 +285,8 @@ def main(argv=None):
                             results.append(partial)
                             print("INCOMPLETE: %s" % partial, flush=True)
                             save_results(args.json_out, port, results, complete=False)
+                            if args.json_out:
+                                print("Saved:", args.json_out, flush=True)
                             print("STOP. Do not reuse the port until the receiver state is checked.")
                             return 2
                         durations.append(duration)
@@ -303,6 +305,9 @@ def main(argv=None):
             # Saved before teardown: a lost STOPPED ack must not discard measured frames.
             save_results(args.json_out, port, results, complete=True)
             stop_device(link)
+            save_results(args.json_out, port, results, complete=True, device_stopped=True)
+            if args.json_out:
+                print("Saved:", args.json_out, flush=True)
             if args.smoke:
                 print("Smoke test PASS (16 bytes, binary including 0x03, CRC matched)")
             else:
