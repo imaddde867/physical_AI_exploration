@@ -107,6 +107,11 @@ Timing interpretation:
   header and READY round-trip. Real Buddy OS framing may differ.
 - `heap_min`, `heap_max` are the device's observed free heap during acknowledged
   frames, not necessarily the lowest instantaneous peak during receipt.
+- Each `results[]` record carries `status`: `complete` for a finished
+  configuration, `incomplete` (plus `attempted_frames`, `completed_frames` and
+  `recovered`) for a failed one. The top-level `complete` and `device_stopped`
+  describe the run and the teardown separately; a record is only evidence of a
+  measurement if the run that wrote it also says `complete: true`.
 - A 28,800-byte payload modifies a prefix of the existing full framebuffer;
   `lcd.show()` still refreshes all 134,400 bytes. **Dirty-rectangle refresh has
   not been measured.** `show=1` minus `show=0` is an approximation affected by
@@ -162,6 +167,11 @@ host process itself died mid-frame, nothing is left to complete it: reconnect
 USB power, then confirm the port and begin with `--smoke`. Preserve logs as
 evidence; no failed run counts toward a throughput threshold. Use Thonny or
 `mpremote repl` to inspect a traceback if available.
+
+A Ctrl+C during a run prints `INTERRUPTED` and exits `130`. Every configuration
+that finished is already on disk; the in-progress one is discarded. No
+`BENCH 0 0` is sent, so if the board stops responding, reconnect USB power and
+begin again with `--smoke`.
 
 ## Restore verified working firmware
 
