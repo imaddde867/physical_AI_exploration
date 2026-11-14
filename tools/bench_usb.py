@@ -270,7 +270,8 @@ def recovery_test(link):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("port", nargs="?", help="serial port (auto-detect if exactly one cu.usbmodem)")
-    parser.add_argument("--smoke", action="store_true", help="one 16-byte no-show frame")
+    parser.add_argument("--smoke", action="store_true",
+                        help="one 16-byte no-show frame in safe mode S; ignores --size/--show/--frames/--mode")
     parser.add_argument("--recovery-test", action="store_true", help="SAFE-mode partial-frame recovery")
     parser.add_argument("--frames", type=int, default=FRAMES, help="frames per configuration (default: 100)")
     parser.add_argument("--size", type=int, action="append", choices=FRAME_SIZES,
@@ -330,7 +331,8 @@ def main(argv=None):
                         heaps.append(heap)
                         seq += 1
                     stats = summarize(durations, nbytes, 0, cycles, heaps)
-                    record = {"size_bytes": nbytes, "show": show, "mode": mode, **stats}
+                    record = {"size_bytes": nbytes, "show": show, "mode": mode,
+                              "status": "complete", **stats}
                     results.append(record)
                     print("%d B show=%d mode=%s: %s" % (nbytes, show, mode, stats), flush=True)
                     if mode == "F":
@@ -347,7 +349,7 @@ def main(argv=None):
             if args.json_out:
                 print("Saved:", args.json_out, flush=True)
             if args.smoke:
-                print("Smoke test PASS (16 bytes, binary including 0x03, CRC matched)")
+                print("Smoke test PASS (16 bytes, mode S, binary including 0x03, CRC matched)")
             else:
                 print("Complete: %d successful transfers, 0 frame failures. Recovery is a separate test." %
                       sum(x["frames"] for x in results))

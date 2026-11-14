@@ -256,11 +256,15 @@ class HostTransport(unittest.TestCase):
         try:
             with tempfile.TemporaryDirectory() as directory:
                 output = os.path.join(directory, "smoke.json")
-                rc = host.main([os.ttyname(slave), '--smoke', '--json-out', output])
+                buffer = io.StringIO()
+                with redirect_stdout(buffer):
+                    rc = host.main([os.ttyname(slave), '--smoke', '--json-out', output])
                 self.assertEqual(rc, 0)
+                self.assertIn("mode S", buffer.getvalue())
                 with open(output, encoding="utf-8") as result_file:
                     result = json.load(result_file)
             self.assertTrue(result["complete"] and result["device_stopped"])
+            self.assertEqual(result["results"][0]["status"], "complete")
             self.assertEqual(board.frame_count, 1)
             board.join(timeout=1)
             self.assertFalse(board.is_alive())
