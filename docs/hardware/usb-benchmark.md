@@ -21,10 +21,11 @@ data is ready. This is visible in MicroPython's
   `readinto()` waits for every requested byte, so a host that stops mid-slice
   would leave it blocked; on a stalled write the host fills the rest of the
   declared frame, discards the CRC-mismatched result, and resynchronizes with a
-  fresh `SYNC`. This is covered by a pty test, not by a hardware run. If the
-  host process dies (nothing is left to send filler), the device still needs a
-  power cycle; a device-side 200 ms timeout inside a slice still needs a
-  nonblocking native receive path or a verified watchdog.
+  fresh `SYNC`. Covered by a pty test and measured on hardware on 2026-11-14
+  (see the bring-up log). If the host process dies (nothing is left to send
+  filler), the device still needs a power cycle; a device-side 200 ms timeout
+  inside a slice still needs a nonblocking native receive path or a verified
+  watchdog.
 - **S (safe)**: polls before every 1-byte read, ensuring the read itself cannot
   wait for more than one already-available byte. On a 200 ms gap, reports
   `ERR <session> <seq> stall <count>` and requires a fresh `SYNC`. Its per-byte
@@ -131,7 +132,8 @@ python3 tools/bench_usb.py "$PORT" --recovery-test
 `SAFE recovery PASS` establishes only the bounded-read path on that physical
 connection. It **does not** prove fast-mode stall recovery on hardware. A host
 that stalls mid-frame now completes the frame with filler and resynchronizes
-(pty test only); a device-side 200 ms timeout inside a fast-mode slice still
+(measured on hardware 2026-11-14; see the bring-up log); a device-side 200 ms
+timeout inside a fast-mode slice still
 needs a nonblocking native receive implementation or a verified
 watchdog/reboot strategy.
 
