@@ -2,6 +2,172 @@
 
 Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
 
+## 2026-11-14 Recovery probe and cable pull on the 16 MiB build — measured
+
+Both on the 1.29.0 / 16 MiB build from the entry below, with the benchmark
+installed as `main.py` and the blink restored afterwards (sha256 `f3931442...`,
+byte-identical to the backup).
+
+**Safe-mode partial-frame recovery: PASS.** A 17-byte partial frame stalled, the
+receiver resynchronized, and the next frame completed CRC-valid in 8.3 ms with
+76,240 B free (1.22.2: 7.8 ms, 75,776 B). The preceding smoke run passed at
+8.33 ms, heap 81,200 B.
+
+**Cable pull: the host fails fast and the board recovers without reflashing.**
+400 frames of 134,400 B were requested; the cable came out around frame 334.
+The host recorded `status: incomplete`, `expected_frames: 400`,
+`attempted_frames: 334`, `completed_frames: 333`, `failures: 1`,
+`recovered: False`, `error: '[Errno 6] Device not configured'`, then
+`STOP. Do not reuse the port until the receiver state is checked.` and exit 2.
+No `BENCH 0 0` was sent, as designed, and the partial numbers were still saved
+(114.88 KB/s to that point, heap floor 560 B).
+
+After replugging: `machine.reset_cause()` was 1 (PWRON_RESET, a real power cycle
+rather than a soft reset), the port came back as the same
+`/dev/cu.usbmodem101`, and recovery took no reflash — smoke PASS at 8.33 ms,
+then one 28,800 B frame in 255.95 ms (112.52 KB/s, heap 74,528 B).
+
+**Two method notes.** First, a `/dev/cu.usbmodem*` node can outlive the unplug on
+macOS: a once-per-second presence monitor logged no transition at all while the
+host was getting Errno 6, so a surviving device node is not evidence the cable
+is connected, and the host error plus `PWRON_RESET` are the real evidence.
+Second, `mpremote exec` leaves the board at the REPL, so an immediately following
+`--smoke` reads its own `SYNC` back as an echo and exits 2 with
+`unexpected startup reply`; reset before each invocation. That was a harness
+sequencing mistake, not a board fault — the clean rerun passed.
+
+## 2026-11-14 16 MiB build: flashed, storage and throughput re-measured — measured
+
+Follows the flash-space check below, with user approval. Order was: back up,
+verify, flash, restore, re-baseline. Board, port and cable unchanged.
+
+**Backup, verified.** All eight device files went to
+`.local-archive/device-backup-2026-11-14/` (git-ignored) and were hashed on both
+sides — `hashlib.sha256` on the device, `shasum -a 256` on the Mac — with all
+eight matching. `main.py` was `f3931442b87e...`, the same hash this log records
+for the blink, so the backup is the state that was actually running.
+
+**Flash.** `WAVESHARE_RP2040_PLUS-FLASH_16M-20260824-v1.29.0.uf2`, sha256
+`654744919132d80f8095db8a5f5a641a8966d685f818dc66df0e14cdd7d2c1ba`, 676,864 B,
+1,322 UF2 blocks, embedded board string `Waveshare RP2040-Plus 16MB with RP2040`,
+highest address written `0x10052A00` (the image stays under 2 MB; it is the
+*storage layout* that grows). Entered bootloader with `mpremote ... bootloader`.
+The volume is `/Volumes/RPI-RP2`; its first `ls` returned `Permission denied`
+while the volume was still mounting, then writes succeeded. The board rebooted
+and re-enumerated on the same `/dev/cu.usbmodem101`.
+
+**Filesystem.** `os.statvfs('/')` = 3840 x 4096 = **15,728,640 B**, exactly the
+variant's `MICROPY_HW_FLASH_STORAGE_BYTES`. Fresh flash: 15,720,448 B free. After
+restoring all eight files: 221,184 B used, 15,507,456 B free — room for 115 raw
+134,400 B frames against nine before.
+
+**Restored firmware runs.** `blink ready; free heap: 78768 bytes`, eyes drawn
+normally. That is 7,632 B less headroom than the 86,400 B recorded on 1.22.2 with
+the same driver loaded, so the newer runtime costs memory.
+
+**Throughput re-measured**, 400 frames, 0 failures, host exit 0, JSON
+`complete: true` and `device_stopped: true` (KB = 1000 bytes):
+
+| payload | show | KB/s | ms mean | ms p95 | heap_min |
+|---|---|---|---|---|---|
+| 28,800 | 0 | 112.31 | 256.4 | 264.4 | 768 |
+| 28,800 | 1 | 92.53 | 311.2 | 320.1 | 1,408 |
+| 134,400 | 0 | 114.87 | 1170.0 | 1177.4 | 64 |
+| 134,400 | 1 | 109.73 | 1224.8 | 1232.0 | 448 |
+
+Pre-suite single 28,800 B fast frame: 255.9 ms, 112.56 KB/s, heap 74,528. Smoke:
+8.32 ms, heap 81,200 (1.22.2: 7.8 ms, 80,768). JSON and transcript in
+`.local-archive/usb-benchmark-16m-v1.29.0.{json,log}`.
+
+**The USB receive path is unchanged.** 112.3 and 114.9 KB/s against 112.2 and
+114.5, so the < 150 KB/s branch and its decision still stand. The heap floor is
+also unchanged in character: 768 / 1,408 / 64 / 448 B, still thin and still
+unexplained.
+
+**Display refresh regressed, and the peripheral clock is the cause.** `show()`
+alone now measures **55.44 ms mean, 56.3 p95, 66.8 max, 18.04 fps** (1.22.2:
+23.2 ms mean, 43 fps). `benchmark_display.py` reports the bus as
+`SPI(1, baudrate=24000000, ...)` although the driver requests 100 MHz; 134,400 B
+at 24 MHz is 44.8 ms on its own, which accounts for the difference.
+`machine.freq()` is 125 MHz and raising it to 133 MHz did not change the SPI
+object; `machine` exposes only `freq` and `rp2` exposes no clock setter. The old
+23.2 ms implies about 62.5 MHz on 1.22.2, but the SPI object was not printed
+then, so that rate is inferred rather than measured.
+
+Consequence: `show=1` minus `show=0` is 54.8 ms at both payload sizes, matching
+the standalone figure. At 12 FPS an 83.3 ms frame budget leaves about 28 ms for
+flash read plus decode, and 18 fps is the hard ceiling without a faster SPI path.
+
+**Not measured here, but measured next** in the entry above: the safe-mode
+recovery probe and a mid-frame cable pull, both run after this suite. Still
+unmeasured: anything beyond 400 frames, and the 24 MHz SPI cause is diagnosed
+but not fixed. Options for the SPI rate — a custom build raising clk_peri, a PIO
+SPI path, or accepting 24 MHz — are considered and **not chosen** here.
+
+## 2026-11-14 Flash space: filesystem measured, 16 MiB build available — checked
+
+Prompted by the storage question in the character-frame entry below. The board
+is advertised with 16 MB flash, yet MicroPython reported 1.40 MB free. Measured
+read-only over `mpremote` on `/dev/cu.usbmodem101`, no firmware change:
+
+- Build is the stock Pico target: `v1.22.2 on 2024-02-22`, `machine`
+  `Raspberry Pi Pico with RP2040`. That target maps 2 MB of flash, so 14 MB of
+  the chip is unused.
+- `os.statvfs('/')` = `(4096, 4096, 352, 298, ...)`: **1,441,792 B total**
+  (352 x 4096), **1,220,608 B free** (298 blocks), 221,184 B used.
+- Free heap at a bare REPL was 228,688 B; the 72-87 KB figures elsewhere in this
+  log were measured with the LCD driver loaded, so they are not comparable.
+
+**Correction:** this log's earlier "reported 1.40 MB free flash" is the *total*
+filesystem size, not free space. Usable headroom is 1.16 MiB, which holds nine
+raw 134,400 B frames.
+
+**16 MiB build exists prebuilt.** MicroPython publishes a
+`WAVESHARE_RP2040_PLUS-FLASH_16M-<date>-<version>.uf2` alongside that board's
+normal build (https://micropython.org/download/WAVESHARE_RP2040_PLUS/). Its
+`mpconfigvariant_FLASH_16M.cmake` sets `MICROPY_HW_FLASH_STORAGE_BYTES` =
+15,728,640 B (15 MiB, one 1 MiB block reserved). On the download page the 16 MiB
+variant starts at v1.28.0; there is no 1.22.2 build of it. There is no
+MicroPython board target for the RP2040-Touch-LCD-1.69 itself, and none is
+needed: `firmware/rp2040/main.py` imports no `machine` symbol, and the vendor LCD
+driver takes explicit pins, so any RP2040 build runs the same code.
+
+**Done later the same day** — the backup, flash and re-measurement are in the
+entry above. Two caveats still govern the older numbers in this log: the 112 KB/s
+baselines were measured on 1.22.2, and the chip's 16 MB capacity rests on the
+Waveshare specification rather than on a JEDEC ID read from this board.
+
+**What this changes:** at 12 FPS, an eight-second raw clip is 96 x 134,400 B =
+12,902,400 B and fits in 15 MiB with room to spare; at 30 FPS it does not. Clip
+*size* stops being the binding constraint at 12 FPS, and flash-read plus decode
+throughput becomes the one to measure.
+
+## 2026-11-14 Character frame: first full-resolution display — passed
+
+Rendered the saved `ANCHORED | watch` character in Blender and displayed one
+frame on the Waveshare RP2040-Touch-LCD-1.69. The user approved the closer
+`CAM | Window close-up` framing at 65 mm and the `Standard` view transform;
+these scene settings were saved in `animation/crying-head-2-anchored.blend`.
+
+- Blender rendered 240 × 280 PNG to `/tmp/watch-final.png`; converted it to
+  big-endian RGB565 at `/tmp/watch-final.rgb565` (134,400 bytes).
+- The frame displayed correctly using Thonny and the existing LCD driver. The
+  test streams one 480-byte row at a time into the driver's existing full-screen
+  framebuffer, avoiding a second 134,400-byte allocation.
+- A red/green/blue/white bar check displayed the four colors in the right order.
+  Backlight duty 8192 (12.5%) preserves the preferred dark background;
+  increasing it to 32768 made little visible difference and lifted the blacks.
+- An earlier 120 × 140 attempt failed when it allocated an extra 33,600-byte
+  image buffer. Reuse the LCD framebuffer and stream rows instead.
+
+**Status:** one static frame is verified on hardware. Animation playback,
+compressed clip size, sustained timing, and a Mac command selecting a clip are
+still open. The 134,400-byte frame demonstrates that full-resolution raw frame
+sequences cannot fit in the board's 1.40 MB filesystem (1.16 MB free, measured —
+see the flash-space entry above) for an eight-second 30 FPS animation. Next:
+prototype compact encoding and on-device decode/playback, then measure frame
+cadence and stability before implementing clip commands.
+
 ## 2026-11-14 Fast-mode stall completion (host-side fix) — measured
 
 Host: merged `main` (`861f82f`), MicroPython 1.22.2, same board, port and cable.

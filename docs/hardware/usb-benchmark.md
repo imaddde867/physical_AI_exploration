@@ -4,7 +4,10 @@ Status: **measured on hardware, 2026-11-14; two repeat runs agree within 0.1%**.
 Source: PR #31 created the first version. This revision fixes header crashes, adds
 frame synchronization and bounded host writes, and adds a separate recovery probe.
 The original spec's `BENCH 0 0` ends each successful invocation with a `STOPPED` acknowledgment after board cleanup.
-MicroPython version on the user's board: **1.22.2**. Board:
+MicroPython versions measured on the user's board: **1.22.2** (2 MB layout) and
+**1.29.0** (16 MiB layout, flashed 2026-11-14). Receive throughput is identical on
+both, but `show()` costs 55 ms on 1.29.0 against 23 ms on 1.22.2 because the SPI
+bus reports 24 MHz instead of requesting 100 MHz — see the bring-up log. Board:
 **Waveshare RP2040-Touch-LCD-1.69**. Mac: **M4 MacBook Pro**. Results, decision and
 what remains unmeasured: [bring-up log](bringup-log.md), section 2026-11-14.
 
