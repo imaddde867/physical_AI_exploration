@@ -2,6 +2,54 @@
 
 Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
 
+## 2026-11-14 USB CDC throughput (slice 0) — measured
+
+Benchmark commit `6355c0d`, MicroPython 1.22.2, Waveshare RP2040-Touch-LCD-1.69,
+M4 MacBook Pro, `/dev/cu.usbmodem101`. Two full runs of four configurations, 100
+frames each, 800 frames total, **0 failures**. Each run ended with a confirmed
+`STOPPED` acknowledgement, so `BENCH 0 0` teardown works on hardware.
+
+Fast mode (`F`), KB = 1000 bytes, second column is the repeat run:
+
+| payload | show | KB/s run 1 / run 2 | avg KB/s | ms mean run 1 / run 2 | ms p95 |
+|---|---|---|---|---|---|
+| 28,800 | 0 | 112.2 / 112.2 | 112.2 | 256.7 / 256.6 | 266.6 |
+| 28,800 | 1 | 103.3 / 103.2 | 103.2 | 278.9 / 279.1 | 288.6 |
+| 134,400 | 0 | 114.5 / 114.5 | 114.5 | 1174.3 / 1173.8 | 1181.8 |
+| 134,400 | 1 | 112.3 / 112.3 | 112.3 | 1197.0 / 1196.4 | 1203.6 |
+
+Run-to-run spread is 0.01-0.06% on throughput and under 0.2 ms on p95, so the
+numbers are repeatable, not a lucky pass.
+
+**Decision: all four configurations land below 150 KB/s — "MicroPython CDC receive
+path bottleneck".** Throughput is flat across payload size (112.2 / 103.2 / 114.5 /
+112.3 KB/s), so the cost is per byte, not per frame: chunk tuning cannot reach the
+500 KB/s full-region threshold. Ceiling at this rate: about 3.8 fps for a 120x120
+region (28,800 B) and about 0.85 fps for a full 134,400 B frame. The spec's `< 150`
+branch applies: add a C/viper receive path, or stay device-side with clips in flash.
+
+Two side readings:
+
+- `lcd.show()` costs a flat ~22 ms per frame regardless of payload (256.7 -> 278.9
+  ms, 1174.3 -> 1197.0 ms). Display refresh is not the bottleneck.
+- Free heap started near 85 KB and bottomed out at **176-1104 B** within each
+  100-frame run (`heap_min`: 320/336, 1056/176, 448/848, 272/1104). The runs
+  completed, so GC kept up, but that floor is thin and unexplained; measure it
+  before running anything longer than 100 frames per configuration.
+
+Smoke: 16-byte CRC frame passed with a confirmed `STOPPED` (`complete: true`,
+`device_stopped: true`), free heap 80,768 B. Safe-mode recovery probe
+(`--recovery-test`) passed on hardware: 17-byte partial frame stalled,
+resynchronized, then a CRC-valid 16-byte frame at 7.8 ms, 75,776 B free.
+
+**Not measured / not passed:** a physical USB cable pull mid-frame (needs a hand on
+the plug and a power-cycle plan), fast-mode stall recovery on a truncated 256-byte
+read, real partial-region refresh (only whole-screen `lcd.show()` was exercised),
+and sustained runs longer than 100 frames per configuration.
+
+Artifacts kept outside the repo, in the 2026-11-13 backup folder:
+`full-6355c0d.json`, `full-6355c0d-run2.json`, `smoke-6355c0d.json`.
+
 ## 2026-11-13 USB CDC throughput (slice 0) — incomplete
 
 Status: **not measured**. The first physical attempt used the PR #31 benchmark

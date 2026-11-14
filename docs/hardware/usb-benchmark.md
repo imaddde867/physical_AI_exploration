@@ -1,11 +1,12 @@
 # RP2040 USB CDC benchmark: safe experiment protocol
 
-Status: **software tests only; no hardware throughput or recovery result yet**.
+Status: **measured on hardware, 2026-11-14; two repeat runs agree within 0.1%**.
 Source: PR #31 created the first version. This revision fixes header crashes, adds
 frame synchronization and bounded host writes, and adds a separate recovery probe.
 The original spec's `BENCH 0 0` ends each successful invocation with a `STOPPED` acknowledgment after board cleanup.
 MicroPython version on the user's board: **1.22.2**. Board:
-**Waveshare RP2040-Touch-LCD-1.69**. Mac: **M4 MacBook Pro**.
+**Waveshare RP2040-Touch-LCD-1.69**. Mac: **M4 MacBook Pro**. Results, decision and
+what remains unmeasured: [bring-up log](bringup-log.md), section 2026-11-14.
 
 ## Why two receive modes?
 
