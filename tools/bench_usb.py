@@ -338,6 +338,8 @@ def main(argv=None):
                         print("  -> provisional:", decide(stats["kb_s_mean"]) + suffix, flush=True)
                     else:
                         print("  -> safe-mode diagnostic only; do not choose streaming architecture", flush=True)
+                    # Evidence on disk before the next configuration: an interrupt must not discard it.
+                    save_results(args.json_out, port, results, complete=False)
             # Saved before teardown: a lost STOPPED ack must not discard measured frames.
             save_results(args.json_out, port, results, complete=True)
             stop_device(link)
@@ -353,6 +355,11 @@ def main(argv=None):
     except (TimeoutError, BenchmarkError, ConnectionError, OSError) as exc:
         print("FAIL: %s" % exc, file=sys.stderr)
         return 2
+    except KeyboardInterrupt:
+        # No BENCH 0 0: the receiver may be mid-frame. Completed configurations are already saved.
+        print("INTERRUPTED: completed configurations saved; the in-progress one is lost",
+              file=sys.stderr)
+        return 130
 
 
 if __name__ == "__main__":

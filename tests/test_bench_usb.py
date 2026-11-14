@@ -353,6 +353,41 @@ class HostTransport(unittest.TestCase):
             os.close(slave)
             os.close(master)
 
+    def test_interrupt_keeps_completed_configurations(self):
+        class FakeLink:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+        with tempfile.TemporaryDirectory() as directory:
+            output = os.path.join(directory, "interrupted.json")
+            with (patch.object(host, "SerialPort", return_value=FakeLink()),
+                  patch.object(host, "synchronize", return_value="0123456789abcdef"),
+                  patch.object(host, "send_frame", side_effect=[
+                      (0.1, 0.11, 87024), KeyboardInterrupt()]),
+                  patch.object(host, "stop_device") as stop):
+                exit_code = host.main(["/dev/fake", "--frames", "1", "--show", "0",
+                                       "--size", "16", "--size", "1024",
+                                       "--json-out", output])
+                self.assertEqual(exit_code, 130)
+                stop.assert_not_called()  # receiver state is unknown
+            with open(output, encoding="utf-8") as result_file:
+                result = json.load(result_file)
+        self.assertEqual([record["size_bytes"] for record in result["results"]], [16])
+        self.assertFalse(result["complete"])
+        self.assertFalse(result["device_stopped"])
+
+    def test_failed_port_open_keeps_an_existing_results_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = os.path.join(directory, "results.json")
+            with open(output, "w", encoding="utf-8") as existing:
+                existing.write("previous evidence")
+            with patch.object(host, "resolve_port", side_effect=host.BenchmarkError("no port")):
+                exit_code = host.main(["--json-out", output])
+            self.assertEqual(exit_code, 2)
+            with open(output, encoding="utf-8") as result_file:
+                self.assertEqual(result_file.read(), "previous evidence")
+
 
 if __name__ == '__main__':
     unittest.main()
