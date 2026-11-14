@@ -79,6 +79,8 @@ Tests: `pick` (priority, preemption, TTL, alert gap, presence, pin) is pure logi
 
 Status 2026-11-14: slices 0 and 1 implemented per [the plan](../plans/2026-11-13-buddy-os-core.md). Slice 0 is measured on the board: 103-115 KB/s in all four fast-mode configurations, unplug recovery verified for the power-cycle path. The result is below the spec's 150 KB/s threshold, so the MicroPython CDC receive path is the bottleneck and the decision in [the bring-up log](../../hardware/bringup-log.md) applies: add a C/viper receive path, or stay device-side with clips in flash. Frame leases (slice 4) wait on that choice.
 
+Status 2026-11-15: the `clk_peri` fix brought `show()` to about 22 ms (about 45 fps), not 55 ms, and partial `Windows_show` updates proved slower than a full refresh, so dirty rectangles on that path are dropped. Character animation will be Blender-baked, delta-encoded clips played from flash rather than Mac-streamed or composited sprites: [clip playback plan](../plans/2026-11-15-clip-playback.md). Frame leases (slice 4) stay for small regions only, and USB stays at the MicroPython 115 KB/s.
+
 ## Out of scope for now
 
 Typed inter-module events and manifests; CRC/magic framing; full-screen scenes per module; streaming full-screen video.
