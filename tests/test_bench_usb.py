@@ -393,6 +393,18 @@ class HostTransport(unittest.TestCase):
             with open(output, encoding="utf-8") as result_file:
                 self.assertEqual(result_file.read(), "previous evidence")
 
+    def test_interrupt_during_save_keeps_the_previous_results_file(self):
+        # The save now runs after every configuration, so a Ctrl+C can land inside it.
+        with tempfile.TemporaryDirectory() as directory:
+            output = os.path.join(directory, "results.json")
+            with open(output, "w", encoding="utf-8") as existing:
+                existing.write("previous evidence")
+            with patch.object(host.json, "dump", side_effect=KeyboardInterrupt()):
+                with self.assertRaises(KeyboardInterrupt):
+                    host.save_results(output, "/dev/fake", [], complete=False)
+            with open(output, encoding="utf-8") as result_file:
+                self.assertEqual(result_file.read(), "previous evidence")
+
     def test_recovery_pass_prints_only_after_the_stop_ack(self):
         nonce = "0123456789abcdef"
         crc = binascii.crc32(host.payload(16))

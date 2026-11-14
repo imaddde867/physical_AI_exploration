@@ -243,11 +243,13 @@ def save_results(path, port, results, complete, device_stopped=False):
     """`complete` is the measurement; `device_stopped` is the confirmed teardown."""
     if not path:
         return
-    with open(path, "w", encoding="utf-8") as output:
+    temporary = path + ".tmp"  # an interrupt mid-dump must not truncate the last good evidence
+    with open(temporary, "w", encoding="utf-8") as output:
         json.dump({"port": port, "results": results, "complete": complete,
                    "device_stopped": device_stopped, "hardware_validated": False,
                    "note": "Hardware conclusions require inspected board output and recovery evidence"},
                   output, indent=2)
+    os.replace(temporary, path)
 
 
 def recovery_test(link):
