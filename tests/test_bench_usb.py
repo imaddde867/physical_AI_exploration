@@ -12,7 +12,7 @@ import termios
 import threading
 import time
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from unittest.mock import patch
 
 from firmware.rp2040 import bench_usb as device
@@ -415,6 +415,22 @@ class HostTransport(unittest.TestCase):
             exit_code = host.main(["/dev/fake", "--recovery-test"])
         self.assertEqual(exit_code, 2)
         self.assertNotIn("SAFE recovery PASS", buffer.getvalue())
+
+    def test_termios_error_at_open_is_a_transport_failure(self):
+        master, slave = pty.openpty()
+        errors = io.StringIO()
+        try:
+            with (patch.object(host, "open_raw",
+                               return_value=(os.dup(slave), termios.tcgetattr(slave))),
+                  patch.object(host.termios, "tcflush",
+                               side_effect=termios.error(6, "Device not configured")),
+                  redirect_stderr(errors)):
+                exit_code = host.main(["/dev/fake", "--smoke"])
+            self.assertEqual(exit_code, 2)
+            self.assertIn("FAIL:", errors.getvalue())
+        finally:
+            os.close(slave)
+            os.close(master)
 
 
 if __name__ == '__main__':

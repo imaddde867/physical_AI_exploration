@@ -305,7 +305,7 @@ def main(argv=None):
                     for _ in range(frames):
                         try:
                             duration, cycle, heap = send_frame(link, nonce, seq, nbytes, show, mode)
-                        except (TimeoutError, BenchmarkError, OSError) as exc:
+                        except (TimeoutError, BenchmarkError, OSError, termios.error) as exc:
                             # Do not send more frames on an unknown receiver state.
                             partial = {"size_bytes": nbytes, "show": show, "mode": mode,
                                        "status": "incomplete", "expected_frames": frames,
@@ -352,7 +352,7 @@ def main(argv=None):
                 print("Complete: %d successful transfers, 0 frame failures. Recovery is a separate test." %
                       sum(x["frames"] for x in results))
             return 0
-    except (TimeoutError, BenchmarkError, ConnectionError, OSError) as exc:
+    except (TimeoutError, BenchmarkError, ConnectionError, OSError, termios.error) as exc:
         print("FAIL: %s" % exc, file=sys.stderr)
         return 2
     except KeyboardInterrupt:
