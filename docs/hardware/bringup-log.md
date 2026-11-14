@@ -2,6 +2,95 @@
 
 Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
 
+## 2026-11-14 USB CDC throughput (slice 0) — measured
+
+Benchmark commit `6355c0d`, MicroPython 1.22.2, Waveshare RP2040-Touch-LCD-1.69,
+M4 MacBook Pro, `/dev/cu.usbmodem101`. Two full runs of four configurations, 100
+frames each, 800 frames total, **0 failures**. Each run ended with a confirmed
+`STOPPED` acknowledgement, so `BENCH 0 0` teardown works on hardware.
+
+Fast mode (`F`), KB = 1000 bytes, second column is the repeat run:
+
+| payload | show | KB/s run 1 / run 2 | avg KB/s | ms mean run 1 / run 2 | ms p95 |
+|---|---|---|---|---|---|
+| 28,800 | 0 | 112.2 / 112.2 | 112.2 | 256.7 / 256.6 | 266.6 |
+| 28,800 | 1 | 103.3 / 103.2 | 103.2 | 278.9 / 279.1 | 288.6 |
+| 134,400 | 0 | 114.5 / 114.5 | 114.5 | 1174.3 / 1173.8 | 1181.8 |
+| 134,400 | 1 | 112.3 / 112.3 | 112.3 | 1197.0 / 1196.4 | 1203.6 |
+
+Run-to-run spread is 0.01-0.06% on throughput and under 0.2 ms on p95, so the
+numbers are repeatable, not a lucky pass.
+
+**Decision: all four configurations land below 150 KB/s — "MicroPython CDC receive
+path bottleneck".** Throughput is flat across payload size (112.2 / 103.2 / 114.5 /
+112.3 KB/s), so the cost is per byte, not per frame: chunk tuning cannot reach the
+500 KB/s full-region threshold. Ceiling at this rate: about 3.8 fps for a 120x120
+region (28,800 B) and about 0.85 fps for a full 134,400 B frame. The spec's `< 150`
+branch applies: add a C/viper receive path, or stay device-side with clips in flash.
+
+Two side readings:
+
+- `lcd.show()` costs a flat ~22 ms per frame regardless of payload (256.7 -> 278.9
+  ms, 1174.3 -> 1197.0 ms). Display refresh is not the bottleneck.
+- Free heap started near 85 KB and bottomed out at **176-1104 B** within each
+  100-frame run (`heap_min`: 320/336, 1056/176, 448/848, 272/1104). The runs
+  completed, so GC kept up, but that floor is thin and unexplained; measure it
+  before running anything longer than 100 frames per configuration.
+
+Smoke: 16-byte CRC frame passed with a confirmed `STOPPED` (`complete: true`,
+`device_stopped: true`), free heap 80,768 B. Safe-mode recovery probe
+(`--recovery-test`) passed on hardware: 17-byte partial frame stalled,
+resynchronized, then a CRC-valid 16-byte frame at 7.8 ms, 75,776 B free.
+
+**Cable pull, measured (2026-11-14).** Unplugged during a 200-frame, 134,400-byte
+fast-mode run, at frame 5. The host failed fast with `[Errno 6] Device not
+configured` and kept the four completed frames plus `failures: 1` in
+`cablepull-6355c0d.json` with `complete: false`, `device_stopped: false`. Before
+fix `039843e` it also printed a `termios.error` traceback and exited 1 instead of
+2; that is fixed and pinned by `test_close_survives_a_cable_pull`. After replug
+(same port name, no reflash, no second replug) a 16-byte smoke passed with
+`STOPPED`, then one 28,800-byte fast-mode frame passed at 112.6 KB/s - within
+0.4% of the pre-pull average. Each later invocation needs the documented
+`mpremote connect "$PORT" reset`, because `STOPPED` leaves the board at the REPL.
+
+**Not measured / not passed:** fast-mode stall recovery on a truncated 256-byte
+read (the pull proved power-cycle recovery, not in-place stall recovery), real
+partial-region refresh (only whole-screen `lcd.show()` was exercised), and
+sustained runs longer than 100 frames per configuration.
+
+Artifacts kept outside the repo, in the 2026-11-13 backup folder:
+`full-6355c0d.json`, `full-6355c0d-run2.json`, `smoke-6355c0d.json`,
+`cablepull-6355c0d.json`, `cablepull-recovery-6355c0d.json`,
+`cablepull-recovery-28800.json`.
+
+## 2026-11-13 USB CDC throughput (slice 0) — incomplete
+
+Status: **not measured**. The first physical attempt used the PR #31 benchmark
+at Git commit `071c14c`, on an M4 MacBook Pro connected to the Waveshare
+RP2040-Touch-LCD-1.69 running MicroPython 1.22.2. Serial port observed:
+`/dev/cu.usbmodem101` (not guaranteed stable across reconnects).
+
+- Verified pre-test: 16-byte payload, `show=0`, device replied
+  `OK 345230767 87024`; host CRC32 check passed; free heap reported: **87,024 B**.
+- Full four-configuration test started but terminated by the host's external
+  **480-second timeout**. **Zero usable full-configuration result lines** were
+  recorded; throughput, display overhead and p95 are **not measured**.
+- Additional 28,800-byte transfer: host wrote 28,814 bytes including header,
+  but received repeated `U` characters from the REPL rather than a valid `OK`;
+  CRC verification failed. No 28,800-byte throughput figure is established.
+- Diagnostic REPL reboot showed `bench ready; free heap: 87424` followed by
+  `ValueError: need more than 0 values to unpack` at `main.py` line 35; a
+  later Ctrl+C produced `KeyboardInterrupt`.
+- Restored the previously backed-up device-side `main.py`; `cmp` verified the
+  restored copy byte-for-byte; board reset and blink resumed normally.
+
+**Not tested / not passed:** sustained 28,800-byte and 134,400-byte transfers,
+`show=1` performance, four-by-100-frame run, fast-mode stall recovery, safe-mode
+recovery, USB cable pull while sending, physical partial-region refresh, and
+Buddy OS streaming/leased-frame operation. **No architecture decision** follows
+from this attempt. Corrected benchmark proposed on draft PR #32; hardware run
+pending separate approval and observation.
+
 ## 2026-11-12 Waveshare board: first load (current hardware)
 
 MicroPython 1.22.2 installed; the vendor driver and `firmware/rp2040/main.py` were loaded. Session results (free heap, orientation, colour, flicker, tearing, SPI rate) are not recorded yet. This is the ordered bench prototype, separate from the paused Good Display proposal below.
