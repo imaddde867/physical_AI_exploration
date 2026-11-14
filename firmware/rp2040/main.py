@@ -19,6 +19,26 @@ OVERFLOW = object()  # LineReader sentinel: the line exceeded MAX_LINE and was d
 FW = "blink-0.3"
 
 
+def fast_peri_clock():
+    """MicroPython 1.29 clocks clk_peri from PLL_USB (48 MHz), capping SPI at 24 MHz.
+
+    Re-source it from clk_sys (125 MHz) before the SPI object exists: show() 55 -> 22 ms.
+    The SPI repr keeps printing 24000000 (cached); measure show() instead.
+    """
+    try:
+        import machine
+        import time
+    except ImportError:
+        return  # host tests
+    ctrl = 0x40008048  # CLK_PERI_CTRL; no glitchless mux, so disable first
+    machine.mem32[ctrl] &= ~0x800
+    time.sleep_ms(1)
+    machine.mem32[ctrl] = (machine.mem32[ctrl] & ~0xE0) | 0x800  # AUXSRC 0 = clk_sys
+
+
+fast_peri_clock()
+
+
 def make_hello():
     try:
         import binascii
