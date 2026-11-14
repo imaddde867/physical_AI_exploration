@@ -8,6 +8,7 @@ except ImportError:
 import select
 import json
 import tempfile
+import termios
 import threading
 import time
 import unittest
@@ -300,6 +301,19 @@ class HostTransport(unittest.TestCase):
             with host.SerialPort(os.ttyname(slave)) as link:
                 with self.assertRaises(TimeoutError):
                     link.read_line(.025)
+        finally:
+            os.close(slave)
+            os.close(master)
+
+    def test_close_survives_a_cable_pull(self):
+        # termios.error is not an OSError subclass, and a pulled cable raises it.
+        master, slave = pty.openpty()
+        try:
+            link = host.SerialPort(os.ttyname(slave))
+            with patch.object(host.termios, 'tcsetattr',
+                              side_effect=termios.error(6, 'Device not configured')):
+                link.close()
+            self.assertIsNone(link.fd)
         finally:
             os.close(slave)
             os.close(master)

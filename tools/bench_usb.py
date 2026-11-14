@@ -88,7 +88,7 @@ class SerialPort:
         if self.fd is not None:
             try:
                 termios.tcsetattr(self.fd, termios.TCSANOW, self.saved)
-            except OSError:
+            except (OSError, termios.error):
                 pass  # disconnected ports may not allow attribute restoration
             os.close(self.fd)
             self.fd = None
