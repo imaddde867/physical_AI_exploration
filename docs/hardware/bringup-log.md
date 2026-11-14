@@ -2,6 +2,38 @@
 
 Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
 
+## 2026-11-14 SPI clock recovered: show() 55 -> 22 ms — measured
+
+**Cause, read from registers.** `CLK_PERI_CTRL` (0x40008048) was `0x840`: AUXSRC 2 =
+`PLL_USB`, 48 MHz. SPI divides that by 2, hence 24 MHz. (`clk_sys` is 125 MHz.)
+On 1.22.2 the same register is presumably sourced from `clk_sys` — *inferred*; it
+matches the old 23.2 ms but was not read then.
+
+**Fix.** `fast_peri_clock()` in `firmware/rp2040/main.py` disables `clk_peri`,
+sets AUXSRC 0 (`clk_sys`) and re-enables it, before the SPI object is built. No
+reflash; it is re-applied on every boot. The SPI repr still prints `24000000`
+(cached by MicroPython). The real rate is *inferred* as 62.5 MHz = 125/2, the
+ST7789V2 datasheet write limit; the measured evidence is the timing.
+
+| Measure | Before | After |
+|---|---|---|
+| `show()` mean / p95 | 55.4 / 56.3 ms | **22.0 / 22.2 ms** (about 45 fps) |
+| `benchmark_display.py` | 18 fps | 44.2 fps transfer-only |
+| flash read 134,400 B | 19.04 ms | 19.04 ms |
+| 40x40 `Windows_show` | 14.39 ms | 12.35 ms |
+| 120x120 `Windows_show` | 78.8 ms | 63.4 ms |
+| 240x60 band | 44.3 ms | 37.0 ms |
+
+Image on the panel checked by the user: no artifacts, colours correct, with the
+clock raised. Not tested over long periods or temperature.
+
+**Consequences.** Read + `show()` = 41 ms: 12 fps has about 50% headroom, 24 fps
+(41.7 ms) fits with none. Partial refresh barely sped up, so it is CPU-bound
+in the per-row Python loop, not the wire: **a full `show()` (22 ms) is cheaper than
+any partial window above about 12 ms of payload.** Do not build a dirty-rectangle
+path on `Windows_show`. `main.py` sha256 is now `e0f04546...` (blink plus clock fix);
+the older `f3931442...` blink is still in the backup folder.
+
 ## 2026-11-14 Measurement gaps: flash read, partial refresh, stall recovery, host death, endurance — measured
 
 Same board, 1.29.0 / 16 MiB build, port `/dev/cu.usbmodem101`. Plan:
