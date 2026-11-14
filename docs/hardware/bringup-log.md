@@ -2,6 +2,39 @@
 
 Status, 2026-11-04: panel choice and bench plan remain on hold; no first light is recorded for this Good Display proposal. This is the historical evidence log for the Good Display proposal, not the current hardware verdict. See the [product brief](../product-brief.md).
 
+## 2026-11-14 Measurement gaps: flash read, partial refresh, stall recovery, host death, endurance — measured
+
+Same board, 1.29.0 / 16 MiB build, port `/dev/cu.usbmodem101`. Plan:
+`docs/superpowers/plans/2026-11-14-rp2040-measurement-gaps.md`. Raw output in
+`.local-archive/agent-{1..5}-*/` (git-ignored). Board ended on the blink: `main.py`
+sha256 `f3931442...`, all eight files present, 15,507,456 B free.
+
+| Gap | Result |
+|---|---|
+| Flash read, 134,400 B into the framebuffer | **19.04 ms** mean (p95 19.08), 7.06 MB/s, CRC matches host file; 33,600 B: 4.54 ms. `seek(0)` 0.014 ms; `open()+close()` 1.77 ms. Control `show()` 54.75 ms |
+| Read + full refresh | 73.8 ms. 12 fps (83.3 ms) is reachable **without** 20% headroom, not with it; 80%-headroom ceiling is about 10.8 fps. *Inferred* from the two means, not run together |
+| Partial refresh via `Windows_show` | 40x40 at (100,120): effective 60x60, 7,200 B, **14.39 ms** (p95 26.3), 60 row writes. 120x120: effective 140x140, 39,200 B, 78.8 ms. Band 240x60: 28,800 B, 44.3 ms. About 0.5 MB/s against 2.45 MB/s for whole-screen `show()`. A 40x40 update is **not** under 10 ms. `set_window` alone: 2.04 ms |
+| Panel edge | 40x40 at (200,120) raises `ValueError: display window is outside the panel` (effective x 190..250). No sprite within 10 px of the right edge through this path |
+| Fast-mode stall (F) | A 100 B partial chunk gives no reply in 1.2 s: `readinto` blocks mid-chunk, as on 1.22.2. Completing the chunk gives `ERR ... stall 256` about 202 ms later. Then `ERR need_sync`, fresh `SYNC`, 16 B frame CRC-valid |
+| Wedge | `SYNC` sent while blocked is swallowed as payload. 28,800 filler bytes finish the frame (`OK`), then `SYNC` works after a 0.5 s pause. Recovery cost one frame of bytes, no reset |
+| Host `kill -9` mid-frame | Killed at 0.6 s and at 0.9 s: both times the kill landed on a chunk boundary and the board sent `ERR ... stall 67840` / `103680` about 208 ms later, freeing its own session. The 134,400 B filler was not needed; the board then took `SYNC` and a 16 B frame CRC-valid, `BENCH 0 0` gave `STOPPED`. Port name unchanged, no reset. Kill to valid frame was about 18 s, mostly my filler draining |
+| Endurance | 600 frames x 134,400 B, 0 failures, 114.92 KB/s, p95 1177 ms, `heap_min` 128 B, `heap_max` 85,808 B (min/max only, no trend claim) |
+| Capacity | 96 frames (12,902,400 B) written; 2,576,384 B left; first, middle, last frame CRC match; deleting the file returned free space to exactly 15,507,456 B. **Write speed 72 KB/s** (1.87 s per frame, flush 7.3 ms) |
+
+**Meaning for 12 fps:** USB is not the bottleneck and a raw 8 s clip fits, but
+loading it is slow (about 3 minutes for 96 frames at 72 KB/s). Playback needs
+19 ms read + 55 ms refresh, which leaves about 9 ms and no headroom. Partial updates
+are not cheap enough yet: per-row writes cost about 5x the wire rate.
+
+**Deviations:** the first Task 2 run was invalid (driver waited 1 s after `READY`
+so the 200 ms timer fired, and its payload contained the Ctrl-C byte); kept as
+`transcript-run1-INVALID-driver-bug.log` and rerun. Task 3 killed at 0.6 s and 0.9 s
+instead of the planned 0.2 s, because 0.2 s is likely before the frame starts.
+
+**Not measured:** a kill landing mid-chunk (the blocked-`readinto` case for a dead
+host), runs beyond 600 frames, flash wear and power loss during a write, on-screen
+correctness of partial refresh, decode cost.
+
 ## 2026-11-14 Recovery probe and cable pull on the 16 MiB build — measured
 
 Both on the 1.29.0 / 16 MiB build from the entry below, with the benchmark
@@ -100,7 +133,7 @@ flash read plus decode, and 18 fps is the hard ceiling without a faster SPI path
 
 **Not measured here, but measured next** in the entry above: the safe-mode
 recovery probe and a mid-frame cable pull, both run after this suite. Still
-unmeasured: anything beyond 400 frames, and the 24 MHz SPI cause is diagnosed
+unmeasured: anything beyond 400 frames (600 frames since measured, see the first entry), and the 24 MHz SPI cause is diagnosed
 but not fixed. Options for the SPI rate — a custom build raising clk_peri, a PIO
 SPI path, or accepting 24 MHz — are considered and **not chosen** here.
 
@@ -190,7 +223,7 @@ wrote 28,500 filler bytes plus a newline; the frame is discarded, not counted:
 
 **Not measured:** a device-side 200 ms timeout *inside* a fast-mode slice (the
 device cannot author one while blocked in `readinto()`), and recovery after the
-host process itself dies mid-frame. Both still need a nonblocking native receive
+host process itself dies mid-frame (both since measured, see the first entry). Both still need a nonblocking native receive
 path or a verified watchdog, which is the slice 0 architecture decision.
 
 Evidence: `~/Desktop/macdesk-buddy-usb-2026-11-13/stall-recovery-2026-11-14.{py,log}`,
@@ -251,7 +284,8 @@ fix `039843e` it also printed a `termios.error` traceback and exited 1 instead o
 **Not measured / not passed:** fast-mode stall recovery on a truncated 256-byte
 read (the pull proved power-cycle recovery, not in-place stall recovery), real
 partial-region refresh (only whole-screen `lcd.show()` was exercised), and
-sustained runs longer than 100 frames per configuration.
+sustained runs longer than 100 frames per configuration. (All three since
+measured; see the first entry.)
 
 Artifacts kept outside the repo, in the 2026-11-13 backup folder:
 `full-6355c0d.json`, `full-6355c0d-run2.json`, `smoke-6355c0d.json`,
