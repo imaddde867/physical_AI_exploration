@@ -13,7 +13,7 @@ Hardware next step: [ordered prototype bring-up](docs/hardware/shortlist-handoff
 | Face experiments | `sim/` and `experiments/hello_buddy.py` | Simple eyes; placeholder identity |
 | Hardware | [Bring-up log](docs/hardware/bringup-log.md), [Mac measurements](docs/hardware/measure-mac.md) | Waveshare RP2040-Touch-LCD-1.69 delivered and flashed 2026-11-12; bench measurements recorded 2026-11-14 (see the [bring-up log](docs/hardware/bringup-log.md)) |
 | Device prototype | [Local blink setup](firmware/rp2040/README.md) | MicroPython blink loaded on the board 2026-11-12; restore after the 2026-11-14 benchmark verified byte-for-byte |
-| Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec, line transport and the Buddy OS core (`daemon/arbiter.py`, `reconciler.py`, `host.py`) tested without hardware; no module is wired to the real port yet. USB throughput measured 2026-11-14: 103-115 KB/s, MicroPython CDC receive path is the bottleneck - see the [bring-up log](docs/hardware/bringup-log.md) |
+| Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec, line transport and the Buddy OS core (`daemon/arbiter.py`, `reconciler.py`, `host.py`) tested without hardware; `python3 -m daemon` now runs the core on the real port (keepalive, hello resync, reconnect); no module exists yet. USB throughput measured 2026-11-14: 103-115 KB/s, MicroPython CDC receive path is the bottleneck - see the [bring-up log](docs/hardware/bringup-log.md) |
 
 Older simulator plans in `docs/superpowers/`, the [November 1 slab record](docs/archive/2026-11-01-slab-decisions.md), and `cad/slab/src/scale_compare.py` are historical references. The removed 1.64" pod work remains in git history.
 
