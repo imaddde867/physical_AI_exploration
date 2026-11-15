@@ -88,13 +88,17 @@ class CutTest(unittest.TestCase):
         self.assertEqual(p.step(), "scratch")
         self.assertEqual(bytes(self.fb), self.ref["scratch"][0])
 
-    def test_cut_is_ignored_mid_gesture(self):
+    def test_cut_interrupts_a_gesture_but_same_state_is_ignored(self):
         p = self.p = self.player()
         p.request("scratch")
         p.step()
         p.step()
-        p.request("watch", now=True)  # idle never cuts; gestures finish first
-        self.assertEqual(p.step(), "scratch")
+        p.request("scratch", now=True)  # already playing: no restart
+        p.step()
+        self.assertEqual(p.idx, 3)
+        p.request("watch", now=True)  # a different state cuts in at once
+        self.assertEqual(p.step(), "watch")
+        self.assertEqual(p.idx, 1)
 
 
 if __name__ == "__main__":

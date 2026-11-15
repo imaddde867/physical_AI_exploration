@@ -88,11 +88,14 @@ class ClipPlayer:
         self.period_ms = 83
 
     def request(self, state, now=False):
-        """Queue `state` for the next loop boundary; now=True jump-cuts from idle (touch reactivity)."""
+        """Queue `state` for the next loop boundary; now=True jump-cuts to it from any state.
+
+        A cut to the state already playing is ignored, so repeated taps do not restart it.
+        """
         if state not in STATES:
             raise ValueError("unknown state " + str(state))
         self.pending = state
-        self.cut = now and self.state == IDLE and state != IDLE
+        self.cut = now and state != self.state
 
     def _open(self, state):
         if self.f:

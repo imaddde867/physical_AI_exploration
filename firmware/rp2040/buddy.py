@@ -1,4 +1,4 @@
-"""Live buddy: idle with autonomous glances, reacts to touch. Run with mpremote; do not replace main.py.
+"""Live buddy: short idle dwells between autonomous gestures, reacts to touch from any state. Run with mpremote; do not replace main.py.
 
 Needs <state>-12.clp for all 8 states on the board. Ctrl-C leaves the last frame up.
 """
@@ -9,7 +9,7 @@ GESTURE_STATE = {0x05: "lean_in", 0x0B: "look_around", 0x0C: "scratch",
 # Weighted, so the character mostly shifts and glances and scratches rarely.
 IDLE_PICKS = ("shift", "shift", "shift", "look_left", "look_left", "look_right", "look_right",
               "look_around", "lean_in", "lean_back", "scratch")
-GESTURE_CHANCE = 70  # percent per idle loop that a gesture follows
+DWELL_MS = (1500, 4500)  # idle time before the next autonomous gesture
 BACKLIGHT = 40000
 
 
@@ -44,6 +44,8 @@ def run():
     gc.collect()
     print("buddy ready; heap", gc.mem_free())
     last = None
+    idle_at = time.ticks_ms()
+    dwell = DWELL_MS[0]
     try:
         while True:
             t = time.ticks_ms()
@@ -51,14 +53,17 @@ def run():
             if code:
                 touch.Gestures = 0
                 last = GESTURE_STATE.get(code, "lean_in")
+                print("touch 0x%02X -> %s" % (code, last))
                 player.request(last, now=True)
-            state = player.step()
-            lcd.show()
-            # idx 2 = the first frame after an idle loop (re)starts: decide what follows it
-            if state == IDLE and player.idx == 2 and player.pending == IDLE \
-                    and os.urandom(1)[0] * 100 < GESTURE_CHANCE * 256:
+            elif player.state == IDLE and player.pending == IDLE and time.ticks_diff(t, idle_at) > dwell:
                 last = pick(last)
-                player.request(last)
+                player.request(last, now=True)
+            was = player.state
+            state = player.step()
+            if state == IDLE and was != IDLE:
+                idle_at = time.ticks_ms()  # dwell restarts when a gesture hands back to idle
+                dwell = DWELL_MS[0] + os.urandom(1)[0] * (DWELL_MS[1] - DWELL_MS[0]) // 255
+            lcd.show()
             time.sleep_ms(max(0, player.period_ms - time.ticks_diff(time.ticks_ms(), t)))
     except KeyboardInterrupt:
         pass
