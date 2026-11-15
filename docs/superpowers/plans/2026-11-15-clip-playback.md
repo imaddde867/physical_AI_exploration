@@ -43,21 +43,22 @@ Blender PNG sequence -> RGB565 with ordered dither -> keyframe plus per-frame de
 - Render the real PNGs (not the H.264 previews) for `watch` and `look-around` first.
 - Bake dithering here; it costs nothing on the device. Keep backgrounds at exact `0x0000`. Avoid large dark gradients (RGB565 bands).
 - Report per clip: size, mean and peak delta bytes per frame, at 12 and 24 fps.
-- **Go:** every clip is at most 2 MB at 24 fps, and the exporter has a host-side decode test that reproduces the dithered source frames exactly.
-- **No-go action:** lower the frame rate to 12 to 15 fps, shrink the rendered area (the character covers 240x238 of 280 rows), or trim states.
+- **Go (amended 2026-11-15):** all 8 clips fit in flash with room, and the exporter has a host-side decode test that reproduces the dithered source frames exactly. The original "each clip at most 2 MB at 24 fps" was not met and 24 fps is unmeasured.
+- **No-go action:** lower the frame rate to 12 to 15 fps, shrink the rendered area, or trim states.
+- **Result (done, `animation/clip_export.py`, 7 tests pass):** 12 fps, hold threshold 6, luma threshold 14. All 8 states total 11.2 MB vs 15.5 MB free. Per clip MB: watch 0.44, scratch 0.59, lean_in 0.80, lean_back 0.92, look_right 1.93, look_left 2.02, shift 2.17, look_around 2.36. Peak delta 13 to 65 KB per frame (look_* 56 to 65 KB), not the ~12 KB assumed above.
+- **Findings:** about 29% of pixels flicker by 1 to 2/255 per frame (render noise; the hold threshold removes it). A shading gradient drifting 7 to 20/255 across the body while it moves is the real cost (the luma threshold). The character spans rows 21 to 279, not 238 rows. Pinning key light and AO to world space in the .blend might cut sizes further (not tried).
 
 ### Stage 1: Player prototype on the board
 
 `look-around` from flash, viper apply into the one framebuffer, `show()`. Time read, apply and show separately over 1000 frames. Do not replace `main.py`; use `mpremote run`.
 
-- **Go for 24 fps:** p95 total under 38 ms, heap at least 20 KB free.
-- **Fallback:** 12 to 15 fps with p95 under 70 ms.
+- **Go:** 12 fps (target after Stage 0): p95 total under ~70 ms, heap at least 20 KB free. Peak deltas of 56 to 65 KB mean about 9 ms read + 22 ms show before apply, so 24 fps (p95 under 38 ms) is doubtful; try it only to record the number.
 - **If apply time is the miss:** go to Stage 4.
 - Needs a look at the panel: no tearing artefacts, no stale pixels after loop wrap.
 
 ### Stage 2: Eight-state machine and badge strip
 
-All eight states, switching at the shared idle boundary pose. Badge strip drawn procedurally in the rows the character does not use (about 40 px free, M).
+All eight states, switching at the shared idle boundary pose. Badge strip drawn procedurally in the rows the character does not use (about 20 px free: the character spans rows 21 to 279).
 
 - **Go:** no visible glitch at state switches; a 30-minute run with no heap drift (record `gc.mem_free()` at start and end); flash holds all clips.
 
