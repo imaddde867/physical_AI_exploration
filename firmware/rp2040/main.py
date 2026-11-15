@@ -211,7 +211,9 @@ def run():
             # Accumulate short tick differences so long runs survive clock wraparound.
             phase += elapsed
             if phase >= period:
-                phase, period = phase - period, random.randint(*BLINK_RANGE_MS)
+                # one blink in four is a quick double
+                phase, period = phase - period, (BLINK_MS + 160 if random.randint(0, 3) == 0
+                                                 else random.randint(*BLINK_RANGE_MS))
             previous = now
             reader.tick(elapsed)
             if hold_ms:
