@@ -1,7 +1,7 @@
 """Write a livelier copy of the anchored scene: stronger idle and gesture head motion, still planted.
 
 Run: Blender --background animation/crying-head-2-anchored.blend --python animation/amplify_states.py -- \
-       --output animation/tmp/lively.blend [--idle 4] [--gesture 1.6]
+       --output animation/tmp/lively.blend [--idle 3] [--gesture 1.6]
 
 Only the head ('Basic') channels of each ANCHORED action change; the eight IK-planted limbs follow.
 Each gesture gain is capped by the same reach test anchor_contacts.py used, so contacts stay valid.
@@ -42,7 +42,7 @@ def compose(w0, w, s, idle, gain):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--idle', type=float, default=4.0, help='idle living-motion gain (1 = unchanged)')
+    parser.add_argument('--idle', type=float, default=3.0, help='idle living-motion gain (1 = unchanged)')
     parser.add_argument('--gesture', type=float, default=1.6, help='gesture amplitude gain (1 = unchanged)')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
     if args.output.exists():
