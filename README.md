@@ -4,14 +4,13 @@ A slim display companion beside a 14" MacBook Pro lid, with silver framing and b
 
 Start with the [current product brief](docs/product-brief.md): approved direction, first-version scope, open decisions, and next steps. The physical appearance was approved on 2026-11-04; electronics fit and print readiness remain unresolved. The ordered bench prototype is the Waveshare RP2040-Touch-LCD-1.69; final enclosure hardware is not frozen.
 
-Current character: [planted 3D character and animation handoff](animation/README.md).
+Current face: two simple eyes (blink, gaze) drawn live on the board; the visual identity is still to be designed. The 3D skeleton/clip-playback work is archived at git tag `archive/clip-playback`.
 Hardware next step: [ordered prototype bring-up](docs/hardware/shortlist-handoff.md).
 
 | Area | Current entry point | Status |
 |---|---|---|
 | Physical design | [CAD decisions and commands](cad/slab/DECISIONS.md) | Approved appearance; concept geometry |
-| Character | [Blender library](animation/README.md) | Eight validated states, planted claw contacts, 30 FPS exports |
-| Earlier face experiments | `sim/` and `experiments/occupant_idle.py` | Approved 2D checkpoint retained |
+| Face experiments | `sim/` and `experiments/hello_buddy.py` | Simple eyes; placeholder identity |
 | Hardware | [Bring-up log](docs/hardware/bringup-log.md), [Mac measurements](docs/hardware/measure-mac.md) | Waveshare RP2040-Touch-LCD-1.69 delivered and flashed 2026-11-12; bench measurements recorded 2026-11-14 (see the [bring-up log](docs/hardware/bringup-log.md)) |
 | Device prototype | [Local blink setup](firmware/rp2040/README.md) | MicroPython blink loaded on the board 2026-11-12; restore after the 2026-11-14 benchmark verified byte-for-byte |
 | Communication | [Draft protocol](docs/protocol.md), `daemon/protocol.py` | Codec, line transport and the Buddy OS core (`daemon/arbiter.py`, `reconciler.py`, `host.py`) tested without hardware; no module is wired to the real port yet. USB throughput measured 2026-11-14: 103-115 KB/s, MicroPython CDC receive path is the bottleneck - see the [bring-up log](docs/hardware/bringup-log.md) |
