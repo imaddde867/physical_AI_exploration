@@ -83,13 +83,16 @@ class ClipPlayer:
         self.f = None
         self.state = None
         self.pending = IDLE
+        self.cut = False
         self.idx = self.total = self.loop_off = 0
         self.period_ms = 83
 
-    def request(self, state):
+    def request(self, state, now=False):
+        """Queue `state` for the next loop boundary; now=True jump-cuts from idle (touch reactivity)."""
         if state not in STATES:
             raise ValueError("unknown state " + str(state))
         self.pending = state
+        self.cut = now and self.state == IDLE and state != IDLE
 
     def _open(self, state):
         if self.f:
@@ -125,7 +128,8 @@ class ClipPlayer:
 
     def step(self):
         """Apply the next frame. Returns the state it belongs to."""
-        if self.f is None or self.idx >= self.total:
+        if self.f is None or self.idx >= self.total or self.cut:
+            self.cut = False
             nxt, self.pending = self.pending, IDLE  # a gesture plays once, then idle
             if nxt == IDLE and self.state == IDLE:
                 self.f.seek(self.loop_off)  # idle loops without redrawing the keyframe

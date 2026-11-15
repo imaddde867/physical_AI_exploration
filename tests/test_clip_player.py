@@ -77,5 +77,25 @@ class PlayerTest(unittest.TestCase):
             last = state
 
 
+class CutTest(unittest.TestCase):
+    setUp, tearDown, player = PlayerTest.setUp, PlayerTest.tearDown, PlayerTest.player
+
+    def test_cut_from_idle_jumps_straight_to_gesture_keyframe(self):
+        p = self.p = self.player()
+        p.step()
+        p.step()
+        p.request("scratch", now=True)
+        self.assertEqual(p.step(), "scratch")
+        self.assertEqual(bytes(self.fb), self.ref["scratch"][0])
+
+    def test_cut_is_ignored_mid_gesture(self):
+        p = self.p = self.player()
+        p.request("scratch")
+        p.step()
+        p.step()
+        p.request("watch", now=True)  # idle never cuts; gestures finish first
+        self.assertEqual(p.step(), "scratch")
+
+
 if __name__ == "__main__":
     unittest.main()

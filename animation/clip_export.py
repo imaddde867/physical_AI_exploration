@@ -26,6 +26,7 @@ MERGE_GAP = 2
 BLACK = 3  # sources with every channel <= this become exact 0x0000 (no dithered glow)
 DARK = 40  # channel level below which hold thresholds tighten
 BLACK_POINT = 8  # source levels <= this become exact black
+SATURATION = 1.3  # >1 pushes colour away from grey
 GAMMA = (1.05, 1.2, 1.2)  # r, g, b: heavier on g/b deepens and saturates the reds
 BAYER4 = ((0, 8, 2, 10), (12, 4, 14, 6), (3, 11, 1, 9), (15, 7, 13, 5))
 
@@ -164,10 +165,19 @@ def tone_luts(black=BLACK_POINT, gamma=GAMMA):
             for g in gamma]
 
 
-def tone(rgb, luts):
+def tone(rgb, luts, saturation=SATURATION):
     out = bytearray(len(rgb))
     for c in range(3):
         out[c::3] = rgb[c::3].translate(luts[c])
+    k = round(saturation * 256)
+    if k != 256:
+        for i in range(0, len(out), 3):
+            r, g, b = out[i], out[i + 1], out[i + 2]
+            if r or g or b:  # pure black stays pure black
+                y = (2 * r + 5 * g + b) >> 3
+                out[i] = min(255, max(0, y + ((r - y) * k >> 8)))
+                out[i + 1] = min(255, max(0, y + ((g - y) * k >> 8)))
+                out[i + 2] = min(255, max(0, y + ((b - y) * k >> 8)))
     return bytes(out)
 
 
@@ -200,7 +210,7 @@ def hold_noise(prev, cur, threshold, luma_threshold=None):
     return bytes(out)
 
 
-def load_frames(folder, step=1, threshold=0, luma_threshold=None, black=BLACK_POINT, gamma=GAMMA):
+def load_frames(folder, step=1, threshold=0, luma_threshold=None, black=BLACK_POINT, gamma=GAMMA, saturation=SATURATION):
     files = sorted(Path(folder).glob("frame-*.png"))[::step]
     raw, size = [], None
     luts = tone_luts(black, gamma)
@@ -209,7 +219,7 @@ def load_frames(folder, step=1, threshold=0, luma_threshold=None, black=BLACK_PO
         if size not in (None, (w, h)):
             raise ValueError(f"{f}: size changed mid-sequence")
         size = (w, h)
-        raw.append(tone(rgb, luts))
+        raw.append(tone(rgb, luts, saturation))
     held = None
     for lap in range(2 if threshold else 1):  # lap 2 starts from the end state so the loop wrap is held too
         held_frames = []
@@ -227,10 +237,11 @@ def main():
     ap.add_argument("--luma-threshold", type=int, default=None, help="looser brightness-only hold (default = --threshold)")
     ap.add_argument("--black", type=int, default=BLACK_POINT, help="source levels <= this become pure black")
     ap.add_argument("--gamma", type=float, nargs=3, default=GAMMA, metavar=("R", "G", "B"), help="per-channel gamma (>1 deepens)")
+    ap.add_argument("--saturation", type=float, default=SATURATION, help="colour boost around grey (1 = off)")
     ap.add_argument("--output", type=Path, required=True, help="new .clp file")
     a = ap.parse_args()
     frames, (w, h) = load_frames(a.folder, step=24 // a.fps, threshold=a.threshold, luma_threshold=a.luma_threshold,
-                                  black=a.black, gamma=a.gamma)
+                                  black=a.black, gamma=a.gamma, saturation=a.saturation)
     blob, sizes = encode_clip(frames, w, h, a.fps)
     if decode_clip(blob)[3] != frames + [frames[0]]:
         sys.exit("decode check failed")

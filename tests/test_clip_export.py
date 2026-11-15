@@ -96,7 +96,7 @@ class ClipExportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             for k, px in enumerate(synthetic(1)):
                 write_png(Path(d) / f"frame-{k:04d}.png", px, filter_type=k % 2)
-            frames, size = load_frames(d, black=0, gamma=(1, 1, 1))  # identity tone curve
+            frames, size = load_frames(d, black=0, gamma=(1, 1, 1), saturation=1)  # identity tone curve
             self.assertEqual(size, (W, H))
             want = [dither565(W, H, px) for px in synthetic(1)]
             self.assertEqual(frames, want)  # PNG decode incl. Sub filter is exact
