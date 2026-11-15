@@ -24,6 +24,9 @@ MAGIC = b"CLP1"
 # costs more than re-sending the gap (2 B per pixel).
 MERGE_GAP = 2
 BLACK = 3  # sources with every channel <= this become exact 0x0000 (no dithered glow)
+DARK = 40  # channel level below which hold thresholds tighten
+BLACK_POINT = 8  # source levels <= this become exact black
+GAMMA = (1.05, 1.2, 1.2)  # r, g, b: heavier on g/b deepens and saturates the reds
 BAYER4 = ((0, 8, 2, 10), (12, 4, 14, 6), (3, 11, 1, 9), (15, 7, 13, 5))
 
 
@@ -155,6 +158,19 @@ def decode_clip(blob):
     return w, h, fps, frames
 
 
+def tone_luts(black=BLACK_POINT, gamma=GAMMA):
+    """One 256-entry table per channel: crush to a true black, then a per-channel gamma."""
+    return [bytes(0 if v <= black else round(255 * ((v - black) / (255 - black)) ** g) for v in range(256))
+            for g in gamma]
+
+
+def tone(rgb, luts):
+    out = bytearray(len(rgb))
+    for c in range(3):
+        out[c::3] = rgb[c::3].translate(luts[c])
+    return bytes(out)
+
+
 def hold_noise(prev, cur, threshold, luma_threshold=None):
     """Keep prev's value for every pixel that barely changed.
 
@@ -172,24 +188,28 @@ def hold_noise(prev, cur, threshold, luma_threshold=None):
     for i in range(0, len(cur), 3):
         r, g, b = cur[i], cur[i + 1], cur[i + 2]
         pr, pg, pb = prev[i], prev[i + 1], prev[i + 2]
-        if abs(r - pr) <= threshold and abs(g - pg) <= threshold and abs(b - pb) <= threshold:
+        if bool(r or g or b) != bool(pr or pg or pb):
+            continue  # entering or leaving pure black is an edge moving: never hold, or it ghosts
+        t = threshold if max(pr, pg, pb) >= DARK else min(threshold, 3)  # small steps show in the dark
+        if abs(r - pr) <= t and abs(g - pg) <= t and abs(b - pb) <= t:
             out[i:i + 3] = prev[i:i + 3]
-        elif lt > threshold:
+        elif lt > t and max(pr, pg, pb) >= DARK:
             y, py = (2 * r + 5 * g + b) >> 3, (2 * pr + 5 * pg + pb) >> 3
-            if abs(y - py) <= lt and abs((r - y) - (pr - py)) <= threshold and abs((b - y) - (pb - py)) <= threshold:
+            if abs(y - py) <= lt and abs((r - y) - (pr - py)) <= t and abs((b - y) - (pb - py)) <= t:
                 out[i:i + 3] = prev[i:i + 3]
     return bytes(out)
 
 
-def load_frames(folder, step=1, threshold=0, luma_threshold=None):
+def load_frames(folder, step=1, threshold=0, luma_threshold=None, black=BLACK_POINT, gamma=GAMMA):
     files = sorted(Path(folder).glob("frame-*.png"))[::step]
     raw, size = [], None
+    luts = tone_luts(black, gamma)
     for f in files:
         w, h, rgb = read_png(f)
         if size not in (None, (w, h)):
             raise ValueError(f"{f}: size changed mid-sequence")
         size = (w, h)
-        raw.append(rgb)
+        raw.append(tone(rgb, luts))
     held = None
     for lap in range(2 if threshold else 1):  # lap 2 starts from the end state so the loop wrap is held too
         held_frames = []
@@ -205,9 +225,12 @@ def main():
     ap.add_argument("--fps", type=int, choices=(6, 8, 12, 24), required=True)
     ap.add_argument("--threshold", type=int, default=3, help="hold pixels that moved <= this (0-255); 0 disables")
     ap.add_argument("--luma-threshold", type=int, default=None, help="looser brightness-only hold (default = --threshold)")
+    ap.add_argument("--black", type=int, default=BLACK_POINT, help="source levels <= this become pure black")
+    ap.add_argument("--gamma", type=float, nargs=3, default=GAMMA, metavar=("R", "G", "B"), help="per-channel gamma (>1 deepens)")
     ap.add_argument("--output", type=Path, required=True, help="new .clp file")
     a = ap.parse_args()
-    frames, (w, h) = load_frames(a.folder, step=24 // a.fps, threshold=a.threshold, luma_threshold=a.luma_threshold)
+    frames, (w, h) = load_frames(a.folder, step=24 // a.fps, threshold=a.threshold, luma_threshold=a.luma_threshold,
+                                  black=a.black, gamma=a.gamma)
     blob, sizes = encode_clip(frames, w, h, a.fps)
     if decode_clip(blob)[3] != frames + [frames[0]]:
         sys.exit("decode check failed")

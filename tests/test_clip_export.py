@@ -5,7 +5,7 @@ import unittest
 import zlib
 from pathlib import Path
 
-from animation.clip_export import (dither565, decode_clip, encode_clip, hold_noise, load_frames,
+from animation.clip_export import (dither565, decode_clip, encode_clip, hold_noise, load_frames, tone, tone_luts,
                                    read_png)
 
 W, H = 40, 30
@@ -96,7 +96,7 @@ class ClipExportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             for k, px in enumerate(synthetic(1)):
                 write_png(Path(d) / f"frame-{k:04d}.png", px, filter_type=k % 2)
-            frames, size = load_frames(d)
+            frames, size = load_frames(d, black=0, gamma=(1, 1, 1))  # identity tone curve
             self.assertEqual(size, (W, H))
             want = [dither565(W, H, px) for px in synthetic(1)]
             self.assertEqual(frames, want)  # PNG decode incl. Sub filter is exact
@@ -127,6 +127,18 @@ class ClipExportTests(unittest.TestCase):
         b[70000 * 2:] = b"\x12\x34" * (w * h - 70000)
         blob, _ = encode_clip([a, bytes(b)], w, h, 12)
         self.assertEqual(decode_clip(blob)[3], [a, bytes(b), a])
+
+
+class ToneAndEdgeTests(unittest.TestCase):
+    def test_edge_pixel_going_black_is_never_held(self):
+        # dark body pixel -> background black used to be held (ghost trailing a moving edge)
+        self.assertEqual(hold_noise(bytes([20, 12, 10]), bytes(3), 6, 14), bytes(3))
+        self.assertEqual(hold_noise(bytes(3), bytes([20, 12, 10]), 6, 14), bytes([20, 12, 10]))
+
+    def test_tone_curve_gives_true_black_and_keeps_red_over_green(self):
+        out = tone(bytes([8, 8, 8, 200, 200, 200]), tone_luts())
+        self.assertEqual(out[:3], bytes(3))
+        self.assertGreater(out[3], out[4])
 
 
 if __name__ == "__main__":
