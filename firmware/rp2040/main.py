@@ -10,6 +10,10 @@ WIDTH, HEIGHT = 240, 280
 EYE_R, EYE_DX, BLINK_MS, BLINK_EVERY_MS = 18, 42, 140, 4000
 GAZE_PX = 20  # eye travel at |x| or |y| = 1
 GAZE_EASE = 0.3  # share of the remaining gap closed per 20 ms tick
+BLINK_RANGE_MS = (2500, 6000)  # idle blinks are irregular
+WANDER_RANGE_MS = (1200, 3500)  # idle glance interval
+WANDER_AMP = 0.7  # idle glance reach, as a share of GAZE_PX
+HOST_GAZE_MS = 5000  # the host's gaze wins for this long after its last x/y
 HOLD_MS = 2000  # a host-held blink releases itself, so a dead sender cannot freeze it
 MAX_CHARS_PER_TICK = 256  # caps input work per tick; frame timing under a flood is not measured
 PARTIAL_LINE_MS = 1000  # a half-received line is discarded after this much silence
@@ -175,6 +179,7 @@ def draw(lcd, blink, gx=0, gy=0):
 
 def run():
     import gc
+    import random
     import select
     import sys
     import time
@@ -199,11 +204,16 @@ def run():
         gaze = [0.0, 0.0]
         hello = [make_hello()]
         eased = [0.0, 0.0]
+        period, host_ms, wander, glance_ms = BLINK_EVERY_MS, 0, [0.0, 0.0], 0
         while True:
             now = time.ticks_ms()
             elapsed = time.ticks_diff(now, previous)
             # Accumulate short tick differences so long runs survive clock wraparound.
-            phase = (phase + elapsed) % BLINK_EVERY_MS
+            phase += elapsed
+            if phase >= period:
+                # one blink in four is a quick double
+                phase, period = phase - period, (BLINK_MS + 160 if random.randint(0, 3) == 0
+                                                 else random.randint(*BLINK_RANGE_MS))
             previous = now
             reader.tick(elapsed)
             if hold_ms:
@@ -224,15 +234,24 @@ def run():
                     sys.stdout.write(_line({"v": 1, "t": "err", "code": "too_long"}))
                     replied += 1
                     continue
+                before = gaze[:]
                 reply, hold = handle(line, gaze, hello)
+                if gaze != before:
+                    host_ms = HOST_GAZE_MS
                 if hold is not None:
                     hold_ms = hold
                     if not hold:
                         phase = BLINK_MS  # reopen now, and start a fresh four-second cycle
                 sys.stdout.write(reply)
                 replied += 1
+            host_ms = max(0, host_ms - elapsed)
+            glance_ms -= elapsed
+            if glance_ms <= 0:
+                glance_ms = random.randint(*WANDER_RANGE_MS)
+                wander = [random.uniform(-WANDER_AMP, WANDER_AMP) for _ in (0, 1)]
+            aim = gaze if host_ms else wander
             for i in (0, 1):
-                eased[i] += (gaze[i] - eased[i]) * GAZE_EASE
+                eased[i] += (aim[i] - eased[i]) * GAZE_EASE
             blink = hold_ms > 0 or phase < BLINK_MS
             shown = (blink, round(eased[0] * GAZE_PX), round(eased[1] * GAZE_PX))
             if shown != last_drawn:

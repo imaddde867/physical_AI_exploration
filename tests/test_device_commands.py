@@ -201,9 +201,10 @@ class LoopTests(unittest.TestCase):
         def setWindows(self, x0, y0, x1, y1):
             pass
 
-    def loop(self, clock, *chunks):
+    def loop(self, clock, *chunks, uniform=0.0, randint=4000):
         stdin, out, drawn = FakeStdin(*chunks), io.StringIO(), []
-        modules = {"select": SimpleNamespace(POLLIN=1, poll=lambda: FakePoll(stdin)),
+        modules = {"random": SimpleNamespace(randint=lambda a, b: randint, uniform=lambda a, b: uniform),
+                   "select": SimpleNamespace(POLLIN=1, poll=lambda: FakePoll(stdin)),
                    "time": clock,
                    "gc": SimpleNamespace(collect=lambda: None, mem_free=lambda: 50000),
                    "waveshare_lcd": SimpleNamespace(LCD_1inch69=self.Display)}
@@ -218,6 +219,18 @@ class LoopTests(unittest.TestCase):
     def test_autonomous_blink_keeps_running_without_a_host(self):
         _, drawn = self.loop(Clock(step=20, ticks=210))
         self.assertEqual([d[:2] for d in drawn[:3]], [(0, False), (3860, True), (4000, False)])
+
+    def test_idle_eyes_glance_around_until_the_host_sets_a_gaze(self):
+        _, drawn = self.loop(Clock(step=20, ticks=300), uniform=0.7)
+        self.assertGreater(drawn[-1][2], 0)  # nobody is steering, so the eyes wander
+        _, drawn = self.loop(Clock(step=20, ticks=100), '{"v":1,"t":"face","x":-1,"y":0}\n', uniform=0.7)
+        self.assertLess(drawn[-1][2], 0)  # the host's gaze beats the wander
+
+    def test_some_idle_blinks_come_as_a_quick_double(self):
+        _, drawn = self.loop(Clock(step=20, ticks=260), randint=0)
+        blinks = [t for (t, b, *_), (_, pb, *_) in zip(drawn[1:], drawn) if b and not pb]
+        self.assertGreater(len(blinks), 1)
+        self.assertLess(blinks[1] - blinks[0], 600)
 
     def test_command_blinks_immediately_and_releases_after_two_seconds(self):
         # 50 ms ticks: a per-tick countdown would take 2000 ticks, not 40, so this fails loudly.
