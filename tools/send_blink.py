@@ -11,6 +11,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from daemon import protocol
+from daemon.port import open_raw  # noqa: F401  (re-exported for buddy_service)
 
 DEFAULT_PORT = "/dev/cu.usbmodem1101"
 REPLY_WAIT_S = 0.5
@@ -57,20 +58,6 @@ def acks(replies):
             break
         count += 1
     return count
-
-
-def open_raw(path):
-    """The port, with echo and line translation off so JSON arrives unmodified."""
-    fd = os.open(path, os.O_RDWR | os.O_NOCTTY)
-    saved = termios.tcgetattr(fd)
-    raw = saved[:]
-    raw[0] &= ~(termios.IGNBRK | termios.BRKINT | termios.PARMRK | termios.ISTRIP
-                | termios.INLCR | termios.IGNCR | termios.ICRNL | termios.IXON)
-    raw[1] &= ~termios.OPOST
-    raw[2] = (raw[2] & ~(termios.CSIZE | termios.PARENB)) | termios.CS8
-    raw[3] &= ~(termios.ECHO | termios.ECHONL | termios.ICANON | termios.ISIG | termios.IEXTEN)
-    termios.tcsetattr(fd, termios.TCSANOW, raw)
-    return fd, saved
 
 
 def main(argv):
